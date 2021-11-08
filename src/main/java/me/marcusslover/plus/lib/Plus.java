@@ -1,4 +1,4 @@
-package me.marcusslover.plus.lib.plus;
+package me.marcusslover.plus.lib;
 
 import me.marcusslover.plus.PlusPlugin;
 import org.bukkit.plugin.Plugin;

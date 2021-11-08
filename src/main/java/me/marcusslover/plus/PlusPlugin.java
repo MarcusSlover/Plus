@@ -1,6 +1,6 @@
 package me.marcusslover.plus;
 
-import me.marcusslover.plus.lib.plus.Plus;
+import me.marcusslover.plus.lib.Plus;
 import me.marcusslover.plus.test.WorldConfig;
 import me.marcusslover.plus.test.WorldJson;
 import org.bukkit.plugin.java.JavaPlugin;
