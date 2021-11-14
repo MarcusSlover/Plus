@@ -1,6 +1,7 @@
 package me.marcusslover.plus;
 
 import me.marcusslover.plus.lib.Plus;
+import me.marcusslover.plus.lib.json.JsonWrapper;
 import me.marcusslover.plus.test.WorldConfig;
 import me.marcusslover.plus.test.WorldJson;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -15,8 +16,10 @@ public class PlusPlugin extends JavaPlugin {
         if (!dataFolder.exists()) dataFolder.mkdirs();
 
         /*Test*/
-        WorldConfig config = new WorldConfig(Plus.file("world.yml"));
-        WorldJson json = new WorldJson(Plus.file("world.json"));
+        WorldConfig worldConfig = new WorldConfig(Plus.file("world.yml"));
+        WorldJson worldJson = new WorldJson(Plus.file("world.json"));
+        JsonWrapper json = new JsonWrapper(worldJson.getJsonElement());
+
 
 
     }

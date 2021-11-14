@@ -14,6 +14,11 @@ public class ConfigFile extends AbstractFile {
     }
 
     @Override
+    public boolean isSet(String key) {
+        return yamlConfiguration.isSet(key);
+    }
+
+    @Override
     public void load() {
         yamlConfiguration = YamlConfiguration.loadConfiguration(file);
     }

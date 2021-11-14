@@ -3,7 +3,7 @@ package me.marcusslover.plus.lib.file;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import me.marcusslover.plus.lib.util.JsonUtil;
+import me.marcusslover.plus.lib.json.JsonUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -20,6 +20,15 @@ public class JsonFile extends AbstractFile {
 
     public JsonFile(@NotNull File file) {
         super(file);
+    }
+
+    @Override
+    public boolean isSet(String key) {
+        if (jsonElement == null) return false;
+        if (jsonElement instanceof JsonObject jsonObject) {
+            return jsonObject.has(key);
+        }
+        return false;
     }
 
     public void setGson(@Nullable Gson gson) {

@@ -1,4 +1,4 @@
-package me.marcusslover.plus.lib.util;
+package me.marcusslover.plus.lib.json;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

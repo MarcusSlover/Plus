@@ -19,6 +19,8 @@ public abstract class AbstractFile implements IFile {
         this.file = file;
     }
 
+    public abstract boolean isSet(String key);
+
     @NotNull
     public File getFile() {
         return file;
