@@ -13,17 +13,14 @@ targetCompatibility = JavaVersion.VERSION_16
 repositories {
     mavenCentral()
     maven {
-        url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
-        content {
-            includeGroup 'org.bukkit'
-            includeGroup 'org.spigotmc'
-        }
+        name = "papermc"
+        url = 'https://papermc.io/repo/repository/maven-public/'
     }
 }
 
 dependencies {
     compileOnly 'org.jetbrains:annotations:22.0.0'
-    compileOnly 'org.spigotmc:spigot-api:1.17.1-R0.1-SNAPSHOT'
+    compileOnly 'io.papermc.paper:paper-api:1.17.1-R0.1-SNAPSHOT'
 
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
@@ -34,8 +31,7 @@ tasks.withType(JavaCompile) {
 }
 
 java {
-    withJavadocJar()
-    withSourcesJar()
+    toolchain.languageVersion.set(JavaLanguageVersion.of(16))
 }
 
 

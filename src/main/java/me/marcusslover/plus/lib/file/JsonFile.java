@@ -3,7 +3,7 @@ package me.marcusslover.plus.lib.file;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import me.marcusslover.plus.lib.json.JsonUtil;
+import com.google.gson.JsonParser;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -39,7 +39,7 @@ public class JsonFile extends AbstractFile {
     public void load() {
         try {
             FileReader reader = new FileReader(file);
-            jsonElement = JsonUtil.PARSER.parse(reader);
+            jsonElement = JsonParser.parseReader(reader);
             reader.close();
         } catch (IOException e) {
             e.printStackTrace();
