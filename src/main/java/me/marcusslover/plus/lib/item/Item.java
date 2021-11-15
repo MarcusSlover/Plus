@@ -2,11 +2,12 @@ package me.marcusslover.plus.lib.item;
 
 import me.marcusslover.plus.lib.text.Text;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -69,6 +70,34 @@ public class Item {
         return itemStack.getAmount();
     }
 
+    public Item setDamage(int damage) {
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        if (itemMeta instanceof Damageable damageable) {
+            damageable.setDamage(damage);
+        }
+        itemStack.setItemMeta(itemMeta);
+        return this;
+    }
+
+    public Item setDamagePercent(double percent) {
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        if (itemMeta instanceof Damageable damageable) {
+            double max = itemStack.getType().getMaxDurability();
+            double damage = max * percent / 100;
+            damageable.setDamage((int) Math.max(0, damage));
+        }
+        itemStack.setItemMeta(itemMeta);
+        return this;
+    }
+
+    public int getDamage() {
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        if (itemMeta instanceof Damageable damageable) {
+            return damageable.getDamage();
+        }
+        return 0;
+    }
+
     public int getEnchant(Enchantment enchantment) {
         return itemStack.getEnchantmentLevel(enchantment);
     }
@@ -80,6 +109,38 @@ public class Item {
     public Item setEnchant(Enchantment enchantment, int level) {
         if (level <= 0) itemStack.removeEnchantment(enchantment);
         else itemStack.addUnsafeEnchantment(enchantment, level);
+        return this;
+    }
+
+    public Item setColor(@Nullable Color color) {
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        if (itemMeta instanceof PotionMeta potionMeta) {
+            potionMeta.setColor(color);
+        }
+        if (itemMeta instanceof MapMeta meta) {
+            meta.setColor(color);
+        }
+        if (itemMeta instanceof PotionMeta meta) {
+            meta.setColor(color);
+        }
+        if (itemMeta instanceof LeatherArmorMeta meta) {
+            meta.setColor(color);
+        }
+        itemStack.setItemMeta(itemMeta);
+        return this;
+    }
+
+    public Item addItemFlag(ItemFlag itemFlag) {
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        itemMeta.addItemFlags(itemFlag);
+        itemStack.setItemMeta(itemMeta);
+        return this;
+    }
+
+    public Item removeItemFlag(ItemFlag itemFlag) {
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        itemMeta.removeItemFlags(itemFlag);
+        itemStack.setItemMeta(itemMeta);
         return this;
     }
 
@@ -182,7 +243,6 @@ public class Item {
         itemStack.setItemMeta(itemMeta);
         return this;
     }
-
 
     @NotNull
     public ItemStack getItemStack() {
