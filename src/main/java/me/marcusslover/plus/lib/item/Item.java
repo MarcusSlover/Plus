@@ -1,7 +1,10 @@
 package me.marcusslover.plus.lib.item;
 
+import com.destroystokyo.paper.profile.PlayerProfile;
+import com.destroystokyo.paper.profile.ProfileProperty;
 import me.marcusslover.plus.lib.text.Text;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -12,7 +15,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
+import java.util.UUID;
 
 public class Item {
     @NotNull
@@ -74,8 +79,8 @@ public class Item {
         ItemMeta itemMeta = itemStack.getItemMeta();
         if (itemMeta instanceof Damageable damageable) {
             damageable.setDamage(damage);
+            itemStack.setItemMeta(damageable);
         }
-        itemStack.setItemMeta(itemMeta);
         return this;
     }
 
@@ -85,8 +90,8 @@ public class Item {
             double max = itemStack.getType().getMaxDurability();
             double damage = max * percent / 100;
             damageable.setDamage((int) Math.max(0, damage));
+            itemStack.setItemMeta(damageable);
         }
-        itemStack.setItemMeta(itemMeta);
         return this;
     }
 
@@ -114,19 +119,21 @@ public class Item {
 
     public Item setColor(@Nullable Color color) {
         ItemMeta itemMeta = itemStack.getItemMeta();
-        if (itemMeta instanceof PotionMeta potionMeta) {
-            potionMeta.setColor(color);
+        if (itemMeta instanceof PotionMeta meta) {
+            meta.setColor(color);
+            itemStack.setItemMeta(meta);
+            return this;
         }
         if (itemMeta instanceof MapMeta meta) {
             meta.setColor(color);
-        }
-        if (itemMeta instanceof PotionMeta meta) {
-            meta.setColor(color);
+            itemStack.setItemMeta(meta);
+            return this;
         }
         if (itemMeta instanceof LeatherArmorMeta meta) {
             meta.setColor(color);
+            itemStack.setItemMeta(meta);
+            return this;
         }
-        itemStack.setItemMeta(itemMeta);
         return this;
     }
 
@@ -164,8 +171,7 @@ public class Item {
 
     public Item setUnbreakable(boolean unbreakable) {
         ItemMeta itemMeta = itemStack.getItemMeta();
-        if (!unbreakable) itemMeta.setUnbreakable(false);
-        else itemMeta.setUnbreakable(true);
+        itemMeta.setUnbreakable(unbreakable);
         itemStack.setItemMeta(itemMeta);
         return this;
     }
@@ -242,6 +248,36 @@ public class Item {
         } else itemMeta.lore(null);
         itemStack.setItemMeta(itemMeta);
         return this;
+    }
+
+    public Item skull(PlayerProfile playerProfile) {
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        if (itemMeta instanceof SkullMeta skullMeta) {
+            skullMeta.setPlayerProfile(playerProfile);
+            itemStack.setItemMeta(skullMeta);
+        }
+        return this;
+    }
+
+    public Item skull(String url) {
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        if (itemMeta instanceof SkullMeta skullMeta) {
+            String texture = new String(getEncodedTexture(url));
+            int len = texture.length();
+            UUID uuid = new UUID(texture.substring(len - 20).hashCode(), texture.substring(len - 10).hashCode());
+
+            PlayerProfile profile = Bukkit.createProfile(uuid, null);
+            ProfileProperty property = new ProfileProperty("textures", texture);
+            profile.setProperty(property);
+            skullMeta.setPlayerProfile(profile);
+            itemStack.setItemMeta(skullMeta);
+        }
+        return this;
+    }
+
+    private byte[] getEncodedTexture(String url) {
+        Base64.Encoder encoder = Base64.getEncoder();
+        return encoder.encode(String.format("{textures:{SKIN:{url:\"%s\"}}}", url).getBytes());
     }
 
     @NotNull
