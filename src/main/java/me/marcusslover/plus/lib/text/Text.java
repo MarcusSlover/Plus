@@ -4,6 +4,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.bukkit.command.CommandSender;
 
 public class Text {
     private static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.builder()
@@ -62,6 +63,11 @@ public class Text {
 
     public static Text reset() {
         return new Text("&f");
+    }
+
+    public Text send(CommandSender sender) {
+        sender.sendMessage(comp());
+        return this;
     }
 
 }
