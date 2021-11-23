@@ -64,11 +64,11 @@ public class JsonFile extends AbstractFile {
         }
     }
 
-    public void setJsonElement(JsonElement jsonElement) {
-        this.jsonElement = jsonElement;
-    }
-
     public JsonElement getJsonElement() {
         return jsonElement;
+    }
+
+    public void setJsonElement(JsonElement jsonElement) {
+        this.jsonElement = jsonElement;
     }
 }

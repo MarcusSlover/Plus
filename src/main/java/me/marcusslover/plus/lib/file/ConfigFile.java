@@ -32,11 +32,11 @@ public class ConfigFile extends AbstractFile {
         }
     }
 
-    public void setYamlConfiguration(YamlConfiguration yamlConfiguration) {
-        this.yamlConfiguration = yamlConfiguration;
-    }
-
     public YamlConfiguration getYamlConfiguration() {
         return yamlConfiguration;
+    }
+
+    public void setYamlConfiguration(YamlConfiguration yamlConfiguration) {
+        this.yamlConfiguration = yamlConfiguration;
     }
 }

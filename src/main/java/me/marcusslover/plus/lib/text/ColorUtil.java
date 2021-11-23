@@ -6,11 +6,10 @@ import org.jetbrains.annotations.NotNull;
 import java.util.regex.Pattern;
 
 public class ColorUtil {
-    private ColorUtil() {
-    }
-
     public static final Pattern HEX = Pattern.compile("&#([a-fA-F0-9]{6})");
     public static final char COLOR_CHAR = '\u00A7';
+    private ColorUtil() {
+    }
 
     @NotNull
     public static String hex(@NotNull String text) {
