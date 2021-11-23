@@ -14,7 +14,10 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface Command {
     String name();
+
     String description() default "";
+
     String permission() default "";
+
     String[] aliases() default {};
 }

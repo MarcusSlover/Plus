@@ -60,17 +60,12 @@ public class Item {
         this.itemStack = itemStack;
     }
 
-    public Item setType(Material material) {
-        itemStack.setType(material);
-        return this;
-    }
-
     public Material getType() {
         return itemStack.getType();
     }
 
-    public Item setAmount(int amount) {
-        itemStack.setAmount(Math.min(64, Math.max(0, amount)));
+    public Item setType(Material material) {
+        itemStack.setType(material);
         return this;
     }
 
@@ -78,12 +73,8 @@ public class Item {
         return itemStack.getAmount();
     }
 
-    public Item setDamage(int damage) {
-        ItemMeta itemMeta = itemStack.getItemMeta();
-        if (itemMeta instanceof Damageable damageable) {
-            damageable.setDamage(damage);
-            itemStack.setItemMeta(damageable);
-        }
+    public Item setAmount(int amount) {
+        itemStack.setAmount(Math.min(64, Math.max(0, amount)));
         return this;
     }
 
@@ -104,6 +95,15 @@ public class Item {
             return damageable.getDamage();
         }
         return 0;
+    }
+
+    public Item setDamage(int damage) {
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        if (itemMeta instanceof Damageable damageable) {
+            damageable.setDamage(damage);
+            itemStack.setItemMeta(damageable);
+        }
+        return this;
     }
 
     public int getEnchant(Enchantment enchantment) {
@@ -184,16 +184,16 @@ public class Item {
         return itemMeta.hasCustomModelData();
     }
 
+    public int getCustomModelData() {
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        return itemMeta.getCustomModelData();
+    }
+
     public Item setCustomModelData(int customModelData) {
         ItemMeta itemMeta = itemStack.getItemMeta();
         itemMeta.setCustomModelData(customModelData);
         itemStack.setItemMeta(itemMeta);
         return this;
-    }
-
-    public int getCustomModelData() {
-        ItemMeta itemMeta = itemStack.getItemMeta();
-        return itemMeta.getCustomModelData();
     }
 
     public boolean hasName() {
@@ -209,6 +209,13 @@ public class Item {
         return this;
     }
 
+    @Nullable
+    public Text getName() {
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        if (itemMeta.hasDisplayName()) return new Text(itemMeta.displayName());
+        return null;
+    }
+
     public Item setName(@Nullable String name) {
         ItemMeta itemMeta = itemStack.getItemMeta();
         if (name != null) {
@@ -217,13 +224,6 @@ public class Item {
         } else itemMeta.displayName(null);
         itemStack.setItemMeta(itemMeta);
         return this;
-    }
-
-    @Nullable
-    public Text getName() {
-        ItemMeta itemMeta = itemStack.getItemMeta();
-        if (itemMeta.hasDisplayName()) return new Text(itemMeta.displayName());
-        return null;
     }
 
     public boolean hasLore() {

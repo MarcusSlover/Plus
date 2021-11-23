@@ -14,11 +14,6 @@ public class Plus {
     }
 
     @NotNull
-    private Plugin plugin() {
-        return PlusPlugin.getPlugin(PlusPlugin.class);
-    }
-
-    @NotNull
     public static Plus get() {
         return instance == null ? new Plus() : instance;
     }
@@ -28,6 +23,11 @@ public class Plus {
         Plus plus = get();
         Plugin plugin = plus.plugin();
         return new File(plugin.getDataFolder(), path);
+    }
+
+    @NotNull
+    private Plugin plugin() {
+        return PlusPlugin.getPlugin(PlusPlugin.class);
     }
 
 
