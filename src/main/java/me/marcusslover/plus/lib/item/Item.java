@@ -56,6 +56,9 @@ public class Item {
         setName(name);
         setLore(lore);
     }
+    public Item(ItemStack itemStack) {
+        this.itemStack = itemStack;
+    }
 
     public Material getType() {
         return itemStack.getType();

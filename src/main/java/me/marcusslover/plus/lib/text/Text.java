@@ -4,6 +4,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.bukkit.command.CommandSender;
 
 public class Text {
     private static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.builder()
@@ -32,18 +33,6 @@ public class Text {
         this.component = component;
     }
 
-    public static String legacy(String text) {
-        return ColorUtil.color('&', text);
-    }
-
-    public static Text empty() {
-        return new Text("");
-    }
-
-    public static Text reset() {
-        return new Text("&f");
-    }
-
     public Text setHover(Text hover) {
         component.hoverEvent(HoverEvent.showText(hover.component));
         return this;
@@ -62,6 +51,23 @@ public class Text {
 
     public Component comp() {
         return component;
+    }
+
+    public static String legacy(String text) {
+        return ColorUtil.color('&', text);
+    }
+
+    public static Text empty() {
+        return new Text("");
+    }
+
+    public static Text reset() {
+        return new Text("&f");
+    }
+
+    public Text send(CommandSender sender) {
+        sender.sendMessage(comp());
+        return this;
     }
 
 }
