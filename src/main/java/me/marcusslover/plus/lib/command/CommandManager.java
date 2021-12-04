@@ -33,7 +33,7 @@ public class CommandManager {
 
         CommandMap commandMap = Bukkit.getCommandMap();
         commandMap.register(commandAnnotation.name(), prefix, new org.bukkit.command.Command(
-                name, description, null, aliases) {
+                name, description, "", aliases) {
             @Override
             public boolean execute(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] args) {
                 CommandContext commandContext = new CommandContext(sender, commandLabel, args);

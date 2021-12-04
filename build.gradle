@@ -25,23 +25,6 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
 }
 
-tasks.withType(JavaCompile) {
-    options.release.set(16)
-}
-
-java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(16))
-}
-
-
-test {
-    useJUnitPlatform()
-}
-
-shadowJar {
-    archiveFileName = "Plus-${version}.jar"
-}
-
 publishing {
     publications {
         mavenJava(MavenPublication) {
