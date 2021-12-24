@@ -21,6 +21,10 @@ public class CommandManager {
     }
 
     public CommandManager register(@NotNull ICommand command) {
+        return this.register("plus", command);
+    }
+
+    public CommandManager register(@NotNull String prefix, @NotNull ICommand command) {
         Command commandAnnotation = getCommandAnnotation(command);
         if (commandAnnotation == null) return this;
         String name = commandAnnotation.name();
@@ -28,8 +32,8 @@ public class CommandManager {
         List<String> aliases = Arrays.stream(commandAnnotation.aliases()).toList();
 
         CommandMap commandMap = Bukkit.getCommandMap();
-        commandMap.register(commandAnnotation.name(), "plus", new org.bukkit.command.Command(
-                name, description, null, aliases) {
+        commandMap.register(commandAnnotation.name(), prefix, new org.bukkit.command.Command(
+                name, description, "", aliases) {
             @Override
             public boolean execute(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] args) {
                 CommandContext commandContext = new CommandContext(sender, commandLabel, args);
