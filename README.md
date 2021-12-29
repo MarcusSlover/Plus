@@ -15,7 +15,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'me.marcusslover:plus:2.1'
+    compileOnly 'me.marcusslover.plus:plus:2.1'
 }
 ```
 ## 🦢 Maven
@@ -26,7 +26,7 @@ dependencies {
 </repository>
 
 <dependency>
-    <groupId>me.marcusslover</groupid>
+    <groupId>me.marcusslover.plus</groupid>
     <artifactId>plus</artifactId>
     <verison>2.1</version>
 </dependency>
