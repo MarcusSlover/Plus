@@ -3,6 +3,7 @@ package me.marcusslover.plus.lib.text;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.command.CommandSender;
 
@@ -30,7 +31,7 @@ public class Text {
 
     public Text(String text, Component component) {
         this.text = text;
-        this.component = component;
+        this.component = component.decoration(TextDecoration.ITALIC, false);
     }
 
     public Text setHover(Text hover) {
