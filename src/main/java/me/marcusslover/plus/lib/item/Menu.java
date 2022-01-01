@@ -60,6 +60,14 @@ public class Menu {
 
     }
 
+    public Inventory inventory() {
+        return this.inventory;
+    }
+
+    public int size() {
+        return this.inventory.getSize();
+    }
+
     public Menu set(int slot, Item item) {
         this.inventory.setItem(slot, item.getItemStack());
         return this;
