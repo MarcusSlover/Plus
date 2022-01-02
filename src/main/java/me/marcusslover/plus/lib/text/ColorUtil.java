@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 public class ColorUtil {
     public static final Pattern HEX = Pattern.compile("&#([a-fA-F0-9]{6})");
     public static final char COLOR_CHAR = '\u00A7';
+
     private ColorUtil() {
     }
 

@@ -6,6 +6,10 @@ import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.command.CommandSender;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class Text {
     private static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.builder()
@@ -34,6 +38,25 @@ public class Text {
         this.component = component.decoration(TextDecoration.ITALIC, false);
     }
 
+    @NotNull
+    public static List<Text> list(@NotNull List<Component> lore) {
+        return lore.stream().map(Text::new).collect(Collectors.toList());
+    }
+
+    public static String legacy(String text) {
+        return ColorUtil.color('&', text);
+    }
+
+    @NotNull
+    public static Text empty() {
+        return new Text("");
+    }
+
+    @NotNull
+    public static Text reset() {
+        return new Text("&f");
+    }
+
     public Text setHover(Text hover) {
         component.hoverEvent(HoverEvent.showText(hover.component));
         return this;
@@ -54,19 +77,8 @@ public class Text {
         return component;
     }
 
-    public static String legacy(String text) {
-        return ColorUtil.color('&', text);
-    }
-
-    public static Text empty() {
-        return new Text("");
-    }
-
-    public static Text reset() {
-        return new Text("&f");
-    }
-
-    public Text send(CommandSender sender) {
+    @NotNull
+    public Text send(@NotNull CommandSender sender) {
         sender.sendMessage(comp());
         return this;
     }

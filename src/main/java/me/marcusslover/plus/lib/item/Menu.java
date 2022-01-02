@@ -9,6 +9,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
@@ -24,6 +25,7 @@ public class Menu {
 
     protected Inventory inventory;
     protected LinkedList<ClickAdapter> clickAdapters;
+    protected boolean isCancelled = true;
 
     public Menu() {
         this(3 * 9);
@@ -34,10 +36,7 @@ public class Menu {
     }
 
     public Menu(int size, @Nullable String name) {
-        if (name == null) this.inventory = Bukkit.createInventory(null, size);
-        else this.inventory = Bukkit.createInventory(null, size, name);
-        this.clickAdapters = new LinkedList<>();
-        menus.add(this);
+        this(size, (name == null) ? null : new Text(name));
     }
 
     public Menu(int size, @Nullable Text text) {
@@ -60,6 +59,15 @@ public class Menu {
 
     }
 
+    public boolean isCancelled() {
+        return isCancelled;
+    }
+
+    public Menu setCancelled(boolean cancelled) {
+        isCancelled = cancelled;
+        return this;
+    }
+
     public Inventory inventory() {
         return this.inventory;
     }
@@ -68,23 +76,40 @@ public class Menu {
         return this.inventory.getSize();
     }
 
-    public Menu set(int slot, Item item) {
-        this.inventory.setItem(slot, item.getItemStack());
+    public Menu set(int slot, @Nullable Item item) {
+        return setItem(slot, item, null);
+    }
+
+    public Menu setItem(int slot, @Nullable Item item) {
+        return setItem(slot, item, null);
+    }
+
+    public Menu set(int slot, @Nullable Item item, @Nullable Consumer<InventoryClickEvent> event) {
+        return setItem(slot, item, event);
+    }
+
+    public Menu setItem(int slot, @Nullable Item item, @Nullable Consumer<InventoryClickEvent> event) {
+        if (item != null) this.inventory.setItem(slot, item.getItemStack());
+        if (event != null) return onClick(slot, event);
         return this;
     }
 
-    public Menu onClick(int slot, Consumer<InventoryClickEvent> event) {
+    public Menu onClick(@NotNull Consumer<InventoryClickEvent> event) {
+        return this.onClick(-1, event);
+    }
+
+    public Menu onClick(int slot, @NotNull Consumer<InventoryClickEvent> event) {
         if (pluginListener == null) throw new RuntimeException("The Menu API hasn't been initialized!");
         clickAdapters.add(new ClickAdapter(slot, event));
         return this;
     }
 
-    public Menu open(Player player) {
+    public Menu open(@NotNull Player player) {
         player.openInventory(inventory);
         return this;
     }
 
-    private static record ClickAdapter(int slot, Consumer<InventoryClickEvent> event) {
+    private record ClickAdapter(int slot, @NotNull Consumer<InventoryClickEvent> event) {
     }
 
     private static class ClickListener implements Listener {
@@ -94,8 +119,11 @@ public class Menu {
             menus.stream()
                     .filter(menu -> menu.inventory.equals(event.getInventory()))
                     .forEach(menu -> menu.clickAdapters.stream()
-                            .filter(click -> click.slot == event.getRawSlot())
-                            .forEach(click -> click.event.accept(event)));
+                            .filter(click -> click.slot == event.getRawSlot() || click.slot == -1)
+                            .forEach(click -> {
+                                event.setCancelled(menu.isCancelled);
+                                click.event.accept(event);
+                            }));
         }
     }
 }
