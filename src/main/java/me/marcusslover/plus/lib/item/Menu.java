@@ -25,6 +25,7 @@ public class Menu {
 
     protected Inventory inventory;
     protected LinkedList<ClickAdapter> clickAdapters;
+    protected ClickAdapter mainClickAdapter;
     protected boolean isCancelled = true;
 
     public Menu() {
@@ -104,6 +105,11 @@ public class Menu {
         return this;
     }
 
+    public Menu onMainClick(@NotNull Consumer<InventoryClickEvent> event) {
+        mainClickAdapter = new Menu.ClickAdapter(-1, event);
+        return this;
+    }
+
     public Menu open(@NotNull Player player) {
         player.openInventory(inventory);
         return this;
@@ -118,12 +124,16 @@ public class Menu {
         public void onClick(InventoryClickEvent event) {
             menus.stream()
                     .filter(menu -> menu.inventory.equals(event.getInventory()))
-                    .forEach(menu -> menu.clickAdapters.stream()
-                            .filter(click -> click.slot == event.getRawSlot() || click.slot == -1)
-                            .forEach(click -> {
-                                event.setCancelled(menu.isCancelled);
-                                click.event.accept(event);
-                            }));
+                    .forEach(menu -> {
+                        event.setCancelled(menu.isCancelled);
+
+                        ClickAdapter mainClickAdapter = menu.mainClickAdapter;
+                        if (mainClickAdapter != null) mainClickAdapter.event.accept(event);
+
+                        menu.clickAdapters.stream()
+                                .filter(click -> click.slot == event.getRawSlot() || click.slot == -1)
+                                .forEach(click -> click.event.accept(event));
+                    });
         }
     }
 }
