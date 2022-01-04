@@ -25,6 +25,7 @@ public class Menu {
 
     protected Inventory inventory;
     protected LinkedList<ClickAdapter> clickAdapters;
+    @Nullable
     protected ClickAdapter mainClickAdapter;
     protected boolean isCancelled = true;
 
@@ -44,6 +45,7 @@ public class Menu {
         if (text == null) this.inventory = Bukkit.createInventory(null, size);
         else this.inventory = Bukkit.createInventory(null, size, text.comp());
         this.clickAdapters = new LinkedList<>();
+        this.mainClickAdapter = null;
         menus.add(this);
     }
 
