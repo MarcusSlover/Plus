@@ -12,10 +12,9 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class Menu {
     public static Set<Menu> menus = new HashSet<>(); // This will change later to more efficient cache or weak storage.
@@ -23,6 +22,7 @@ public class Menu {
     private static Plugin pluginListener = null;
     private static ClickListener clickListener = null;
 
+    @NotNull
     protected Inventory inventory;
     protected LinkedList<ClickAdapter> clickAdapters;
     @Nullable
@@ -115,6 +115,14 @@ public class Menu {
     public Menu open(@NotNull Player player) {
         player.openInventory(inventory);
         return this;
+    }
+
+    public List<Player> getViewers() {
+        return inventory.getViewers().stream().map(entity -> (Player) entity).collect(Collectors.toList());
+    }
+
+    public boolean isViewing(@NotNull Player player) {
+        return getViewers().contains(player);
     }
 
     private record ClickAdapter(int slot, @NotNull Consumer<InventoryClickEvent> event) {
