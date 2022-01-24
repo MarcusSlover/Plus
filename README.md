@@ -28,6 +28,6 @@ dependencies {
 <dependency>
     <groupId>me.marcusslover.plus</groupid>
     <artifactId>plus</artifactId>
-    <verison>2.2</version>
+    <verison>dev</version>
 </dependency>
 ```
