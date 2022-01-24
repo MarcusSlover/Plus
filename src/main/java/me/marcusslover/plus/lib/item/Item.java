@@ -3,7 +3,6 @@ package me.marcusslover.plus.lib.item;
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
 import me.marcusslover.plus.lib.text.Text;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -14,10 +13,10 @@ import org.bukkit.inventory.meta.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class Item {
     @NotNull
@@ -56,8 +55,9 @@ public class Item {
         setName(name);
         setLore(lore);
     }
+
     public Item(ItemStack itemStack) {
-        this.itemStack = itemStack;
+        this.itemStack = itemStack == null ? new ItemStack(Material.AIR) : itemStack;
     }
 
     public Material getType() {
@@ -210,7 +210,7 @@ public class Item {
     }
 
     @Nullable
-    public Text getName() {
+    public Text name() {
         ItemMeta itemMeta = itemStack.getItemMeta();
         if (itemMeta.hasDisplayName()) return new Text(itemMeta.displayName());
         return null;
@@ -227,33 +227,36 @@ public class Item {
     }
 
     public boolean hasLore() {
-        ItemMeta itemMeta = itemStack.getItemMeta();
-        return itemMeta.hasLore();
+        return itemStack.hasItemMeta() && itemStack.getItemMeta().hasLore();
     }
 
     public Item setLore(@Nullable List<String> lore) {
         ItemMeta itemMeta = itemStack.getItemMeta();
-        if (lore != null) {
-            List<Component> components = new ArrayList<>();
-            for (String line : lore) components.add(new Text(line).comp());
-            itemMeta.lore(components);
-        } else itemMeta.lore(null);
+        if (lore != null) itemMeta.lore(lore.stream().map(line -> new Text(line).comp()).collect(Collectors.toList()));
+        else itemMeta.lore(null);
         itemStack.setItemMeta(itemMeta);
         return this;
     }
 
+    @Nullable
+    public List<Text> lore() {
+        //noinspection ConstantConditions
+        return hasLore() ? Text.list(itemStack.getItemMeta().lore()) : null;
+    }
+
     public Item lore(@Nullable List<Text> lore) {
         ItemMeta itemMeta = itemStack.getItemMeta();
-        if (lore != null) {
-            List<Component> components = new ArrayList<>();
-            for (Text line : lore) components.add(line.comp());
-            itemMeta.lore(components);
-        } else itemMeta.lore(null);
+        if (lore != null) itemMeta.lore(lore.stream().map(Text::comp).collect(Collectors.toList()));
+        else itemMeta.lore(null);
         itemStack.setItemMeta(itemMeta);
         return this;
     }
 
     public Item skull(PlayerProfile playerProfile) {
+        return setSkull(playerProfile);
+    }
+
+    public Item setSkull(PlayerProfile playerProfile) {
         ItemMeta itemMeta = itemStack.getItemMeta();
         if (itemMeta instanceof SkullMeta skullMeta) {
             skullMeta.setPlayerProfile(playerProfile);
@@ -263,6 +266,10 @@ public class Item {
     }
 
     public Item skull(String url) {
+        return setSkull(url);
+    }
+
+    public Item setSkull(String url) {
         ItemMeta itemMeta = itemStack.getItemMeta();
         if (itemMeta instanceof SkullMeta skullMeta) {
             String texture = new String(getEncodedTexture(url));

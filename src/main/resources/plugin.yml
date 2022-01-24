@@ -1,6 +1,6 @@
 name: Plus
 main: me.marcusslover.plus.PlusPlugin
-version: DEV-2.0
+version: 2.2
 description: ""
 api-version: 1.17
-author: [ MarcusSlover ]
+author: MarcusSlover

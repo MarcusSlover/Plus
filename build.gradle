@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'me.marcusslover.plus'
-version 'DEV-2.0'
+version '2.2'
 
 sourceCompatibility = JavaVersion.VERSION_16
 targetCompatibility = JavaVersion.VERSION_16
