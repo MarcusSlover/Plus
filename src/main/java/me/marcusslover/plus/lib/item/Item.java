@@ -3,6 +3,7 @@ package me.marcusslover.plus.lib.item;
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
 import me.marcusslover.plus.lib.text.Text;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -16,6 +17,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class Item {
@@ -26,44 +28,46 @@ public class Item {
         this(Material.STONE);
     }
 
-    public Item(Material material) {
+    public Item(@NotNull Material material) {
         this(material, 1);
     }
 
-    public Item(Material material, int amount) {
+    public Item(@NotNull Material material, int amount) {
         this.itemStack = new ItemStack(material, amount);
     }
 
-    public Item(Material material, int amount, Text name) {
+    public Item(@NotNull Material material, int amount, @Nullable Text name) {
         this(material, amount);
         name(name);
     }
 
-    public Item(Material material, int amount, Text name, List<Text> lore) {
+    public Item(@NotNull Material material, int amount, @Nullable Text name, @Nullable List<Text> lore) {
         this(material, amount);
         name(name);
         lore(lore);
     }
 
-    public Item(Material material, int amount, String name) {
+    public Item(@NotNull Material material, int amount, @Nullable String name) {
         this(material, amount);
         setName(name);
     }
 
-    public Item(Material material, int amount, String name, List<String> lore) {
+    public Item(@NotNull Material material, int amount, @Nullable String name, @Nullable List<String> lore) {
         this(material, amount);
         setName(name);
         setLore(lore);
     }
 
-    public Item(ItemStack itemStack) {
+    public Item(@Nullable ItemStack itemStack) {
         this.itemStack = itemStack == null ? new ItemStack(Material.AIR) : itemStack;
     }
 
+    @NotNull
     public Material getType() {
         return itemStack.getType();
     }
 
+    @NotNull
     public Item setType(Material material) {
         itemStack.setType(material);
         return this;
@@ -73,169 +77,174 @@ public class Item {
         return itemStack.getAmount();
     }
 
+    @NotNull
     public Item setAmount(int amount) {
         itemStack.setAmount(Math.min(64, Math.max(0, amount)));
         return this;
     }
 
+    @NotNull
     public Item setDamagePercent(double percent) {
-        ItemMeta itemMeta = itemStack.getItemMeta();
-        if (itemMeta instanceof Damageable damageable) {
-            double max = itemStack.getType().getMaxDurability();
-            double damage = max * percent / 100;
-            damageable.setDamage((int) Math.max(0, damage));
-            itemStack.setItemMeta(damageable);
-        }
-        return this;
+        return editMeta(itemMeta -> {
+            if (itemMeta instanceof Damageable damageable) {
+                double max = itemStack.getType().getMaxDurability();
+                double damage = max * percent / 100;
+                damageable.setDamage((int) Math.max(0, damage));
+            }
+        });
     }
 
-    public int getDamage() {
+    @Nullable
+    public Integer getDamage() {
         ItemMeta itemMeta = itemStack.getItemMeta();
+        if (itemMeta == null) return null;
         if (itemMeta instanceof Damageable damageable) {
             return damageable.getDamage();
         }
         return 0;
     }
 
+    @NotNull
     public Item setDamage(int damage) {
-        ItemMeta itemMeta = itemStack.getItemMeta();
-        if (itemMeta instanceof Damageable damageable) {
-            damageable.setDamage(damage);
-            itemStack.setItemMeta(damageable);
-        }
-        return this;
+        return editMeta(itemMeta -> {
+            if (itemMeta instanceof Damageable damageable) {
+                damageable.setDamage(damage);
+            }
+        });
     }
 
-    public int getEnchant(Enchantment enchantment) {
+    public int getEnchant(@NotNull Enchantment enchantment) {
         return itemStack.getEnchantmentLevel(enchantment);
     }
 
-    public boolean hasEnchant(Enchantment enchantment) {
+    public boolean hasEnchant(@NotNull Enchantment enchantment) {
         return getEnchant(enchantment) > 0;
     }
 
-    public Item setEnchant(Enchantment enchantment, int level) {
+    @NotNull
+    public Item setEnchant(@NotNull Enchantment enchantment, int level) {
         if (level <= 0) itemStack.removeEnchantment(enchantment);
         else itemStack.addUnsafeEnchantment(enchantment, level);
         return this;
     }
 
+    @NotNull
     public Item setColor(@Nullable Color color) {
-        ItemMeta itemMeta = itemStack.getItemMeta();
-        if (itemMeta instanceof PotionMeta meta) {
-            meta.setColor(color);
-            itemStack.setItemMeta(meta);
-            return this;
-        }
-        if (itemMeta instanceof MapMeta meta) {
-            meta.setColor(color);
-            itemStack.setItemMeta(meta);
-            return this;
-        }
-        if (itemMeta instanceof LeatherArmorMeta meta) {
-            meta.setColor(color);
-            itemStack.setItemMeta(meta);
-            return this;
-        }
-        return this;
+        return editMeta(itemMeta -> {
+            if (itemMeta instanceof PotionMeta meta) {
+                meta.setColor(color);
+                return;
+            }
+            if (itemMeta instanceof MapMeta meta) {
+                meta.setColor(color);
+                return;
+            }
+            if (itemMeta instanceof LeatherArmorMeta meta) {
+                meta.setColor(color);
+            }
+        });
     }
 
-    public Item addItemFlag(ItemFlag itemFlag) {
-        ItemMeta itemMeta = itemStack.getItemMeta();
-        itemMeta.addItemFlags(itemFlag);
-        itemStack.setItemMeta(itemMeta);
-        return this;
+    @NotNull
+    public Item addItemFlag(@NotNull ItemFlag itemFlag) {
+        return editMeta(itemMeta -> itemMeta.addItemFlags(itemFlag));
     }
 
-    public Item removeItemFlag(ItemFlag itemFlag) {
-        ItemMeta itemMeta = itemStack.getItemMeta();
-        itemMeta.removeItemFlags(itemFlag);
-        itemStack.setItemMeta(itemMeta);
-        return this;
+    @NotNull
+    public Item removeItemFlag(@NotNull ItemFlag itemFlag) {
+        return editMeta(itemMeta -> itemMeta.removeItemFlags(itemFlag));
     }
 
-    public boolean hasItemFlag(ItemFlag itemFlag) {
+    public boolean hasItemFlag(@NotNull ItemFlag itemFlag) {
         ItemMeta itemMeta = itemStack.getItemMeta();
+        if (itemMeta == null) return false;
         return itemMeta.hasItemFlag(itemFlag);
     }
 
+    @NotNull
     public Item setHideflags(boolean hideflags) {
-        ItemMeta itemMeta = itemStack.getItemMeta();
-        if (!hideflags) itemMeta.removeItemFlags(ItemFlag.values());
-        else itemMeta.addItemFlags(ItemFlag.values());
-        itemStack.setItemMeta(itemMeta);
-        return this;
+        return editMeta(itemMeta -> {
+            if (!hideflags) itemMeta.removeItemFlags(ItemFlag.values());
+            else itemMeta.addItemFlags(ItemFlag.values());
+        });
     }
 
     public boolean isUnbreakable() {
         ItemMeta itemMeta = itemStack.getItemMeta();
+        if (itemMeta == null) return false;
         return itemMeta.isUnbreakable();
     }
 
+    @NotNull
     public Item setUnbreakable(boolean unbreakable) {
-        ItemMeta itemMeta = itemStack.getItemMeta();
-        itemMeta.setUnbreakable(unbreakable);
-        itemStack.setItemMeta(itemMeta);
-        return this;
+        return editMeta(itemMeta -> itemMeta.setUnbreakable(unbreakable));
     }
 
     public boolean hasCustomModelData() {
         ItemMeta itemMeta = itemStack.getItemMeta();
+        if (itemMeta == null) return false;
         return itemMeta.hasCustomModelData();
     }
 
-    public int getCustomModelData() {
+    @Nullable
+    public Integer getCustomModelData() {
         ItemMeta itemMeta = itemStack.getItemMeta();
+        if (itemMeta == null) return null;
         return itemMeta.getCustomModelData();
     }
 
+    @NotNull
     public Item setCustomModelData(int customModelData) {
-        ItemMeta itemMeta = itemStack.getItemMeta();
-        itemMeta.setCustomModelData(customModelData);
-        itemStack.setItemMeta(itemMeta);
-        return this;
+        return editMeta(itemMeta -> itemMeta.setCustomModelData(customModelData));
     }
 
     public boolean hasName() {
         ItemMeta itemMeta = itemStack.getItemMeta();
+        if (itemMeta == null) return false;
         return itemMeta.hasDisplayName();
     }
 
+    @NotNull
     public Item name(@Nullable Text name) {
-        ItemMeta itemMeta = itemStack.getItemMeta();
-        if (name != null) itemMeta.displayName(name.comp());
-        else itemMeta.displayName(null);
-        itemStack.setItemMeta(itemMeta);
-        return this;
+        return editMeta(itemMeta -> {
+            if (name != null) itemMeta.displayName(name.comp());
+            else itemMeta.displayName(null);
+        });
     }
 
     @Nullable
     public Text name() {
         ItemMeta itemMeta = itemStack.getItemMeta();
-        if (itemMeta.hasDisplayName()) return new Text(itemMeta.displayName());
+        if (itemMeta == null) return null;
+        if (itemMeta.hasDisplayName()) {
+            Component component = itemMeta.displayName();
+            if (component == null) return null;
+            return new Text(component);
+        }
         return null;
     }
 
+    @NotNull
     public Item setName(@Nullable String name) {
-        ItemMeta itemMeta = itemStack.getItemMeta();
-        if (name != null) {
-            Text text = new Text(name);
-            itemMeta.displayName(text.comp());
-        } else itemMeta.displayName(null);
-        itemStack.setItemMeta(itemMeta);
-        return this;
+        return editMeta(itemMeta -> {
+            if (name != null) {
+                Text text = new Text(name);
+                itemMeta.displayName(text.comp());
+            } else itemMeta.displayName(null);
+        });
     }
 
     public boolean hasLore() {
         return itemStack.hasItemMeta() && itemStack.getItemMeta().hasLore();
     }
 
+    @NotNull
     public Item setLore(@Nullable List<String> lore) {
-        ItemMeta itemMeta = itemStack.getItemMeta();
-        if (lore != null) itemMeta.lore(lore.stream().map(line -> new Text(line).comp()).collect(Collectors.toList()));
-        else itemMeta.lore(null);
-        itemStack.setItemMeta(itemMeta);
-        return this;
+        return editMeta(itemMeta -> {
+            if (lore != null)
+                itemMeta.lore(lore.stream().map(line -> new Text(line).comp()).collect(Collectors.toList()));
+            else itemMeta.lore(null);
+        });
     }
 
     @Nullable
@@ -244,50 +253,57 @@ public class Item {
         return hasLore() ? Text.list(itemStack.getItemMeta().lore()) : null;
     }
 
+    @NotNull
     public Item lore(@Nullable List<Text> lore) {
-        ItemMeta itemMeta = itemStack.getItemMeta();
-        if (lore != null) itemMeta.lore(lore.stream().map(Text::comp).collect(Collectors.toList()));
-        else itemMeta.lore(null);
-        itemStack.setItemMeta(itemMeta);
-        return this;
+        return editMeta(itemMeta -> {
+            if (lore != null) itemMeta.lore(lore.stream().map(Text::comp).collect(Collectors.toList()));
+            else itemMeta.lore(null);
+        });
     }
 
-    public Item skull(PlayerProfile playerProfile) {
+    @NotNull
+    public Item skull(@Nullable PlayerProfile playerProfile) {
         return setSkull(playerProfile);
     }
 
-    public Item setSkull(PlayerProfile playerProfile) {
-        ItemMeta itemMeta = itemStack.getItemMeta();
-        if (itemMeta instanceof SkullMeta skullMeta) {
-            skullMeta.setPlayerProfile(playerProfile);
-            itemStack.setItemMeta(skullMeta);
-        }
-        return this;
+    @NotNull
+    public Item setSkull(@Nullable PlayerProfile playerProfile) {
+        return editMeta(itemMeta -> {
+            if (itemMeta instanceof SkullMeta skullMeta) {
+                skullMeta.setPlayerProfile(playerProfile);
+            }
+        });
     }
 
-    public Item skull(String url) {
+    @NotNull
+    public Item skull(@NotNull String url) {
         return setSkull(url);
     }
 
     public Item setSkull(String url) {
-        ItemMeta itemMeta = itemStack.getItemMeta();
-        if (itemMeta instanceof SkullMeta skullMeta) {
-            String texture = new String(getEncodedTexture(url));
-            int len = texture.length();
-            UUID uuid = new UUID(texture.substring(len - 20).hashCode(), texture.substring(len - 10).hashCode());
+        return editMeta(itemMeta -> {
+            if (itemMeta instanceof SkullMeta skullMeta) {
+                String texture = new String(getEncodedTexture(url));
+                int len = texture.length();
+                UUID uuid = new UUID(texture.substring(len - 20).hashCode(), texture.substring(len - 10).hashCode());
 
-            PlayerProfile profile = Bukkit.createProfile(uuid, null);
-            ProfileProperty property = new ProfileProperty("textures", texture);
-            profile.setProperty(property);
-            skullMeta.setPlayerProfile(profile);
-            itemStack.setItemMeta(skullMeta);
-        }
-        return this;
+                PlayerProfile profile = Bukkit.createProfile(uuid, null);
+                ProfileProperty property = new ProfileProperty("textures", texture);
+                profile.setProperty(property);
+                skullMeta.setPlayerProfile(profile);
+            }
+        });
     }
 
-    private byte[] getEncodedTexture(String url) {
+    private byte[] getEncodedTexture(@NotNull String url) {
         Base64.Encoder encoder = Base64.getEncoder();
         return encoder.encode(String.format("{textures:{SKIN:{url:\"%s\"}}}", url).getBytes());
+    }
+
+    @NotNull
+    public Item editMeta(@NotNull Consumer<ItemMeta> meta) {
+        itemStack.editMeta(meta);
+        return this;
     }
 
     @NotNull

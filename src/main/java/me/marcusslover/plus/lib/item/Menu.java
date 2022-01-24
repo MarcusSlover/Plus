@@ -19,11 +19,14 @@ import java.util.stream.Collectors;
 public class Menu {
     public static Set<Menu> menus = new HashSet<>(); // This will change later to more efficient cache or weak storage.
 
+    @Nullable
     private static Plugin pluginListener = null;
+    @Nullable
     private static ClickListener clickListener = null;
 
     @NotNull
     protected Inventory inventory;
+    @NotNull
     protected LinkedList<ClickAdapter> clickAdapters;
     @Nullable
     protected ClickAdapter mainClickAdapter;
@@ -42,10 +45,10 @@ public class Menu {
     }
 
     public Menu(int size, @Nullable Text text) {
-        if (text == null) this.inventory = Bukkit.createInventory(null, size);
-        else this.inventory = Bukkit.createInventory(null, size, text.comp());
-        this.clickAdapters = new LinkedList<>();
-        this.mainClickAdapter = null;
+        if (text == null) inventory = Bukkit.createInventory(null, size);
+        else inventory = Bukkit.createInventory(null, size, text.comp());
+        clickAdapters = new LinkedList<>();
+        mainClickAdapter = null;
         menus.add(this);
     }
 
@@ -66,57 +69,68 @@ public class Menu {
         return isCancelled;
     }
 
+    @NotNull
     public Menu setCancelled(boolean cancelled) {
         isCancelled = cancelled;
         return this;
     }
 
+    @NotNull
     public Inventory inventory() {
-        return this.inventory;
+        return inventory;
     }
 
     public int size() {
-        return this.inventory.getSize();
+        return inventory.getSize();
     }
 
+    @NotNull
     public Menu set(int slot, @Nullable Item item) {
         return setItem(slot, item, null);
     }
 
+    @NotNull
     public Menu setItem(int slot, @Nullable Item item) {
         return setItem(slot, item, null);
     }
 
+    @NotNull
     public Menu set(int slot, @Nullable Item item, @Nullable Consumer<InventoryClickEvent> event) {
         return setItem(slot, item, event);
     }
 
+    @NotNull
     public Menu setItem(int slot, @Nullable Item item, @Nullable Consumer<InventoryClickEvent> event) {
-        if (item != null) this.inventory.setItem(slot, item.getItemStack());
+        if (item != null) inventory.setItem(slot, item.getItemStack());
         if (event != null) return onClick(slot, event);
         return this;
     }
 
+    @NotNull
     public Menu onClick(@NotNull Consumer<InventoryClickEvent> event) {
-        return this.onClick(-1, event);
+        return onClick(-1, event);
     }
 
+    @NotNull
     public Menu onClick(int slot, @NotNull Consumer<InventoryClickEvent> event) {
         if (pluginListener == null) throw new RuntimeException("The Menu API hasn't been initialized!");
         clickAdapters.add(new ClickAdapter(slot, event));
         return this;
     }
 
+    @NotNull
     public Menu onMainClick(@NotNull Consumer<InventoryClickEvent> event) {
         mainClickAdapter = new Menu.ClickAdapter(-1, event);
         return this;
     }
 
+    @NotNull
     public Menu open(@NotNull Player player) {
         player.openInventory(inventory);
         return this;
     }
 
+    @NotNull
     public List<Player> getViewers() {
         return inventory.getViewers().stream().map(entity -> (Player) entity).collect(Collectors.toList());
     }

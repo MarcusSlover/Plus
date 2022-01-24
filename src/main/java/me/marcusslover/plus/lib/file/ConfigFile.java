@@ -2,6 +2,7 @@ package me.marcusslover.plus.lib.file;
 
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,7 +15,8 @@ public class ConfigFile extends AbstractFile {
     }
 
     @Override
-    public boolean isSet(String key) {
+    public boolean isSet(@NotNull String key) {
+        if (yamlConfiguration == null) return false;
         return yamlConfiguration.isSet(key);
     }
 
@@ -26,17 +28,18 @@ public class ConfigFile extends AbstractFile {
     @Override
     public void save() {
         try {
-            yamlConfiguration.save(file);
+            if (yamlConfiguration != null) yamlConfiguration.save(file);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    @NotNull
     public YamlConfiguration getYamlConfiguration() {
         return yamlConfiguration;
     }
 
-    public void setYamlConfiguration(YamlConfiguration yamlConfiguration) {
+    public void setYamlConfiguration(@NotNull YamlConfiguration yamlConfiguration) {
         this.yamlConfiguration = yamlConfiguration;
     }
 }

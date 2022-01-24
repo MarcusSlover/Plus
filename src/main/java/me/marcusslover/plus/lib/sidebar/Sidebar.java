@@ -8,49 +8,68 @@ import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
 public class Sidebar {
-    private static final ChatColor[] CHAT_COLORS = ChatColor.values();
+    private static final ChatColor[] COLOR = ChatColor.values();
     private static final Map<UUID, Sidebar> SIDEBAR_MAP = new HashMap<>();
+
     private static int customID = 0;
+
+    @NotNull
     public final Scoreboard scoreboard;
+    @NotNull
     public final Objective objective;
 
+    @NotNull
     private final LinkedList<SidebarField> fields;
 
-    public Sidebar(Text title) {
-        this.scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
-        this.objective = this.scoreboard.registerNewObjective(customID + "DS", "dummy", title.comp());
-        this.objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+    public Sidebar(@NotNull Text title) {
+        scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
+        objective = scoreboard.registerNewObjective(customID + "DS", "dummy", title.comp());
+        objective.setDisplaySlot(DisplaySlot.SIDEBAR);
 
-        this.fields = new LinkedList<>();
+        fields = new LinkedList<>();
 
         // Add to the id value
         customID += 1;
     }
 
-    public static Optional<Sidebar> get(Player player) {
+    @NotNull
+    public static Optional<Sidebar> get(@NotNull Player player) {
         return get(player.getUniqueId());
     }
 
-    public static Optional<Sidebar> get(UUID uuid) {
+    @NotNull
+    public static Optional<Sidebar> get(@NotNull UUID uuid) {
         if (SIDEBAR_MAP.containsKey(uuid)) {
             return Optional.of(SIDEBAR_MAP.get(uuid));
         }
         return Optional.empty();
     }
 
-    private String getEntry(int currentSize) {
-        return CHAT_COLORS[currentSize].toString() + CHAT_COLORS[currentSize / 4].toString() + CHAT_COLORS[CHAT_COLORS.length - 1];
+    public static void destroy(@NotNull Player player) {
+        destroy(player.getUniqueId());
     }
 
-    public Sidebar addField(Text prefix, Text suffix) {
-        int currentSize = fields.size();
+    public static void destroy(@NotNull UUID uuid) {
+        get(uuid).ifPresent(sidebar -> SIDEBAR_MAP.remove(uuid));
+    }
+
+    @NotNull
+    private String getEntry(int currentSize) {
+        return COLOR[currentSize].toString() + COLOR[currentSize / 4].toString() + COLOR[COLOR.length - 1];
+    }
+
+    @NotNull
+    public Sidebar addField(@NotNull Text prefix, @NotNull Text suffix) {
+        int currentSize = getSize();
         String entry = getEntry(currentSize);
 
-        Team team = this.scoreboard.registerNewTeam(currentSize + "T");
+        Team team = scoreboard.registerNewTeam(currentSize + "T");
         team.addEntry(entry);
 
         team.prefix(prefix.comp());
@@ -60,15 +79,16 @@ public class Sidebar {
         int fieldsSize = fields.size();
         fields.add(new SidebarField(team, entry, fieldsSize));
 
-        this.objective.getScore(entry).setScore(16 - currentSize);
+        objective.getScore(entry).setScore(16 - currentSize);
         return this;
     }
 
-    public Sidebar insertField(int index, Text prefix, Text suffix) {
-        int currentSize = fields.size();
+    @NotNull
+    public Sidebar insertField(int index, @NotNull Text prefix, @NotNull Text suffix) {
+        int currentSize = getSize();
         String entry = getEntry(currentSize);
 
-        Team team = this.scoreboard.registerNewTeam(currentSize + "T");
+        Team team = scoreboard.registerNewTeam(currentSize + "T");
         team.addEntry(entry);
 
         team.prefix(prefix.comp());
@@ -79,72 +99,91 @@ public class Sidebar {
         fields.add(index, new SidebarField(team, entry, fieldsSize));
 
         // Clear old ones
-        Set<String> entries = this.scoreboard.getEntries();
-        for (String s : entries) {
-            this.scoreboard.resetScores(s);
-        }
+        Set<String> entries = scoreboard.getEntries();
+        entries.forEach(scoreboard::resetScores);
 
         // Update the whole sidebar
-        for (SidebarField field : fields) {
-            this.objective.getScore(field.entry()).setScore(16 - currentSize);
-        }
+        fields.forEach(field -> objective.getScore(field.entry()).setScore(16 - currentSize));
         return this;
     }
 
-    public Sidebar updateField(int index, Text prefix, Text suffix) {
+    @NotNull
+    public Sidebar updateField(int index, @NotNull Text prefix, @NotNull Text suffix) {
         Team team = this.scoreboard.getTeam(index + "T");
-        if (team == null) {
-            return this;
-        }
+        if (team == null) return this;
         team.prefix(prefix.comp());
         team.suffix(suffix.comp());
         return this;
     }
 
+    @Nullable
     public SidebarField getField(int index) {
-        return this.fields.get(index);
+        return fields.get(index);
     }
 
-    public SidebarField findField(String... filters) {
+    @Nullable
+    public SidebarField findField(@NotNull String... filters) {
         for (String filter : filters) {
-            for (SidebarField field : this.fields) {
+            for (SidebarField field : fields) {
                 // match the entry
-                if (field.match(filter)) {
-                    return field;
-                }
+                if (field.match(filter)) return field;
             }
         }
-
         return null;
     }
 
+    @NotNull
     public Sidebar removeField(int index) {
         // Add to the list
         fields.remove(index);
 
         // Clear old ones
-        Set<String> entries = this.scoreboard.getEntries();
-        for (String s : entries) {
-            this.scoreboard.resetScores(s);
-        }
+        Set<String> entries = scoreboard.getEntries();
+        entries.forEach(scoreboard::resetScores);
 
         // Update the whole sidebar
         int fieldsSize = fields.size();
-        for (SidebarField field : fields) {
-            this.objective.getScore(field.entry()).setScore(16 - fieldsSize);
-        }
+        fields.forEach(field -> objective.getScore(field.entry()).setScore(16 - fieldsSize));
         return this;
     }
 
+    @NotNull
     public Sidebar clearFields() {
-        for (Team team : this.scoreboard.getTeams()) {
-            team.unregister();
-        }
-        this.fields.clear();
+        scoreboard.getTeams().forEach(Team::unregister);
+        fields.clear();
         return this;
     }
 
-    public Sidebar send(Player player) {
+    @NotNull
+    public Objective getObjective() {
+        return objective;
+    }
+
+    @NotNull
+    public Scoreboard getScoreboard() {
+        return scoreboard;
+    }
+
+    public static int getCustomID() {
+        return customID;
+    }
+
+    public int getSize() {
+        return fields.size();
+    }
+
+    @NotNull
+    public static Map<UUID, Sidebar> getSidebarMap() {
+        return SIDEBAR_MAP;
+    }
+
+    @NotNull
+    public LinkedList<SidebarField> getFields() {
+        return fields;
+    }
+
+    @NotNull
+    public Sidebar send(@NotNull Player player) {
         player.setScoreboard(scoreboard);
         return this;
     }

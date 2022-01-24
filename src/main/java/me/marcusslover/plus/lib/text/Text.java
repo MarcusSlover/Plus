@@ -7,6 +7,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,23 +18,26 @@ public class Text {
             .character('&')
             .build();
 
+    @NotNull
     protected String text;
+
+    @NotNull
     protected Component component;
 
     public Text() {
         this("");
     }
 
-    public Text(String text) {
+    public Text(@NotNull String text) {
         // Colorize the raw text before deserialization
         this(ColorUtil.hex(text), LEGACY.deserialize(ColorUtil.hex(text)));
     }
 
-    public Text(Component component) {
+    public Text(@NotNull Component component) {
         this(LEGACY.serialize(component), component);
     }
 
-    public Text(String text, Component component) {
+    public Text(@NotNull String text, @NotNull Component component) {
         this.text = text;
         this.component = component.decoration(TextDecoration.ITALIC, false);
     }
@@ -43,7 +47,8 @@ public class Text {
         return lore.stream().map(Text::new).collect(Collectors.toList());
     }
 
-    public static String legacy(String text) {
+    @NotNull
+    public static String legacy(@NotNull String text) {
         return ColorUtil.color('&', text);
     }
 
@@ -57,11 +62,17 @@ public class Text {
         return new Text("&f");
     }
 
-    public Text setHover(Text hover) {
-        component.hoverEvent(HoverEvent.showText(hover.component));
+    @NotNull
+    public Text setHover(@Nullable Text hover) {
+        if (hover == null) {
+            this.component = this.component.hoverEvent(null);
+        } else {
+            this.component = component.hoverEvent(HoverEvent.showText(hover.component));
+        }
         return this;
     }
 
+    @NotNull
     public String raw() {
         return text;
     }
@@ -73,6 +84,7 @@ public class Text {
         return true;
     }
 
+    @NotNull
     public Component comp() {
         return component;
     }

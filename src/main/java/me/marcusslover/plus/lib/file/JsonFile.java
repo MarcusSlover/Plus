@@ -15,6 +15,7 @@ import java.io.IOException;
 public class JsonFile extends AbstractFile {
 
     protected JsonElement jsonElement;
+
     @Nullable
     private Gson gson = null;
 
@@ -23,7 +24,7 @@ public class JsonFile extends AbstractFile {
     }
 
     @Override
-    public boolean isSet(String key) {
+    public boolean isSet(@NotNull String key) {
         if (jsonElement == null) return false;
         if (jsonElement instanceof JsonObject jsonObject) {
             return jsonObject.has(key);
@@ -64,11 +65,12 @@ public class JsonFile extends AbstractFile {
         }
     }
 
+    @NotNull
     public JsonElement getJsonElement() {
         return jsonElement;
     }
 
-    public void setJsonElement(JsonElement jsonElement) {
+    public void setJsonElement(@NotNull JsonElement jsonElement) {
         this.jsonElement = jsonElement;
     }
 }

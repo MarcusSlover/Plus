@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 
 public abstract class AbstractFile implements IFile {
+    @NotNull
     protected final File file;
 
     public AbstractFile(@NotNull File file) {
@@ -19,7 +20,7 @@ public abstract class AbstractFile implements IFile {
         this.file = file;
     }
 
-    public abstract boolean isSet(String key);
+    public abstract boolean isSet(@NotNull String key);
 
     @NotNull
     public File getFile() {

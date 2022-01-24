@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -22,10 +23,13 @@ public class JsonWrapper {
         return jsonElement;
     }
 
-    public void setJsonElement(@NotNull JsonElement jsonElement) {
+    @NotNull
+    public JsonWrapper setJsonElement(@NotNull JsonElement jsonElement) {
         this.jsonElement = jsonElement;
+        return this;
     }
 
+    @NotNull
     public JsonWrapper forEach(@NotNull Consumer<JsonElement> consumer) {
         if (isJsonArray()) {
             JsonArray array = jsonElement.getAsJsonArray();
@@ -50,6 +54,7 @@ public class JsonWrapper {
         if (isJsonObject()) consumer.accept(jsonElement.getAsJsonObject());
     }
 
+    @NotNull
     public JsonWrapper remove(@NotNull String key) {
         jsonObject(json -> json.remove(key));
         return this;
@@ -61,13 +66,15 @@ public class JsonWrapper {
         return atom.get();
     }
 
-    public JsonWrapper set(@NotNull String key, Object value) {
+    @NotNull
+    public JsonWrapper set(@NotNull String key, @Nullable Object value) {
         JsonElement jsonElement = JsonUtil.GSON.toJsonTree(value);
         jsonObject(json -> json.add(key, jsonElement));
         return this;
     }
 
-    public <T> T get(@NotNull String key, T defaultValue, Class<T> type) {
+    @NotNull
+    public <T> T get(@NotNull String key, @Nullable T defaultValue, @NotNull Class<T> type) {
         AtomicReference<T> atom = new AtomicReference<>(defaultValue);
         jsonObject(json -> {
             if (hasKey(key)) {
@@ -78,12 +85,14 @@ public class JsonWrapper {
         return atom.get();
     }
 
-    public JsonWrapper set(@NotNull String key, String value) {
+    @NotNull
+    public JsonWrapper set(@NotNull String key, @Nullable String value) {
         jsonObject(json -> json.addProperty(key, value));
         return this;
     }
 
-    public String get(@NotNull String key, String defaultValue) {
+    @NotNull
+    public String get(@NotNull String key, @Nullable String defaultValue) {
         AtomicReference<String> atom = new AtomicReference<>(defaultValue);
         jsonObject(json -> {
             if (hasKey(key)) atom.set(json.get(key).getAsString());
@@ -92,12 +101,14 @@ public class JsonWrapper {
         return atom.get();
     }
 
-    public JsonWrapper set(@NotNull String key, Number value) {
+    @NotNull
+    public JsonWrapper set(@NotNull String key, @Nullable Number value) {
         jsonObject(json -> json.addProperty(key, value));
         return this;
     }
 
-    public Number get(@NotNull String key, Number defaultValue) {
+    @NotNull
+    public Number get(@NotNull String key, @Nullable Number defaultValue) {
         AtomicReference<Number> atom = new AtomicReference<>(defaultValue);
         jsonObject(json -> {
             if (hasKey(key)) atom.set(json.get(key).getAsNumber());
@@ -106,12 +117,14 @@ public class JsonWrapper {
         return atom.get();
     }
 
-    public JsonWrapper set(@NotNull String key, Character value) {
+    @NotNull
+    public JsonWrapper set(@NotNull String key, @Nullable Character value) {
         jsonObject(json -> json.addProperty(key, value));
         return this;
     }
 
-    public Character get(@NotNull String key, Character defaultValue) {
+    @NotNull
+    public Character get(@NotNull String key, @Nullable Character defaultValue) {
         AtomicReference<Character> atom = new AtomicReference<>(defaultValue);
         jsonObject(json -> {
             if (hasKey(key)) atom.set(json.get(key).getAsCharacter());
@@ -120,13 +133,15 @@ public class JsonWrapper {
         return atom.get();
     }
 
-    public JsonWrapper set(@NotNull String key, Boolean value) {
+    @NotNull
+    public JsonWrapper set(@NotNull String key, @Nullable Boolean value) {
         jsonObject(json -> json.addProperty(key, value));
         return this;
     }
 
-    public Boolean get(@NotNull String key, Boolean defaultValue) {
-        AtomicBoolean atom = new AtomicBoolean(defaultValue);
+    @NotNull
+    public Boolean get(@NotNull String key, @Nullable Boolean defaultValue) {
+        AtomicReference<Boolean> atom = new AtomicReference<>(defaultValue);
         jsonObject(json -> {
             if (hasKey(key)) atom.set(json.get(key).getAsBoolean());
             else atom.set(defaultValue);
