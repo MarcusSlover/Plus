@@ -15,7 +15,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'me.marcusslover.plus:plus:2.2'
+    compileOnly 'me.marcusslover.plus:plus:dev'
 }
 ```
 ## 🦢 Maven
