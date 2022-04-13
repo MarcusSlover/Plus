@@ -29,6 +29,4 @@ public class Plus {
     private Plugin plugin() {
         return PlusPlugin.getPlugin(PlusPlugin.class);
     }
-
-
 }

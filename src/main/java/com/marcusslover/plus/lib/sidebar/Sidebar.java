@@ -59,6 +59,15 @@ public class Sidebar {
         get(uuid).ifPresent(sidebar -> SIDEBAR_MAP.remove(uuid));
     }
 
+    public static int getCustomID() {
+        return customID;
+    }
+
+    @NotNull
+    public static Map<UUID, Sidebar> getSidebarMap() {
+        return SIDEBAR_MAP;
+    }
+
     @NotNull
     private String getEntry(int currentSize) {
         return COLOR[currentSize].toString() + COLOR[currentSize / 4].toString() + COLOR[COLOR.length - 1];
@@ -164,17 +173,8 @@ public class Sidebar {
         return scoreboard;
     }
 
-    public static int getCustomID() {
-        return customID;
-    }
-
     public int getSize() {
         return fields.size();
-    }
-
-    @NotNull
-    public static Map<UUID, Sidebar> getSidebarMap() {
-        return SIDEBAR_MAP;
     }
 
     @NotNull
