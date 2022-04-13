@@ -4,8 +4,9 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '7.1.2'
 }
 
-group 'com.marcusslover.plus'
-version 'experimental'
+group 'com.marcusslover'
+version '3.0-SNAPSHOT'
+ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 
 repositories {
     mavenCentral()
@@ -23,13 +24,17 @@ dependencies {
 }
 
 java {
+    withJavadocJar()
+    withSourcesJar()
     toolchain.languageVersion.set(JavaLanguageVersion.of(17))
 }
 
 publishing {
     publications {
         mavenJava(MavenPublication) {
+            groupId = 'com.marcusslover'
             artifactId = 'plus'
+
             from components.java
             pom {
                 name = 'Plus'
@@ -54,8 +59,8 @@ publishing {
 
     repositories {
         maven {
-            name = 'plus'
-            url = "https://m2.tecc.me/snapshots"
+            name = "ossrh"
+            url = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
             credentials(PasswordCredentials)
         }
     }
