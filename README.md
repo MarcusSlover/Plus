@@ -26,8 +26,8 @@ dependencies {
 </repository>
 
 <dependency>
-    <groupId>me.marcusslover.plus</groupid>
+    <groupId>me.marcusslover.plus</groupId>
     <artifactId>plus</artifactId>
-    <verison>dev</version>
+    <version>dev</version>
 </dependency>
 ```
