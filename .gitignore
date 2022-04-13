@@ -2,3 +2,6 @@
 /.gradle/
 /.idea/
 /build/
+.gitignore
+build.gradle
+README.md

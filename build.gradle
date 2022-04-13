@@ -1,14 +1,12 @@
 plugins {
     id 'java'
     id 'maven-publish'
-    id 'com.github.johnrengelman.shadow' version '7.1.0'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
 }
 
-group 'me.marcusslover.plus'
-version '2.2'
-
-sourceCompatibility = JavaVersion.VERSION_16
-targetCompatibility = JavaVersion.VERSION_16
+group 'com.marcusslover'
+version '3.0-SNAPSHOT'
+ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 
 repositories {
     mavenCentral()
@@ -17,18 +15,26 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'org.jetbrains:annotations:22.0.0'
-    compileOnly 'io.papermc.paper:paper-api:1.17.1-R0.1-SNAPSHOT'
-    compileOnly 'com.comphenix.protocol:ProtocolLib:4.7.0'
+    compileOnly 'org.jetbrains:annotations:23.0.0'
+    compileOnly 'io.papermc.paper:paper-api:1.18.1-R0.1-SNAPSHOT'
+    compileOnly 'com.comphenix.protocol:ProtocolLib:4.8.0'
 
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
 }
 
+java {
+    withJavadocJar()
+    withSourcesJar()
+    toolchain.languageVersion.set(JavaLanguageVersion.of(17))
+}
+
 publishing {
     publications {
         mavenJava(MavenPublication) {
+            groupId = 'com.marcusslover'
             artifactId = 'plus'
+
             from components.java
             pom {
                 name = 'Plus'
@@ -53,8 +59,8 @@ publishing {
 
     repositories {
         maven {
-            name = 'plus'
-            url = "https://m2.tecc.me/snapshots"
+            name = "ossrh"
+            url = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
             credentials(PasswordCredentials)
         }
     }
