@@ -6,7 +6,7 @@
 </p>
 
 # 💻 For Developers
-This library is currently meant to be working with PaperMC 1.17.1.<br/>
+This library is currently meant to be working with PaperMC 1.18.1.<br/>
 
 ## 🐘 Gradle
 ```gradle
