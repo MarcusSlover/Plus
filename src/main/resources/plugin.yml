@@ -1,5 +1,5 @@
 name: Plus
-main: me.marcusslover.plus.PlusPlugin
+main: com.marcusslover.plus.PlusPlugin
 version: experimental
 description: ""
 api-version: 1.18
