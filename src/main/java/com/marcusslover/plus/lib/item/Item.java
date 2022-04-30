@@ -2,7 +2,7 @@ package com.marcusslover.plus.lib.item;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
-import com.marcusslover.plus.PlusPlugin;
+import com.marcusslover.plus.lib.Plus;
 import com.marcusslover.plus.lib.text.Text;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -21,7 +21,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -190,7 +189,7 @@ public class Item {
     public Item setTag(@NotNull String key, @NotNull String value) {
         editMeta(itemMeta -> {
             PersistentDataContainer p = itemMeta.getPersistentDataContainer();
-            NamespacedKey n = new NamespacedKey(Bukkit.getPluginManager().getPlugin("Plus"), key);
+            NamespacedKey n = new NamespacedKey(Plus.hook, key);
             p.set(n, PersistentDataType.STRING, value);
         });
         return this;
@@ -201,7 +200,7 @@ public class Item {
         AtomicReference<String> v = new AtomicReference<>(defaultValue);
         editMeta(itemMeta -> {
             PersistentDataContainer p = itemMeta.getPersistentDataContainer();
-            NamespacedKey n = new NamespacedKey(Bukkit.getPluginManager().getPlugin("Plus"), key);
+            NamespacedKey n = new NamespacedKey(Plus.hook, key);
             if (p.has(n)) v.set(p.get(n, PersistentDataType.STRING));
         });
         return v.get();
@@ -211,7 +210,7 @@ public class Item {
     public Item setTag(@NotNull String key, @NotNull Integer value) {
         editMeta(itemMeta -> {
             PersistentDataContainer p = itemMeta.getPersistentDataContainer();
-            NamespacedKey n = new NamespacedKey(Bukkit.getPluginManager().getPlugin("Plus"), key);
+            NamespacedKey n = new NamespacedKey(Plus.hook, key);
             p.set(n, PersistentDataType.INTEGER, value);
         });
         return this;
@@ -222,7 +221,7 @@ public class Item {
         AtomicReference<Integer> v = new AtomicReference<>(defaultValue);
         editMeta(itemMeta -> {
             PersistentDataContainer p = itemMeta.getPersistentDataContainer();
-            NamespacedKey n = new NamespacedKey(Bukkit.getPluginManager().getPlugin("Plus"), key);
+            NamespacedKey n = new NamespacedKey(Plus.hook, key);
             if (p.has(n)) v.set(p.get(n, PersistentDataType.INTEGER));
         });
         return v.get();
@@ -232,7 +231,7 @@ public class Item {
     public Item setTag(@NotNull String key, @NotNull Double value) {
         editMeta(itemMeta -> {
             PersistentDataContainer p = itemMeta.getPersistentDataContainer();
-            NamespacedKey n = new NamespacedKey(Bukkit.getPluginManager().getPlugin("Plus"), key);
+            NamespacedKey n = new NamespacedKey(Plus.hook, key);
             p.set(n, PersistentDataType.DOUBLE, value);
         });
         return this;
@@ -243,7 +242,7 @@ public class Item {
         AtomicReference<Double> v = new AtomicReference<>(defaultValue);
         editMeta(itemMeta -> {
             PersistentDataContainer p = itemMeta.getPersistentDataContainer();
-            NamespacedKey n = new NamespacedKey(Bukkit.getPluginManager().getPlugin("Plus"), key);
+            NamespacedKey n = new NamespacedKey(Plus.hook, key);
             if (p.has(n)) v.set(p.get(n, PersistentDataType.DOUBLE));
         });
         return v.get();
