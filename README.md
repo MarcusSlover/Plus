@@ -11,23 +11,23 @@ This library is currently meant to be working with PaperMC 1.18.1.<br/>
 ## 🐘 Gradle
 ```gradle
 repositories {
-    maven { url = 'https://m2.tecc.me/snapshots' }
+    maven { url = 'https://s01.oss.sonatype.org/content/repositories/snapshots/' }
 }
 
 dependencies {
-    compileOnly 'me.marcusslover.plus:plus:dev'
+    compileOnly 'com.marcusslover:plus:3.0-SNAPSHOT'
 }
 ```
 ## 🦢 Maven
 ```xml
 <repository>
-    <id>tecc</id>
-    <url>https://m2.tecc.me/snapshots</url>
+    <id>ossrh</id>
+    <url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>
 </repository>
 
 <dependency>
-    <groupId>me.marcusslover.plus</groupId>
+    <groupId>com.marcusslover</groupId>
     <artifactId>plus</artifactId>
-    <version>dev</version>
+    <version>3.0-SNAPSHOT</version>
 </dependency>
 ```
