@@ -2,21 +2,27 @@ package com.marcusslover.plus.lib.item;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
+import com.marcusslover.plus.PlusPlugin;
 import com.marcusslover.plus.lib.text.Text;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.*;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -178,6 +184,69 @@ public class Item {
     @NotNull
     public Item setUnbreakable(boolean unbreakable) {
         return editMeta(itemMeta -> itemMeta.setUnbreakable(unbreakable));
+    }
+
+    @NotNull
+    public Item setTag(@NotNull String key, @NotNull String value) {
+        editMeta(itemMeta -> {
+            PersistentDataContainer p = itemMeta.getPersistentDataContainer();
+            NamespacedKey n = new NamespacedKey(PlusPlugin.getPlugin(PlusPlugin.class), key);
+            p.set(n, PersistentDataType.STRING, value);
+        });
+        return this;
+    }
+
+    @NotNull
+    public String getTag(@NotNull String key, @NotNull String defaultValue) {
+        AtomicReference<String> v = new AtomicReference<>(defaultValue);
+        editMeta(itemMeta -> {
+            PersistentDataContainer p = itemMeta.getPersistentDataContainer();
+            NamespacedKey n = new NamespacedKey(PlusPlugin.getPlugin(PlusPlugin.class), key);
+            if (p.has(n)) v.set(p.get(n, PersistentDataType.STRING));
+        });
+        return v.get();
+    }
+
+    @NotNull
+    public Item setTag(@NotNull String key, @NotNull Integer value) {
+        editMeta(itemMeta -> {
+            PersistentDataContainer p = itemMeta.getPersistentDataContainer();
+            NamespacedKey n = new NamespacedKey(PlusPlugin.getPlugin(PlusPlugin.class), key);
+            p.set(n, PersistentDataType.INTEGER, value);
+        });
+        return this;
+    }
+
+    @NotNull
+    public Integer getTag(@NotNull String key, @NotNull Integer defaultValue) {
+        AtomicReference<Integer> v = new AtomicReference<>(defaultValue);
+        editMeta(itemMeta -> {
+            PersistentDataContainer p = itemMeta.getPersistentDataContainer();
+            NamespacedKey n = new NamespacedKey(PlusPlugin.getPlugin(PlusPlugin.class), key);
+            if (p.has(n)) v.set(p.get(n, PersistentDataType.INTEGER));
+        });
+        return v.get();
+    }
+
+    @NotNull
+    public Item setTag(@NotNull String key, @NotNull Double value) {
+        editMeta(itemMeta -> {
+            PersistentDataContainer p = itemMeta.getPersistentDataContainer();
+            NamespacedKey n = new NamespacedKey(PlusPlugin.getPlugin(PlusPlugin.class), key);
+            p.set(n, PersistentDataType.DOUBLE, value);
+        });
+        return this;
+    }
+
+    @NotNull
+    public Double getTag(@NotNull String key, @NotNull Double defaultValue) {
+        AtomicReference<Double> v = new AtomicReference<>(defaultValue);
+        editMeta(itemMeta -> {
+            PersistentDataContainer p = itemMeta.getPersistentDataContainer();
+            NamespacedKey n = new NamespacedKey(PlusPlugin.getPlugin(PlusPlugin.class), key);
+            if (p.has(n)) v.set(p.get(n, PersistentDataType.DOUBLE));
+        });
+        return v.get();
     }
 
     public boolean hasCustomModelData() {
