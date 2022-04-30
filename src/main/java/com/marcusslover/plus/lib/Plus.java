@@ -41,6 +41,7 @@ public class Plus {
             String label = command.getLabel();
             knownCommands.remove(label);
         }
+        commandSet.clear();
     }
 
     @NotNull
