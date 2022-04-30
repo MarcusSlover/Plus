@@ -383,4 +383,9 @@ public class Item {
     public void setItemStack(@NotNull ItemStack itemStack) {
         this.itemStack = itemStack;
     }
+
+    @NotNull
+    public Item clone() {
+        return new Item(itemStack.clone());
+    }
 }
