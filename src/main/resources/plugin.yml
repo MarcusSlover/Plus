@@ -1,6 +1,6 @@
 name: Plus
 main: com.marcusslover.plus.PlusPlugin
-version: experimental
+version: 3.0-SNAPSHOT
 description: ""
 api-version: 1.18
 author: MarcusSlover

@@ -2,21 +2,29 @@ package com.marcusslover.plus.lib.item;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
+import com.marcusslover.plus.lib.Plus;
 import com.marcusslover.plus.lib.text.Text;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.*;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -60,6 +68,11 @@ public class Item {
 
     public Item(@Nullable ItemStack itemStack) {
         this.itemStack = itemStack == null ? new ItemStack(Material.AIR) : itemStack;
+    }
+
+    public boolean isValid() {
+        //noinspection ConstantConditions
+        return itemStack != null && itemStack.getType() != Material.AIR;
     }
 
     @NotNull
@@ -146,6 +159,21 @@ public class Item {
     }
 
     @NotNull
+    public Item addAttribute(@NotNull Attribute attribute, @NotNull AttributeModifier modifier) {
+        return editMeta(meta -> meta.addAttributeModifier(attribute, modifier));
+    }
+
+    @NotNull
+    public Item removeAttribute(@NotNull Attribute attribute) {
+        return editMeta(meta -> meta.removeAttributeModifier(attribute));
+    }
+
+    @NotNull
+    public Item removeAttribute(@NotNull EquipmentSlot equipmentSlot) {
+        return editMeta(meta -> meta.removeAttributeModifier(equipmentSlot));
+    }
+
+    @NotNull
     public Item addItemFlag(@NotNull ItemFlag itemFlag) {
         return editMeta(itemMeta -> itemMeta.addItemFlags(itemFlag));
     }
@@ -178,6 +206,69 @@ public class Item {
     @NotNull
     public Item setUnbreakable(boolean unbreakable) {
         return editMeta(itemMeta -> itemMeta.setUnbreakable(unbreakable));
+    }
+
+    @NotNull
+    public Item setTag(@NotNull String key, @NotNull String value) {
+        editMeta(itemMeta -> {
+            PersistentDataContainer p = itemMeta.getPersistentDataContainer();
+            NamespacedKey n = new NamespacedKey(Plus.hook, key);
+            p.set(n, PersistentDataType.STRING, value);
+        });
+        return this;
+    }
+
+    @NotNull
+    public String getTag(@NotNull String key, @NotNull String defaultValue) {
+        AtomicReference<String> v = new AtomicReference<>(defaultValue);
+        editMeta(itemMeta -> {
+            PersistentDataContainer p = itemMeta.getPersistentDataContainer();
+            NamespacedKey n = new NamespacedKey(Plus.hook, key);
+            if (p.has(n)) v.set(p.get(n, PersistentDataType.STRING));
+        });
+        return v.get();
+    }
+
+    @NotNull
+    public Item setTag(@NotNull String key, @NotNull Integer value) {
+        editMeta(itemMeta -> {
+            PersistentDataContainer p = itemMeta.getPersistentDataContainer();
+            NamespacedKey n = new NamespacedKey(Plus.hook, key);
+            p.set(n, PersistentDataType.INTEGER, value);
+        });
+        return this;
+    }
+
+    @NotNull
+    public Integer getTag(@NotNull String key, @NotNull Integer defaultValue) {
+        AtomicReference<Integer> v = new AtomicReference<>(defaultValue);
+        editMeta(itemMeta -> {
+            PersistentDataContainer p = itemMeta.getPersistentDataContainer();
+            NamespacedKey n = new NamespacedKey(Plus.hook, key);
+            if (p.has(n)) v.set(p.get(n, PersistentDataType.INTEGER));
+        });
+        return v.get();
+    }
+
+    @NotNull
+    public Item setTag(@NotNull String key, @NotNull Double value) {
+        editMeta(itemMeta -> {
+            PersistentDataContainer p = itemMeta.getPersistentDataContainer();
+            NamespacedKey n = new NamespacedKey(Plus.hook, key);
+            p.set(n, PersistentDataType.DOUBLE, value);
+        });
+        return this;
+    }
+
+    @NotNull
+    public Double getTag(@NotNull String key, @NotNull Double defaultValue) {
+        AtomicReference<Double> v = new AtomicReference<>(defaultValue);
+        editMeta(itemMeta -> {
+            PersistentDataContainer p = itemMeta.getPersistentDataContainer();
+            NamespacedKey n = new NamespacedKey(Plus.hook, key);
+            if (p.has(n)) v.set(p.get(n, PersistentDataType.DOUBLE));
+        });
+        return v.get();
     }
 
     public boolean hasCustomModelData() {
@@ -313,5 +404,10 @@ public class Item {
 
     public void setItemStack(@NotNull ItemStack itemStack) {
         this.itemStack = itemStack;
+    }
+
+    @NotNull
+    public Item clone() {
+        return new Item(itemStack.clone());
     }
 }
