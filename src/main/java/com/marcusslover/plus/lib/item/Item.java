@@ -9,7 +9,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.*;
@@ -65,6 +68,11 @@ public class Item {
 
     public Item(@Nullable ItemStack itemStack) {
         this.itemStack = itemStack == null ? new ItemStack(Material.AIR) : itemStack;
+    }
+
+    public boolean isValid() {
+        //noinspection ConstantConditions
+        return itemStack != null && itemStack.getType() != Material.AIR;
     }
 
     @NotNull
@@ -148,6 +156,21 @@ public class Item {
                 meta.setColor(color);
             }
         });
+    }
+
+    @NotNull
+    public Item addAttribute(@NotNull Attribute attribute, @NotNull AttributeModifier modifier) {
+        return editMeta(meta -> meta.addAttributeModifier(attribute, modifier));
+    }
+
+    @NotNull
+    public Item removeAttribute(@NotNull Attribute attribute) {
+        return editMeta(meta -> meta.removeAttributeModifier(attribute));
+    }
+
+    @NotNull
+    public Item removeAttribute(@NotNull EquipmentSlot equipmentSlot) {
+        return editMeta(meta -> meta.removeAttributeModifier(equipmentSlot));
     }
 
     @NotNull
