@@ -34,11 +34,16 @@ public class Plus {
     public static void unhook() {
         Menu.initialize(null);
         CommandMap commandMap = Bukkit.getCommandMap();
+
         Map<String, Command> knownCommands = commandMap.getKnownCommands();
         CommandManager commandManager = CommandManager.get();
         Set<Command> commandSet = commandManager.getCommandSet();
+
         for (Command command : commandSet) {
             String label = command.getLabel();
+            command.unregister(commandMap);
+
+            // just in case
             knownCommands.remove(label);
         }
         commandSet.clear();

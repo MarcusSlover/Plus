@@ -43,6 +43,12 @@ public class CommandManager {
                 CommandContext commandContext = new CommandContext(sender, commandLabel, args);
                 return command.execute(commandContext);
             }
+
+            @Override
+            public @NotNull List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args) throws IllegalArgumentException {
+                TabCompleteContext tabCompleteContext = new TabCompleteContext(sender, args);
+                return command.tab(tabCompleteContext);
+            }
         };
         commandSet.add(cmd);
         commandMap.register(commandAnnotation.name(), prefix, cmd);

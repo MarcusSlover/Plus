@@ -20,6 +20,10 @@ public class Color {
         this.rgb = rgb;
     }
 
+    public int rgb() {
+        return rgb;
+    }
+
     public int red() {
         return (rgb >> 16) & 0xFF;
     }
