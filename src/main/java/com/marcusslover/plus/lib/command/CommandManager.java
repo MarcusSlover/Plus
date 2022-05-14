@@ -11,8 +11,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class CommandManager {
-    private final Set<org.bukkit.command.Command> commandSet = new HashSet<>();
+public final class CommandManager {
+    @NotNull
+    private final Set<org.bukkit.command.Command> commands = new HashSet<>();
 
     private static CommandManager instance;
 
@@ -20,14 +21,17 @@ public class CommandManager {
         instance = this;
     }
 
+    @NotNull
     public static CommandManager get() {
         return instance == null ? new CommandManager() : instance;
     }
 
+    @NotNull
     public CommandManager register(@NotNull ICommand command) {
         return this.register("plus", command);
     }
 
+    @NotNull
     public CommandManager register(@NotNull String prefix, @NotNull ICommand command) {
         Command commandAnnotation = getCommandAnnotation(command);
         if (commandAnnotation == null) return this;
@@ -50,13 +54,14 @@ public class CommandManager {
                 return command.tab(tabCompleteContext);
             }
         };
-        commandSet.add(cmd);
-        commandMap.register(commandAnnotation.name(), prefix, cmd);
+        commands.add(cmd);
+        commandMap.register(name, prefix, cmd);
         return this;
     }
 
-    public Set<org.bukkit.command.Command> getCommandSet() {
-        return commandSet;
+    @NotNull
+    public Set<org.bukkit.command.Command> getCommands() {
+        return commands;
     }
 
     private @Nullable Command getCommandAnnotation(@NotNull ICommand command) {
@@ -66,5 +71,9 @@ public class CommandManager {
             return annotationsByType[0];
         }
         return null;
+    }
+
+    public void clearCommands() {
+        commands.clear();
     }
 }

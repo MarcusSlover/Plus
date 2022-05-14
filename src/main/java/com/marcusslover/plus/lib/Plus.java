@@ -13,7 +13,7 @@ import java.io.File;
 import java.util.Map;
 import java.util.Set;
 
-public class Plus {
+public final class Plus {
     public static Plugin hook;
     private static Plus instance;
 
@@ -26,27 +26,18 @@ public class Plus {
         return instance == null ? new Plus() : instance;
     }
 
-    public static void hook(Plugin plugin) {
+    public static void hook(@NotNull Plugin plugin) {
         Plus.hook = plugin;
         Menu.initialize(plugin);
     }
 
     public static void unhook() {
         Menu.initialize(null);
-        CommandMap commandMap = Bukkit.getCommandMap();
-
-        Map<String, Command> knownCommands = commandMap.getKnownCommands();
         CommandManager commandManager = CommandManager.get();
-        Set<Command> commandSet = commandManager.getCommandSet();
+        commandManager.clearCommands();
 
-        for (Command command : commandSet) {
-            String label = command.getLabel();
-            command.unregister(commandMap);
-
-            // just in case
-            knownCommands.remove(label);
-        }
-        commandSet.clear();
+        CommandMap commandMap = Bukkit.getCommandMap();
+        commandMap.clearCommands();
     }
 
     @NotNull
