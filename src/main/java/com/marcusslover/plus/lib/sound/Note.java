@@ -30,6 +30,21 @@ public class Note {
     }
 
     @NotNull
+    public static Note of(@NotNull Sound sound) {
+        return new Note(sound);
+    }
+
+    @NotNull
+    public static Note of(@NotNull Sound sound, float volume, float pitch) {
+        return new Note(sound, volume, pitch);
+    }
+
+    @NotNull
+    public static Note of(@NotNull Sound sound, float volume, float pitch, @NotNull SoundCategory category) {
+        return new Note(sound, volume, pitch, category);
+    }
+
+    @NotNull
     public Sound getSound() {
         return sound;
     }

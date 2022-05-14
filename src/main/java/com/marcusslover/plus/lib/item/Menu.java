@@ -55,6 +55,16 @@ public class Menu {
         menus.add(this);
     }
 
+    @NotNull
+    public static Menu of(int size) {
+        return new Menu(size);
+    }
+
+    @NotNull
+    public static Menu of(int size, @Nullable String name) {
+        return new Menu(size, name);
+    }
+
     public static void initialize(@Nullable Plugin plugin) {
         if (plugin == null) {
             if (pluginListener != null && clickListener != null) {

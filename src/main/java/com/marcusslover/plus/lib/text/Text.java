@@ -43,6 +43,16 @@ public class Text {
     }
 
     @NotNull
+    public static Text of(@NotNull String text) {
+        return new Text(text);
+    }
+
+    @NotNull
+    public static Text of(@NotNull Component component) {
+        return new Text(component);
+    }
+
+    @NotNull
     public static List<Text> list(@NotNull List<Component> lore) {
         return lore.stream().map(Text::new).collect(Collectors.toList());
     }

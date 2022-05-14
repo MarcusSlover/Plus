@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class Title {
     private static final net.kyori.adventure.title.Title.Times TIMES =
-            net.kyori.adventure.title.Title.Times.of(
+            net.kyori.adventure.title.Title.Times.times(
                     Ticks.duration(10),
                     Ticks.duration(40),
                     Ticks.duration(10));
@@ -43,7 +43,7 @@ public class Title {
 
     @NotNull
     public Title send(@NotNull Player player, long fadeIn, long fadeStay, long fadeOut) {
-        net.kyori.adventure.title.Title.Times of = net.kyori.adventure.title.Title.Times.of(Ticks.duration(fadeIn), Ticks.duration(fadeStay), Ticks.duration(fadeOut));
+        net.kyori.adventure.title.Title.Times of = net.kyori.adventure.title.Title.Times.times(Ticks.duration(fadeIn), Ticks.duration(fadeStay), Ticks.duration(fadeOut));
         player.showTitle(net.kyori.adventure.title.Title.title(title.comp(), subtitle.comp(), of));
         return this;
     }

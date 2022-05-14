@@ -12,6 +12,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
+@Deprecated
 public class JsonFile extends AbstractFile {
 
     protected JsonElement jsonElement;
