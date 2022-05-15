@@ -15,17 +15,24 @@ public class CommandManager {
     private final Set<org.bukkit.command.Command> commandSet = new HashSet<>();
 
     private static CommandManager instance;
-
-    private CommandManager() {
+    private String namespace;
+    
+    
+    private CommandManager(String namespace) {
         instance = this;
+        this.namespace = namespace;
     }
 
     public static CommandManager get() {
-        return instance == null ? new CommandManager() : instance;
+        return instance == null ? new CommandManager("plus") : instance;
+    }
+    
+    public static CommandManager get(String namespace) {
+        return instance == null ? new CommandManager(namespace) : instance;
     }
 
     public CommandManager register(@NotNull ICommand command) {
-        return this.register("plus", command);
+        return this.register(this.namespace, command);
     }
 
     public CommandManager register(@NotNull String prefix, @NotNull ICommand command) {
