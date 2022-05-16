@@ -2,7 +2,6 @@ package com.marcusslover.plus.lib.item;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
-import com.marcusslover.plus.lib.Plus;
 import com.marcusslover.plus.lib.text.Text;
 import net.kyori.adventure.text.Component;
 import org.bukkit.*;
@@ -366,15 +365,6 @@ public class Item {
         return itemStack.hasItemMeta() && itemStack.getItemMeta().hasLore();
     }
 
-    @NotNull
-    public Item setLore(@Nullable List<String> lore) {
-        return editMeta(itemMeta -> {
-            if (lore != null)
-                itemMeta.lore(lore.stream().map(line -> new Text(line).comp()).collect(Collectors.toList()));
-            else itemMeta.lore(null);
-        });
-    }
-
     @Nullable
     public List<Text> lore() {
         //noinspection ConstantConditions
@@ -392,6 +382,15 @@ public class Item {
     @Nullable
     public List<String> getLore() {
         return hasLore() ? getMeta().getLore() : null;
+    }
+
+    @NotNull
+    public Item setLore(@Nullable List<String> lore) {
+        return editMeta(itemMeta -> {
+            if (lore != null)
+                itemMeta.lore(lore.stream().map(line -> new Text(line).comp()).collect(Collectors.toList()));
+            else itemMeta.lore(null);
+        });
     }
 
     @NotNull
