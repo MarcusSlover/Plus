@@ -53,7 +53,7 @@ public final class CommandManager {
 
     @NotNull
     public Set<org.bukkit.command.Command> getCommands() {
-        return commands;
+        return commandSet;
     }
 
     private @Nullable Command getCommandAnnotation(@NotNull ICommand command) {
