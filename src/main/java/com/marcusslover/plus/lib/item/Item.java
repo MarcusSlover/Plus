@@ -5,10 +5,7 @@ import com.destroystokyo.paper.profile.ProfileProperty;
 import com.marcusslover.plus.lib.Plus;
 import com.marcusslover.plus.lib.text.Text;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Bukkit;
-import org.bukkit.Color;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
+import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
@@ -70,9 +67,18 @@ public class Item {
         this.itemStack = itemStack == null ? new ItemStack(Material.AIR) : itemStack;
     }
 
+    @NotNull
+    public static Item of(@Nullable ItemStack itemStack) {
+        return new Item(itemStack);
+    }
+
     public boolean isValid() {
         //noinspection ConstantConditions
         return itemStack != null && itemStack.getType() != Material.AIR;
+    }
+
+    public int getMaxStack() {
+        return itemStack.getType().getMaxStackSize();
     }
 
     @NotNull
@@ -139,6 +145,11 @@ public class Item {
         if (level <= 0) itemStack.removeEnchantment(enchantment);
         else itemStack.addUnsafeEnchantment(enchantment, level);
         return this;
+    }
+
+    @NotNull
+    public Item setColor(@Nullable com.marcusslover.plus.lib.color.Color plusColor) {
+        return setColor(plusColor != null ? Color.fromRGB(plusColor.rgb()) : null);
     }
 
     @NotNull
@@ -209,6 +220,11 @@ public class Item {
     }
 
     @NotNull
+    public PersistentDataContainer getPersistentDataContainer() {
+        return getMeta().getPersistentDataContainer();
+    }
+
+    @NotNull
     public Item setTag(@NotNull String key, @NotNull String value) {
         editMeta(itemMeta -> {
             PersistentDataContainer p = itemMeta.getPersistentDataContainer();
@@ -235,6 +251,16 @@ public class Item {
             PersistentDataContainer p = itemMeta.getPersistentDataContainer();
             NamespacedKey n = new NamespacedKey("plus", key);
             p.set(n, PersistentDataType.INTEGER, value);
+        });
+        return this;
+    }
+
+    @NotNull
+    public Item setTag(@NotNull String key, @NotNull Long value) {
+        editMeta(itemMeta -> {
+            PersistentDataContainer p = itemMeta.getPersistentDataContainer();
+            NamespacedKey n = new NamespacedKey(Plus.hook, key);
+            p.set(n, PersistentDataType.LONG, value);
         });
         return this;
     }
@@ -267,6 +293,17 @@ public class Item {
             PersistentDataContainer p = itemMeta.getPersistentDataContainer();
             NamespacedKey n = new NamespacedKey("plus", key);
             if (p.has(n)) v.set(p.get(n, PersistentDataType.DOUBLE));
+        });
+        return v.get();
+    }
+
+    @NotNull
+    public Long getTag(@NotNull String key, @NotNull Long defaultValue) {
+        AtomicReference<Long> v = new AtomicReference<>(defaultValue);
+        editMeta(itemMeta -> {
+            PersistentDataContainer p = itemMeta.getPersistentDataContainer();
+            NamespacedKey n = new NamespacedKey(Plus.hook, key);
+            if (p.has(n)) v.set(p.get(n, PersistentDataType.LONG));
         });
         return v.get();
     }
@@ -305,7 +342,7 @@ public class Item {
 
     @Nullable
     public Text name() {
-        ItemMeta itemMeta = itemStack.getItemMeta();
+        ItemMeta itemMeta = getMeta();
         if (itemMeta == null) return null;
         if (itemMeta.hasDisplayName()) {
             Component component = itemMeta.displayName();
@@ -341,7 +378,7 @@ public class Item {
     @Nullable
     public List<Text> lore() {
         //noinspection ConstantConditions
-        return hasLore() ? Text.list(itemStack.getItemMeta().lore()) : null;
+        return hasLore() ? Text.list(getMeta().lore()) : null;
     }
 
     @NotNull
@@ -352,9 +389,23 @@ public class Item {
         });
     }
 
+    @Nullable
+    public List<String> getLore() {
+        return hasLore() ? getMeta().getLore() : null;
+    }
+
     @NotNull
     public Item skull(@Nullable PlayerProfile playerProfile) {
         return setSkull(playerProfile);
+    }
+
+    @NotNull
+    public Item setSkull(@Nullable OfflinePlayer player) {
+        return editMeta(itemMeta -> {
+            if (itemMeta instanceof SkullMeta skullMeta) {
+                skullMeta.setOwningPlayer(player);
+            }
+        });
     }
 
     @NotNull
@@ -395,6 +446,10 @@ public class Item {
     public Item editMeta(@NotNull Consumer<ItemMeta> meta) {
         itemStack.editMeta(meta);
         return this;
+    }
+
+    public ItemMeta getMeta() {
+        return itemStack.getItemMeta();
     }
 
     @NotNull

@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 
-public class Plus {
+public final class Plus {
     private static Plus instance;
 
     private Plus() {

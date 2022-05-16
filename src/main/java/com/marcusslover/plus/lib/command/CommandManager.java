@@ -15,7 +15,6 @@ public final class CommandManager {
     @NotNull
     private final Plugin plugin;
 
-
     private CommandManager(@NotNull Plugin plugin) {
         this.plugin = plugin;
     }
@@ -25,6 +24,7 @@ public final class CommandManager {
         return new CommandManager(plugin);
     }
 
+    @NotNull
     public CommandManager register(@NotNull ICommand command) {
         Command commandAnnotation = getCommandAnnotation(command);
         if (commandAnnotation == null) return this;
@@ -47,12 +47,13 @@ public final class CommandManager {
             }
         };
         commandSet.add(cmd);
-        commandMap.register(commandAnnotation.name(), plugin.getName().toLowerCase(Locale.ROOT), cmd);
+        commandMap.register(name, plugin.getName().toLowerCase(Locale.ROOT), cmd);
         return this;
     }
 
-    public Set<org.bukkit.command.Command> getCommandSet() {
-        return commandSet;
+    @NotNull
+    public Set<org.bukkit.command.Command> getCommands() {
+        return commands;
     }
 
     private @Nullable Command getCommandAnnotation(@NotNull ICommand command) {

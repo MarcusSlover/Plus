@@ -27,6 +27,10 @@ public class Sidebar {
     @NotNull
     private final LinkedList<SidebarField> fields;
 
+    public Sidebar(@NotNull String title) {
+        this(new Text(title));
+    }
+
     public Sidebar(@NotNull Text title) {
         scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
         objective = scoreboard.registerNewObjective(customID + "DS", "dummy", title.comp());
@@ -36,6 +40,16 @@ public class Sidebar {
 
         // Add to the id value
         customID += 1;
+    }
+
+    @NotNull
+    public static Sidebar of(@NotNull String title) {
+        return new Sidebar(title);
+    }
+
+    @NotNull
+    public static Sidebar of(@NotNull Text title) {
+        return new Sidebar(title);
     }
 
     @NotNull
@@ -74,6 +88,11 @@ public class Sidebar {
     }
 
     @NotNull
+    public Sidebar addField(@NotNull String prefix, @NotNull String suffix) {
+        return addField(new Text(prefix), new Text(suffix));
+    }
+
+    @NotNull
     public Sidebar addField(@NotNull Text prefix, @NotNull Text suffix) {
         int currentSize = getSize();
         String entry = getEntry(currentSize);
@@ -90,6 +109,11 @@ public class Sidebar {
 
         objective.getScore(entry).setScore(16 - currentSize);
         return this;
+    }
+
+    @NotNull
+    public Sidebar insertField(int index, @NotNull String prefix, @NotNull String suffix) {
+        return insertField(index, new Text(prefix), new Text(suffix));
     }
 
     @NotNull
@@ -114,6 +138,11 @@ public class Sidebar {
         // Update the whole sidebar
         fields.forEach(field -> objective.getScore(field.entry()).setScore(16 - currentSize));
         return this;
+    }
+
+    @NotNull
+    public Sidebar updateField(int index, @NotNull String prefix, @NotNull String suffix) {
+        return updateField(index, new Text(prefix), new Text(suffix));
     }
 
     @NotNull
