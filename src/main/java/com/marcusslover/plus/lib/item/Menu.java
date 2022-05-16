@@ -114,9 +114,6 @@ public class Menu {
         return getViewers().contains(player);
     }
 
-    public record ClickAdapter(int slot, @NotNull Consumer<InventoryClickEvent> event) {
-    }
-
     public @Nullable ClickAdapter getMainClickAdapter() {
         return mainClickAdapter;
     }
@@ -127,5 +124,8 @@ public class Menu {
 
     public @NotNull LinkedList<ClickAdapter> getClickAdapters() {
         return clickAdapters;
+    }
+
+    public record ClickAdapter(int slot, @NotNull Consumer<InventoryClickEvent> event) {
     }
 }
