@@ -3,6 +3,7 @@ package com.marcusslover.plus.lib.command;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
 import org.bukkit.command.CommandSender;
+import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -11,21 +12,28 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class CommandManager {
+public final class CommandManager {
     private final Set<org.bukkit.command.Command> commandSet = new HashSet<>();
 
-    private static CommandManager instance;
+    @Nullable
+    private final Plugin plugin;
 
-    private CommandManager() {
-        instance = this;
+
+    private CommandManager(@Nullable Plugin plugin) {
+        this.plugin = plugin;
     }
 
-    public static CommandManager get() {
-        return instance == null ? new CommandManager() : instance;
+    @NotNull
+    public static CommandManager get(@Nullable Plugin plugin) {
+        return new CommandManager(plugin);
     }
 
+    @NotNull
     public CommandManager register(@NotNull ICommand command) {
-        return this.register("plus", command);
+        String namespace;
+        if (plugin == null) namespace = "plus";
+        else namespace = plugin.getName().toLowerCase();
+        return this.register(namespace, command);
     }
 
     public CommandManager register(@NotNull String prefix, @NotNull ICommand command) {
@@ -66,5 +74,9 @@ public class CommandManager {
             return annotationsByType[0];
         }
         return null;
+    }
+
+    public void clearCommands() {
+
     }
 }
