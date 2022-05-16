@@ -259,7 +259,7 @@ public class Item {
     public Item setTag(@NotNull String key, @NotNull Long value) {
         editMeta(itemMeta -> {
             PersistentDataContainer p = itemMeta.getPersistentDataContainer();
-            NamespacedKey n = new NamespacedKey(Plus.hook, key);
+            NamespacedKey n = new NamespacedKey("plus", key);
             p.set(n, PersistentDataType.LONG, value);
         });
         return this;
@@ -302,7 +302,7 @@ public class Item {
         AtomicReference<Long> v = new AtomicReference<>(defaultValue);
         editMeta(itemMeta -> {
             PersistentDataContainer p = itemMeta.getPersistentDataContainer();
-            NamespacedKey n = new NamespacedKey(Plus.hook, key);
+            NamespacedKey n = new NamespacedKey("plus", key);
             if (p.has(n)) v.set(p.get(n, PersistentDataType.LONG));
         });
         return v.get();
