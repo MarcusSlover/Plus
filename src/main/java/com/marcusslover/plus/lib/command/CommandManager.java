@@ -3,36 +3,29 @@ package com.marcusslover.plus.lib.command;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
 import org.bukkit.command.CommandSender;
+import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public final class CommandManager {
+    private final Set<org.bukkit.command.Command> commandSet = new HashSet<>();
+
     @NotNull
-    private final Set<org.bukkit.command.Command> commands = new HashSet<>();
+    private final Plugin plugin;
 
-    private static CommandManager instance;
-
-    private CommandManager() {
-        instance = this;
+    private CommandManager(@NotNull Plugin plugin) {
+        this.plugin = plugin;
     }
 
     @NotNull
-    public static CommandManager get() {
-        return instance == null ? new CommandManager() : instance;
+    public static CommandManager get(@NotNull Plugin plugin) {
+        return new CommandManager(plugin);
     }
 
     @NotNull
     public CommandManager register(@NotNull ICommand command) {
-        return this.register("plus", command);
-    }
-
-    @NotNull
-    public CommandManager register(@NotNull String prefix, @NotNull ICommand command) {
         Command commandAnnotation = getCommandAnnotation(command);
         if (commandAnnotation == null) return this;
         String name = commandAnnotation.name();
@@ -40,8 +33,7 @@ public final class CommandManager {
         List<String> aliases = Arrays.stream(commandAnnotation.aliases()).toList();
 
         CommandMap commandMap = Bukkit.getCommandMap();
-        org.bukkit.command.Command cmd = new org.bukkit.command.Command(
-                name, description, "", aliases) {
+        org.bukkit.command.Command cmd = new org.bukkit.command.Command(name, description, "", aliases) {
             @Override
             public boolean execute(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] args) {
                 CommandContext commandContext = new CommandContext(sender, commandLabel, args);
@@ -54,8 +46,8 @@ public final class CommandManager {
                 return command.tab(tabCompleteContext);
             }
         };
-        commands.add(cmd);
-        commandMap.register(name, prefix, cmd);
+        commandSet.add(cmd);
+        commandMap.register(name, plugin.getName().toLowerCase(Locale.ROOT), cmd);
         return this;
     }
 
@@ -74,6 +66,11 @@ public final class CommandManager {
     }
 
     public void clearCommands() {
-        commands.clear();
+        CommandMap commandMap = Bukkit.getCommandMap();
+        List<String> keys = new ArrayList<>();
+        commandMap.getKnownCommands().forEach((key, value) -> {
+            if (this.commandSet.contains(value)) keys.add(key);
+        });
+        for (String key : keys) commandMap.getKnownCommands().remove(key);
     }
 }
