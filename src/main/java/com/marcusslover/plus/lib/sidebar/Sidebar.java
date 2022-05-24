@@ -214,6 +214,7 @@ public class Sidebar {
     @NotNull
     public Sidebar send(@NotNull Player player) {
         player.setScoreboard(scoreboard);
+        SIDEBAR_MAP.put(player.getUniqueId(), this);
         return this;
     }
 }
