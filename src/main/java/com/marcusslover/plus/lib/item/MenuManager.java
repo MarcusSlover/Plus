@@ -5,11 +5,13 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 public final class MenuManager implements Listener {
@@ -52,18 +54,25 @@ public final class MenuManager implements Listener {
 
     @EventHandler
     public void onClick(InventoryClickEvent event) {
-        menus.stream()
-                .filter(menu -> menu.inventory.equals(event.getInventory()))
-                .forEach(menu -> {
-                    event.setCancelled(menu.isCancelled);
+        Iterator<Menu> iterator = menus.iterator();
+        while (iterator.hasNext()) {
+            Menu menu = iterator.next();
+            if (menu.inventory.equals(event.getInventory())) {
+                event.setCancelled(menu.isCancelled);
 
-                    Menu.ClickAdapter mainClickAdapter = menu.mainClickAdapter;
-                    if (mainClickAdapter != null) mainClickAdapter.event().accept(event);
+                Menu.ClickAdapter mainClickAdapter = menu.mainClickAdapter;
+                if (mainClickAdapter != null) mainClickAdapter.event().accept(event);
 
-                    menu.clickAdapters.stream()
-                            .filter(click -> click.slot() == event.getRawSlot() || click.slot() == -1)
-                            .forEach(click -> click.event().accept(event));
-                });
+                menu.clickAdapters.stream()
+                        .filter(click -> click.slot() == event.getRawSlot() || click.slot() == -1)
+                        .forEach(click -> click.event().accept(event));
+            }
+        }
+    }
+
+    @EventHandler
+    public void onClose(InventoryCloseEvent event) {
+        menus.removeIf(menu -> menu.inventory.equals(event.getInventory()));
     }
 
     @NotNull
