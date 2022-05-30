@@ -22,8 +22,7 @@ public abstract class AbstractFile implements IFile {
 
     public abstract boolean isSet(@NotNull String key);
 
-    @NotNull
-    public File getFile() {
+    public @NotNull File getFile() {
         return file;
     }
 }

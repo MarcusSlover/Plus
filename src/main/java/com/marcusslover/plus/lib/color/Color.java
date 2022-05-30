@@ -40,12 +40,11 @@ public class Color {
         return (rgb >> 24) & 0xff;
     }
 
-    @NotNull
-    public String hex() {
+    public @NotNull String hex() {
         return "&#" + Integer.toHexString(rgb);
     }
 
-    public Color darker(double value) {
+    public @NotNull Color darker(double value) {
         return new Color(
                 Math.max((int) (red() * value), 0),
                 Math.max((int) (green() * value), 0),
@@ -53,15 +52,13 @@ public class Color {
         );
     }
 
-    public Color brighter(double value) {
+    public @NotNull Color brighter(double value) {
         int r = red();
         int g = green();
         int b = blue();
 
         int i = (int) (1.0 / (1.0 - value));
-        if (r == 0 && g == 0 && b == 0) {
-            return new Color(i, i, i);
-        }
+        if (r == 0 && g == 0 && b == 0) return new Color(i, i, i);
         if (r > 0 && r < i) r = i;
         if (g > 0 && g < i) g = i;
         if (b > 0 && b < i) b = i;

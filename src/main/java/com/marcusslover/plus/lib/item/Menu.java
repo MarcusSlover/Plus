@@ -1,6 +1,9 @@
 package com.marcusslover.plus.lib.item;
 
 import com.marcusslover.plus.lib.text.Text;
+import com.marcusslover.plus.lib.util.Alternative;
+import com.marcusslover.plus.lib.util.ISendable;
+import com.marcusslover.plus.lib.util.RequiresManager;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -13,13 +16,11 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-public class Menu {
-    @NotNull
-    protected Inventory inventory;
-    @NotNull
-    protected LinkedList<ClickAdapter> clickAdapters;
-    @Nullable
-    protected ClickAdapter mainClickAdapter;
+@RequiresManager
+public class Menu implements ISendable<Player, Menu> {
+    protected @NotNull Inventory inventory;
+    protected @NotNull LinkedList<@NotNull ClickAdapter> clickAdapters;
+    protected @Nullable ClickAdapter mainClickAdapter;
     protected boolean isCancelled = true;
 
     public Menu() {
@@ -45,14 +46,12 @@ public class Menu {
         return isCancelled;
     }
 
-    @NotNull
-    public Menu setCancelled(boolean cancelled) {
+    public @NotNull Menu setCancelled(boolean cancelled) {
         isCancelled = cancelled;
         return this;
     }
 
-    @NotNull
-    public Inventory inventory() {
+    public @NotNull Inventory inventory() {
         return inventory;
     }
 
@@ -60,53 +59,50 @@ public class Menu {
         return inventory.getSize();
     }
 
-    @NotNull
-    public Menu set(int slot, @Nullable Item item) {
+    public @NotNull Menu set(int slot, @Nullable Item item) {
         return setItem(slot, item, null);
     }
 
-    @NotNull
-    public Menu setItem(int slot, @Nullable Item item) {
+    public @NotNull Menu setItem(int slot, @Nullable Item item) {
         return setItem(slot, item, null);
     }
 
-    @NotNull
-    public Menu set(int slot, @Nullable Item item, @Nullable Consumer<InventoryClickEvent> event) {
+    public @NotNull Menu set(int slot, @Nullable Item item, @Nullable Consumer<@NotNull InventoryClickEvent> event) {
         return setItem(slot, item, event);
     }
 
-    @NotNull
-    public Menu setItem(int slot, @Nullable Item item, @Nullable Consumer<InventoryClickEvent> event) {
+    public @NotNull Menu setItem(int slot, @Nullable Item item, @Nullable Consumer<@NotNull InventoryClickEvent> event) {
         if (item != null) inventory.setItem(slot, item.getItemStack());
         if (event != null) return onClick(slot, event);
         return this;
     }
 
-    @NotNull
-    public Menu onClick(@NotNull Consumer<InventoryClickEvent> event) {
+    public @NotNull Menu onClick(@NotNull Consumer<@NotNull InventoryClickEvent> event) {
         return onClick(-1, event);
     }
 
-    @NotNull
-    public Menu onClick(int slot, @NotNull Consumer<InventoryClickEvent> event) {
+    public @NotNull Menu onClick(int slot, @NotNull Consumer<@NotNull InventoryClickEvent> event) {
         clickAdapters.add(new ClickAdapter(slot, event));
         return this;
     }
 
-    @NotNull
-    public Menu onMainClick(@NotNull Consumer<InventoryClickEvent> event) {
+    public @NotNull Menu onMainClick(@NotNull Consumer<@NotNull InventoryClickEvent> event) {
         mainClickAdapter = new Menu.ClickAdapter(-1, event);
         return this;
     }
 
-    @NotNull
-    public Menu open(@NotNull Player player) {
-        player.openInventory(inventory);
+    @Override
+    public @NotNull Menu send(@NotNull Player target) {
+        target.openInventory(inventory);
         return this;
     }
 
-    @NotNull
-    public List<Player> getViewers() {
+    @Alternative
+    public @NotNull Menu open(@NotNull Player player) {
+        return this;
+    }
+
+    public @NotNull List<@NotNull Player> getViewers() {
         return inventory.getViewers().stream().map(entity -> (Player) entity).collect(Collectors.toList());
     }
 
@@ -122,10 +118,10 @@ public class Menu {
         return inventory;
     }
 
-    public @NotNull LinkedList<ClickAdapter> getClickAdapters() {
+    public @NotNull LinkedList<@NotNull ClickAdapter> getClickAdapters() {
         return clickAdapters;
     }
 
-    public record ClickAdapter(int slot, @NotNull Consumer<InventoryClickEvent> event) {
+    public record ClickAdapter(int slot, @NotNull Consumer<@NotNull InventoryClickEvent> event) {
     }
 }

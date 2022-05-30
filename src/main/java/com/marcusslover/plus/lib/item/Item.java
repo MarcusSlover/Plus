@@ -17,6 +17,7 @@ import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
@@ -25,8 +26,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class Item {
-    @NotNull
-    protected ItemStack itemStack;
+    protected @NotNull ItemStack itemStack;
 
     public Item() {
         this(Material.STONE);
@@ -45,7 +45,7 @@ public class Item {
         name(name);
     }
 
-    public Item(@NotNull Material material, int amount, @Nullable Text name, @Nullable List<Text> lore) {
+    public Item(@NotNull Material material, int amount, @Nullable Text name, @Nullable List<@NotNull Text> lore) {
         this(material, amount);
         name(name);
         lore(lore);
@@ -56,7 +56,7 @@ public class Item {
         setName(name);
     }
 
-    public Item(@NotNull Material material, int amount, @Nullable String name, @Nullable List<String> lore) {
+    public Item(@NotNull Material material, int amount, @Nullable String name, @Nullable List<@NotNull String> lore) {
         this(material, amount);
         setName(name);
         setLore(lore);
@@ -66,8 +66,35 @@ public class Item {
         this.itemStack = itemStack == null ? new ItemStack(Material.AIR) : itemStack;
     }
 
-    @NotNull
-    public static Item of(@Nullable ItemStack itemStack) {
+    public static @NotNull Item of() {
+        return new Item();
+    }
+
+    public static @NotNull Item of(@NotNull Material material) {
+        return new Item(material);
+    }
+
+    public static @NotNull Item of(@NotNull Material material, int amount) {
+        return new Item(material, amount);
+    }
+
+    public static @NotNull Item of(@NotNull Material material, int amount, @Nullable Text name) {
+        return new Item(material, amount, name);
+    }
+
+    public static @NotNull Item of(@NotNull Material material, int amount, @Nullable Text name, @Nullable List<@NotNull Text> lore) {
+        return new Item(material, amount, name, lore);
+    }
+
+    public static @NotNull Item of(@NotNull Material material, int amount, @Nullable String name) {
+        return new Item(material, amount, name);
+    }
+
+    public static @NotNull Item of(@NotNull Material material, int amount, @Nullable String name, @Nullable List<@NotNull String> lore) {
+        return new Item(material, amount, name, lore);
+    }
+
+    public static @NotNull Item of(@Nullable ItemStack itemStack) {
         return new Item(itemStack);
     }
 
@@ -80,13 +107,11 @@ public class Item {
         return itemStack.getType().getMaxStackSize();
     }
 
-    @NotNull
-    public Material getType() {
+    public @NotNull Material getType() {
         return itemStack.getType();
     }
 
-    @NotNull
-    public Item setType(Material material) {
+    public @NotNull Item setType(@NotNull Material material) {
         itemStack.setType(material);
         return this;
     }
@@ -95,14 +120,12 @@ public class Item {
         return itemStack.getAmount();
     }
 
-    @NotNull
-    public Item setAmount(int amount) {
+    public @NotNull Item setAmount(int amount) {
         itemStack.setAmount(Math.min(64, Math.max(0, amount)));
         return this;
     }
 
-    @NotNull
-    public Item setDamagePercent(double percent) {
+    public @NotNull Item setDamagePercent(double percent) {
         return editMeta(itemMeta -> {
             if (itemMeta instanceof Damageable damageable) {
                 double max = itemStack.getType().getMaxDurability();
@@ -112,8 +135,7 @@ public class Item {
         });
     }
 
-    @Nullable
-    public Integer getDamage() {
+    public @Nullable Integer getDamage() {
         ItemMeta itemMeta = itemStack.getItemMeta();
         if (itemMeta == null) return null;
         if (itemMeta instanceof Damageable damageable) {
@@ -122,8 +144,7 @@ public class Item {
         return 0;
     }
 
-    @NotNull
-    public Item setDamage(int damage) {
+    public @NotNull Item setDamage(int damage) {
         return editMeta(itemMeta -> {
             if (itemMeta instanceof Damageable damageable) {
                 damageable.setDamage(damage);
@@ -139,20 +160,17 @@ public class Item {
         return getEnchant(enchantment) > 0;
     }
 
-    @NotNull
-    public Item setEnchant(@NotNull Enchantment enchantment, int level) {
+    public @NotNull Item setEnchant(@NotNull Enchantment enchantment, int level) {
         if (level <= 0) itemStack.removeEnchantment(enchantment);
         else itemStack.addUnsafeEnchantment(enchantment, level);
         return this;
     }
 
-    @NotNull
-    public Item setColor(@Nullable com.marcusslover.plus.lib.color.Color plusColor) {
+    public @NotNull Item setColor(@Nullable com.marcusslover.plus.lib.color.Color plusColor) {
         return setColor(plusColor != null ? Color.fromRGB(plusColor.rgb()) : null);
     }
 
-    @NotNull
-    public Item setColor(@Nullable Color color) {
+    public @NotNull Item setColor(@Nullable Color color) {
         return editMeta(itemMeta -> {
             if (itemMeta instanceof PotionMeta meta) {
                 meta.setColor(color);
@@ -168,28 +186,23 @@ public class Item {
         });
     }
 
-    @NotNull
-    public Item addAttribute(@NotNull Attribute attribute, @NotNull AttributeModifier modifier) {
+    public @NotNull Item addAttribute(@NotNull Attribute attribute, @NotNull AttributeModifier modifier) {
         return editMeta(meta -> meta.addAttributeModifier(attribute, modifier));
     }
 
-    @NotNull
-    public Item removeAttribute(@NotNull Attribute attribute) {
+    public @NotNull Item removeAttribute(@NotNull Attribute attribute) {
         return editMeta(meta -> meta.removeAttributeModifier(attribute));
     }
 
-    @NotNull
-    public Item removeAttribute(@NotNull EquipmentSlot equipmentSlot) {
+    public @NotNull Item removeAttribute(@NotNull EquipmentSlot equipmentSlot) {
         return editMeta(meta -> meta.removeAttributeModifier(equipmentSlot));
     }
 
-    @NotNull
-    public Item addItemFlag(@NotNull ItemFlag itemFlag) {
+    public @NotNull Item addItemFlag(@NotNull ItemFlag itemFlag) {
         return editMeta(itemMeta -> itemMeta.addItemFlags(itemFlag));
     }
 
-    @NotNull
-    public Item removeItemFlag(@NotNull ItemFlag itemFlag) {
+    public @NotNull Item removeItemFlag(@NotNull ItemFlag itemFlag) {
         return editMeta(itemMeta -> itemMeta.removeItemFlags(itemFlag));
     }
 
@@ -199,8 +212,8 @@ public class Item {
         return itemMeta.hasItemFlag(itemFlag);
     }
 
-    @NotNull
-    public Item setHideflags(boolean hideflags) {
+
+    public @NotNull Item setHideflags(boolean hideflags) {
         return editMeta(itemMeta -> {
             if (!hideflags) itemMeta.removeItemFlags(ItemFlag.values());
             else itemMeta.addItemFlags(ItemFlag.values());
@@ -213,18 +226,15 @@ public class Item {
         return itemMeta.isUnbreakable();
     }
 
-    @NotNull
-    public Item setUnbreakable(boolean unbreakable) {
+    public @NotNull Item setUnbreakable(boolean unbreakable) {
         return editMeta(itemMeta -> itemMeta.setUnbreakable(unbreakable));
     }
 
-    @NotNull
-    public PersistentDataContainer getPersistentDataContainer() {
+    public @NotNull PersistentDataContainer getPersistentDataContainer() {
         return getMeta().getPersistentDataContainer();
     }
 
-    @NotNull
-    public Item setTag(@NotNull String key, @NotNull String value) {
+    public @NotNull Item setTag(@NotNull String key, @NotNull String value) {
         editMeta(itemMeta -> {
             PersistentDataContainer p = itemMeta.getPersistentDataContainer();
             NamespacedKey n = new NamespacedKey("plus", key);
@@ -233,8 +243,7 @@ public class Item {
         return this;
     }
 
-    @NotNull
-    public String getTag(@NotNull String key, @NotNull String defaultValue) {
+    public @NotNull String getTag(@NotNull String key, @NotNull String defaultValue) {
         AtomicReference<String> v = new AtomicReference<>(defaultValue);
         editMeta(itemMeta -> {
             PersistentDataContainer p = itemMeta.getPersistentDataContainer();
@@ -244,8 +253,7 @@ public class Item {
         return v.get();
     }
 
-    @NotNull
-    public Item setTag(@NotNull String key, @NotNull Integer value) {
+    public @NotNull Item setTag(@NotNull String key, @NotNull Integer value) {
         editMeta(itemMeta -> {
             PersistentDataContainer p = itemMeta.getPersistentDataContainer();
             NamespacedKey n = new NamespacedKey("plus", key);
@@ -254,8 +262,7 @@ public class Item {
         return this;
     }
 
-    @NotNull
-    public Item setTag(@NotNull String key, @NotNull Long value) {
+    public @NotNull Item setTag(@NotNull String key, @NotNull Long value) {
         editMeta(itemMeta -> {
             PersistentDataContainer p = itemMeta.getPersistentDataContainer();
             NamespacedKey n = new NamespacedKey("plus", key);
@@ -264,8 +271,8 @@ public class Item {
         return this;
     }
 
-    @NotNull
-    public Integer getTag(@NotNull String key, @NotNull Integer defaultValue) {
+
+    public @NotNull Integer getTag(@NotNull String key, @NotNull Integer defaultValue) {
         AtomicReference<Integer> v = new AtomicReference<>(defaultValue);
         editMeta(itemMeta -> {
             PersistentDataContainer p = itemMeta.getPersistentDataContainer();
@@ -275,8 +282,7 @@ public class Item {
         return v.get();
     }
 
-    @NotNull
-    public Item setTag(@NotNull String key, @NotNull Double value) {
+    public @NotNull Item setTag(@NotNull String key, @NotNull Double value) {
         editMeta(itemMeta -> {
             PersistentDataContainer p = itemMeta.getPersistentDataContainer();
             NamespacedKey n = new NamespacedKey("plus", key);
@@ -285,8 +291,7 @@ public class Item {
         return this;
     }
 
-    @NotNull
-    public Double getTag(@NotNull String key, @NotNull Double defaultValue) {
+    public @NotNull Double getTag(@NotNull String key, @NotNull Double defaultValue) {
         AtomicReference<Double> v = new AtomicReference<>(defaultValue);
         editMeta(itemMeta -> {
             PersistentDataContainer p = itemMeta.getPersistentDataContainer();
@@ -296,8 +301,7 @@ public class Item {
         return v.get();
     }
 
-    @NotNull
-    public Long getTag(@NotNull String key, @NotNull Long defaultValue) {
+    public @NotNull Long getTag(@NotNull String key, @NotNull Long defaultValue) {
         AtomicReference<Long> v = new AtomicReference<>(defaultValue);
         editMeta(itemMeta -> {
             PersistentDataContainer p = itemMeta.getPersistentDataContainer();
@@ -313,15 +317,13 @@ public class Item {
         return itemMeta.hasCustomModelData();
     }
 
-    @Nullable
-    public Integer getCustomModelData() {
+    public @Nullable Integer getCustomModelData() {
         ItemMeta itemMeta = itemStack.getItemMeta();
         if (itemMeta == null) return null;
         return itemMeta.getCustomModelData();
     }
 
-    @NotNull
-    public Item setCustomModelData(int customModelData) {
+    public @NotNull Item setCustomModelData(int customModelData) {
         return editMeta(itemMeta -> itemMeta.setCustomModelData(customModelData));
     }
 
@@ -331,16 +333,14 @@ public class Item {
         return itemMeta.hasDisplayName();
     }
 
-    @NotNull
-    public Item name(@Nullable Text name) {
+    public @NotNull Item name(@Nullable Text name) {
         return editMeta(itemMeta -> {
             if (name != null) itemMeta.displayName(name.comp());
             else itemMeta.displayName(null);
         });
     }
 
-    @Nullable
-    public Text name() {
+    public @Nullable Text name() {
         ItemMeta itemMeta = getMeta();
         if (itemMeta == null) return null;
         if (itemMeta.hasDisplayName()) {
@@ -351,12 +351,11 @@ public class Item {
         return null;
     }
 
-    @NotNull
-    public Item setName(@Nullable String name) {
+    public @NotNull Item setName(@Nullable String name) {
         return editMeta(itemMeta -> {
             if (name != null) {
-                Text text = new Text(name);
-                itemMeta.displayName(text.comp());
+                if (name.isEmpty() || name.isBlank()) itemMeta.displayName(null);
+                else itemMeta.displayName(Text.of(name).comp());
             } else itemMeta.displayName(null);
         });
     }
@@ -365,41 +364,37 @@ public class Item {
         return itemStack.hasItemMeta() && itemStack.getItemMeta().hasLore();
     }
 
-    @Nullable
-    public List<Text> lore() {
+    public @NotNull List<@NotNull Text> lore() {
         //noinspection ConstantConditions
-        return hasLore() ? Text.list(getMeta().lore()) : null;
+        return hasLore() ? Text.list(getMeta().lore()) : new ArrayList<>();
     }
 
-    @NotNull
-    public Item lore(@Nullable List<Text> lore) {
+    public @NotNull Item lore(@Nullable List<@NotNull Text> lore) {
         return editMeta(itemMeta -> {
             if (lore != null) itemMeta.lore(lore.stream().map(Text::comp).collect(Collectors.toList()));
             else itemMeta.lore(null);
         });
     }
 
-    @Nullable
-    public List<String> getLore() {
-        return hasLore() ? getMeta().getLore() : null;
+    public @NotNull List<@NotNull String> getLore() {
+        //noinspection ConstantConditions
+        return hasLore() ? getMeta().getLore() : new ArrayList<>();
     }
 
-    @NotNull
-    public Item setLore(@Nullable List<String> lore) {
+    public @NotNull Item setLore(@Nullable List<@NotNull String> lore) {
         return editMeta(itemMeta -> {
             if (lore != null)
-                itemMeta.lore(lore.stream().map(line -> new Text(line).comp()).collect(Collectors.toList()));
+                if (lore.isEmpty()) itemMeta.lore(null);
+                else itemMeta.lore(lore.stream().map(line -> Text.of(line).comp()).toList());
             else itemMeta.lore(null);
         });
     }
 
-    @NotNull
-    public Item skull(@Nullable PlayerProfile playerProfile) {
+    public @NotNull Item skull(@Nullable PlayerProfile playerProfile) {
         return setSkull(playerProfile);
     }
 
-    @NotNull
-    public Item setSkull(@Nullable OfflinePlayer player) {
+    public @NotNull Item setSkull(@Nullable OfflinePlayer player) {
         return editMeta(itemMeta -> {
             if (itemMeta instanceof SkullMeta skullMeta) {
                 skullMeta.setOwningPlayer(player);
@@ -407,8 +402,7 @@ public class Item {
         });
     }
 
-    @NotNull
-    public Item setSkull(@Nullable PlayerProfile playerProfile) {
+    public @NotNull Item setSkull(@Nullable PlayerProfile playerProfile) {
         return editMeta(itemMeta -> {
             if (itemMeta instanceof SkullMeta skullMeta) {
                 skullMeta.setPlayerProfile(playerProfile);
@@ -416,12 +410,11 @@ public class Item {
         });
     }
 
-    @NotNull
-    public Item skull(@NotNull String url) {
+    public @NotNull Item skull(@NotNull String url) {
         return setSkull(url);
     }
 
-    public Item setSkull(String url) {
+    public @NotNull Item setSkull(@NotNull String url) {
         return editMeta(itemMeta -> {
             if (itemMeta instanceof SkullMeta skullMeta) {
                 String texture = new String(getEncodedTexture(url));
@@ -441,8 +434,7 @@ public class Item {
         return encoder.encode(String.format("{textures:{SKIN:{url:\"%s\"}}}", url).getBytes());
     }
 
-    @NotNull
-    public Item editMeta(@NotNull Consumer<ItemMeta> meta) {
+    public @NotNull Item editMeta(@NotNull Consumer<@NotNull ItemMeta> meta) {
         itemStack.editMeta(meta);
         return this;
     }
@@ -451,17 +443,16 @@ public class Item {
         return itemStack.getItemMeta();
     }
 
-    @NotNull
-    public ItemStack getItemStack() {
+    public @NotNull ItemStack getItemStack() {
         return itemStack;
     }
 
-    public void setItemStack(@NotNull ItemStack itemStack) {
+    public @NotNull Item setItemStack(@NotNull ItemStack itemStack) {
         this.itemStack = itemStack;
+        return this;
     }
 
-    @NotNull
-    public Item clone() {
+    public @NotNull Item clone() {
         return new Item(itemStack.clone());
     }
 }

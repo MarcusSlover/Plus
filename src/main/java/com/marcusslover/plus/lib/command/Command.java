@@ -15,15 +15,12 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface Command {
-    @NotNull
-    String name();
 
-    @NotNull
-    String description() default "";
+    @NotNull String name();
 
-    @NotNull
-    String permission() default "";
+    @NotNull String description() default "";
 
-    @NotNull
-    String[] aliases() default {};
+    @NotNull String permission() default "";
+
+    @NotNull String[] aliases() default {};
 }

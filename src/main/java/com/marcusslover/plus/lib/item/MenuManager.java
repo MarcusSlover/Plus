@@ -15,45 +15,43 @@ import java.util.Iterator;
 import java.util.Set;
 
 public final class MenuManager implements Listener {
-    @NotNull
-    private final Plugin plugin;
-    @NotNull
-    private final Set<Menu> menus = new HashSet<>();
+    private final @NotNull Plugin plugin;
+    private final @NotNull Set<@NotNull Menu> menus = new HashSet<>();
 
     private MenuManager(@NotNull Plugin plugin) {
         this.plugin = plugin;
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
-    @NotNull
-    public static MenuManager get(@NotNull Plugin plugin) {
+    @Deprecated
+    public static @NotNull MenuManager get(@NotNull Plugin plugin) {
         return new MenuManager(plugin);
     }
 
-    @NotNull
-    public Plugin getPlugin() {
+    public static @NotNull MenuManager createManager(@NotNull Plugin plugin) {
+        return new MenuManager(plugin);
+    }
+
+    public @NotNull Plugin getPlugin() {
         return plugin;
     }
 
-    @NotNull
-    public Menu createMenu(int size) {
+    public @NotNull Menu createMenu(int size) {
         return createMenu(size, (String) null);
     }
 
-    @NotNull
-    public Menu createMenu(int size, @Nullable String name) {
+    public @NotNull Menu createMenu(int size, @Nullable String name) {
         return createMenu(size, (name == null) ? null : new Text(name));
     }
 
-    @NotNull
-    public Menu createMenu(int size, @Nullable Text text) {
+    public @NotNull Menu createMenu(int size, @Nullable Text text) {
         Menu menu = new Menu(size, text);
         menus.add(menu);
         return menu;
     }
 
     @EventHandler
-    public void onClick(InventoryClickEvent event) {
+    public void onClick(@NotNull InventoryClickEvent event) {
         Iterator<Menu> iterator = menus.iterator();
         while (iterator.hasNext()) {
             Menu menu = iterator.next();
@@ -71,12 +69,11 @@ public final class MenuManager implements Listener {
     }
 
     @EventHandler
-    public void onClose(InventoryCloseEvent event) {
+    public void onClose(@NotNull InventoryCloseEvent event) {
         menus.removeIf(menu -> menu.inventory.equals(event.getInventory()));
     }
 
-    @NotNull
-    public Set<Menu> getMenus() {
+    public @NotNull Set<@NotNull Menu> getMenus() {
         return menus;
     }
 }
