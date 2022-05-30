@@ -1,18 +1,18 @@
 package com.marcusslover.plus.lib.sound;
 
+import com.marcusslover.plus.lib.util.Alternative;
+import com.marcusslover.plus.lib.util.ISendable;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public class Note {
-    @NotNull
-    protected Sound sound;
+public class Note implements ISendable<Player, Note> {
+    protected @NotNull Sound sound;
     protected float volume;
     protected float pitch;
-    @NotNull
-    protected SoundCategory category;
+    protected @NotNull SoundCategory category;
 
     public Note(@NotNull Sound sound) {
         this(sound, 1.0f, 1.0f, SoundCategory.MASTER);
@@ -29,28 +29,23 @@ public class Note {
         this.category = category;
     }
 
-    @NotNull
-    public static Note of(@NotNull Sound sound) {
+    public static @NotNull Note of(@NotNull Sound sound) {
         return new Note(sound);
     }
 
-    @NotNull
-    public static Note of(@NotNull Sound sound, float volume, float pitch) {
+    public static @NotNull Note of(@NotNull Sound sound, float volume, float pitch) {
         return new Note(sound, volume, pitch);
     }
 
-    @NotNull
-    public static Note of(@NotNull Sound sound, float volume, float pitch, @NotNull SoundCategory category) {
+    public static @NotNull Note of(@NotNull Sound sound, float volume, float pitch, @NotNull SoundCategory category) {
         return new Note(sound, volume, pitch, category);
     }
 
-    @NotNull
-    public Sound getSound() {
+    public @NotNull Sound getSound() {
         return sound;
     }
 
-    @NotNull
-    public Note setSound(@NotNull Sound sound) {
+    public @NotNull Note setSound(@NotNull Sound sound) {
         this.sound = sound;
         return this;
     }
@@ -59,8 +54,7 @@ public class Note {
         return volume;
     }
 
-    @NotNull
-    public Note setVolume(float volume) {
+    public @NotNull Note setVolume(float volume) {
         this.volume = volume;
         return this;
     }
@@ -69,30 +63,36 @@ public class Note {
         return pitch;
     }
 
-    @NotNull
-    public Note setPitch(float pitch) {
+    public @NotNull Note setPitch(float pitch) {
         this.pitch = pitch;
         return this;
     }
 
-    @NotNull
-    public SoundCategory getCategory() {
+    public @NotNull SoundCategory getCategory() {
         return category;
     }
 
-    @NotNull
-    public Note setCategory(@NotNull SoundCategory category) {
+    public @NotNull Note setCategory(@NotNull SoundCategory category) {
         this.category = category;
         return this;
     }
 
-    @NotNull
-    public Note play(@NotNull Player player) {
-        return play(player, player.getLocation());
+    @Alternative
+    public @NotNull Note play(@NotNull Player player) {
+        return this.send(player);
     }
 
-    @NotNull
-    public Note play(@NotNull Player player, @NotNull Location location) {
+    @Alternative
+    public @NotNull Note play(@NotNull Player player, @NotNull Location location) {
+        return this.send(player, location);
+    }
+
+    @Override
+    public @NotNull Note send(@NotNull Player player) {
+        return this.send(player, player.getLocation());
+    }
+
+    public @NotNull Note send(@NotNull Player player, @NotNull Location location) {
         player.playSound(location, sound, category, volume, pitch);
         return this;
     }

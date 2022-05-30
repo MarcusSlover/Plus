@@ -9,9 +9,9 @@ import java.util.List;
  * The implementation class must have the {@link Command} annotation above the class.
  */
 public interface ICommand {
-    boolean execute(@NotNull CommandContext commandContext);
+    boolean execute(@NotNull CommandContext cmd);
 
-    default List<String> tab(@NotNull TabCompleteContext tabContext) {
+    default @NotNull List<@NotNull String> tab(@NotNull TabCompleteContext tab) {
         return Collections.emptyList();
     }
 }

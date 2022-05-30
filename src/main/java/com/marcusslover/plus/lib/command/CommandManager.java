@@ -10,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 public final class CommandManager {
-    private final Set<org.bukkit.command.Command> commandSet = new HashSet<>();
+    private final @NotNull Set<org.bukkit.command.Command> commandSet = new HashSet<>();
 
     @NotNull
     private final Plugin plugin;
@@ -19,13 +19,11 @@ public final class CommandManager {
         this.plugin = plugin;
     }
 
-    @NotNull
-    public static CommandManager get(@NotNull Plugin plugin) {
+    public static @NotNull CommandManager get(@NotNull Plugin plugin) {
         return new CommandManager(plugin);
     }
 
-    @NotNull
-    public CommandManager register(@NotNull ICommand command) {
+    public @NotNull CommandManager register(@NotNull ICommand command) {
         Command commandAnnotation = getCommandAnnotation(command);
         if (commandAnnotation == null) return this;
         String name = commandAnnotation.name();

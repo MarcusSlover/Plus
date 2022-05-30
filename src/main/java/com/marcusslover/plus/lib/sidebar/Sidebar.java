@@ -1,6 +1,7 @@
 package com.marcusslover.plus.lib.sidebar;
 
 import com.marcusslover.plus.lib.text.Text;
+import com.marcusslover.plus.lib.util.ISendable;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -13,19 +14,16 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public class Sidebar {
-    private static final ChatColor[] COLOR = ChatColor.values();
-    private static final Map<UUID, Sidebar> SIDEBAR_MAP = new HashMap<>();
+public class Sidebar implements ISendable<Player, Sidebar> {
+    private static final @NotNull ChatColor[] COLOR = ChatColor.values();
+    private static final @NotNull Map<UUID, Sidebar> SIDEBAR_MAP = new HashMap<>();
 
     private static int customID = 0;
 
-    @NotNull
-    public final Scoreboard scoreboard;
-    @NotNull
-    public final Objective objective;
+    public final @NotNull Scoreboard scoreboard;
+    public final @NotNull Objective objective;
 
-    @NotNull
-    private final LinkedList<SidebarField> fields;
+    protected final @NotNull LinkedList<@NotNull SidebarField> fields;
 
     public Sidebar(@NotNull String title) {
         this(new Text(title));
@@ -42,23 +40,19 @@ public class Sidebar {
         customID += 1;
     }
 
-    @NotNull
-    public static Sidebar of(@NotNull String title) {
+    public static @NotNull Sidebar of(@NotNull String title) {
         return new Sidebar(title);
     }
 
-    @NotNull
-    public static Sidebar of(@NotNull Text title) {
+    public static @NotNull Sidebar of(@NotNull Text title) {
         return new Sidebar(title);
     }
 
-    @NotNull
-    public static Optional<Sidebar> get(@NotNull Player player) {
+    public static @NotNull Optional<Sidebar> get(@NotNull Player player) {
         return get(player.getUniqueId());
     }
 
-    @NotNull
-    public static Optional<Sidebar> get(@NotNull UUID uuid) {
+    public static @NotNull Optional<Sidebar> get(@NotNull UUID uuid) {
         if (SIDEBAR_MAP.containsKey(uuid)) {
             return Optional.of(SIDEBAR_MAP.get(uuid));
         }
@@ -77,23 +71,19 @@ public class Sidebar {
         return customID;
     }
 
-    @NotNull
-    public static Map<UUID, Sidebar> getSidebarMap() {
+    public static @NotNull Map<UUID, Sidebar> getSidebarMap() {
         return SIDEBAR_MAP;
     }
 
-    @NotNull
-    private String getEntry(int currentSize) {
+    private @NotNull String getEntry(int currentSize) {
         return COLOR[currentSize].toString() + COLOR[currentSize / 4].toString() + COLOR[COLOR.length - 1];
     }
 
-    @NotNull
-    public Sidebar addField(@NotNull String prefix, @NotNull String suffix) {
+    public @NotNull Sidebar addField(@NotNull String prefix, @NotNull String suffix) {
         return addField(new Text(prefix), new Text(suffix));
     }
 
-    @NotNull
-    public Sidebar addField(@NotNull Text prefix, @NotNull Text suffix) {
+    public @NotNull Sidebar addField(@NotNull Text prefix, @NotNull Text suffix) {
         int currentSize = getSize();
         String entry = getEntry(currentSize);
 
@@ -111,13 +101,11 @@ public class Sidebar {
         return this;
     }
 
-    @NotNull
-    public Sidebar insertField(int index, @NotNull String prefix, @NotNull String suffix) {
+    public @NotNull Sidebar insertField(int index, @NotNull String prefix, @NotNull String suffix) {
         return insertField(index, new Text(prefix), new Text(suffix));
     }
 
-    @NotNull
-    public Sidebar insertField(int index, @NotNull Text prefix, @NotNull Text suffix) {
+    public @NotNull Sidebar insertField(int index, @NotNull Text prefix, @NotNull Text suffix) {
         int currentSize = getSize();
         String entry = getEntry(currentSize);
 
@@ -140,13 +128,11 @@ public class Sidebar {
         return this;
     }
 
-    @NotNull
-    public Sidebar updateField(int index, @NotNull String prefix, @NotNull String suffix) {
+    public @NotNull Sidebar updateField(int index, @NotNull String prefix, @NotNull String suffix) {
         return updateField(index, new Text(prefix), new Text(suffix));
     }
 
-    @NotNull
-    public Sidebar updateField(int index, @NotNull Text prefix, @NotNull Text suffix) {
+    public @NotNull Sidebar updateField(int index, @NotNull Text prefix, @NotNull Text suffix) {
         Team team = this.scoreboard.getTeam(index + "T");
         if (team == null) return this;
         team.prefix(prefix.comp());
@@ -154,13 +140,11 @@ public class Sidebar {
         return this;
     }
 
-    @Nullable
-    public SidebarField getField(int index) {
+    public @Nullable SidebarField getField(int index) {
         return fields.get(index);
     }
 
-    @Nullable
-    public SidebarField findField(@NotNull String... filters) {
+    public @Nullable SidebarField findField(@NotNull String... filters) {
         for (String filter : filters) {
             for (SidebarField field : fields) {
                 // match the entry
@@ -170,8 +154,7 @@ public class Sidebar {
         return null;
     }
 
-    @NotNull
-    public Sidebar removeField(int index) {
+    public @NotNull Sidebar removeField(int index) {
         // Add to the list
         fields.remove(index);
 
@@ -185,20 +168,17 @@ public class Sidebar {
         return this;
     }
 
-    @NotNull
-    public Sidebar clearFields() {
+    public @NotNull Sidebar clearFields() {
         scoreboard.getTeams().forEach(Team::unregister);
         fields.clear();
         return this;
     }
 
-    @NotNull
-    public Objective getObjective() {
+    public @NotNull Objective getObjective() {
         return objective;
     }
 
-    @NotNull
-    public Scoreboard getScoreboard() {
+    public @NotNull Scoreboard getScoreboard() {
         return scoreboard;
     }
 
@@ -206,13 +186,12 @@ public class Sidebar {
         return fields.size();
     }
 
-    @NotNull
-    public LinkedList<SidebarField> getFields() {
+    public @NotNull LinkedList<@NotNull SidebarField> getFields() {
         return fields;
     }
 
-    @NotNull
-    public Sidebar send(@NotNull Player player) {
+    @Override
+    public @NotNull Sidebar send(@NotNull Player player) {
         player.setScoreboard(scoreboard);
         SIDEBAR_MAP.put(player.getUniqueId(), this);
         return this;

@@ -12,18 +12,15 @@ public class ColorUtil {
     private ColorUtil() {
     }
 
-    @NotNull
-    public static String hex(@NotNull String text) {
+    public static @NotNull String hex(@NotNull String text) {
         return hexColorization(text);
     }
 
-    @NotNull
-    public static String color(@NotNull String textToTranslate) {
+    public static @NotNull String color(@NotNull String textToTranslate) {
         return color('&', textToTranslate);
     }
 
-    @NotNull
-    public static String color(@NotNull char altColorChar, @NotNull String textToTranslate) {
+    public static @NotNull String color(char altColorChar, @NotNull String textToTranslate) {
         Validate.notNull(textToTranslate, "Cannot translate null text");
 
         char[] b = textToTranslate.toCharArray();
@@ -36,8 +33,7 @@ public class ColorUtil {
         return new String(b);
     }
 
-    @NotNull
-    private static String hexColorization(@NotNull String text) {
+    private static @NotNull String hexColorization(@NotNull String text) {
         var matcher = HEX.matcher(text);
         while (matcher.find()) {
             var bukkitColor = new StringBuilder("&x");
