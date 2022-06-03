@@ -146,7 +146,7 @@ public class Potion implements ISendable<Player, Potion> {
                 .withIcon(icon);
 
         if (force) target.addPotionEffect(potionEffect, true);
-        else target.addPotionEffect(potionEffect);
+        else target.addPotionEffect(potionEffect, false);
         return this;
     }
 }
