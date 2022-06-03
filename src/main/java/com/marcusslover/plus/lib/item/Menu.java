@@ -99,7 +99,7 @@ public class Menu implements ISendable<Player, Menu> {
 
     @Alternative
     public @NotNull Menu open(@NotNull Player player) {
-        return this;
+        return send(player);
     }
 
     public @NotNull List<@NotNull Player> getViewers() {
