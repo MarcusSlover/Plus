@@ -21,7 +21,9 @@ public class Menu implements ISendable<Player, Menu> {
     protected @NotNull Inventory inventory;
     protected @NotNull LinkedList<@NotNull ClickAdapter> clickAdapters;
     protected @Nullable ClickAdapter mainClickAdapter;
-    protected boolean isCancelled = true;
+    protected boolean cancelled = true;
+
+    long lastActivity = -1L;
 
     public Menu() {
         this(3 * 9);
@@ -43,11 +45,11 @@ public class Menu implements ISendable<Player, Menu> {
     }
 
     public boolean isCancelled() {
-        return isCancelled;
+        return cancelled;
     }
 
     public @NotNull Menu setCancelled(boolean cancelled) {
-        isCancelled = cancelled;
+        this.cancelled = cancelled;
         return this;
     }
 
@@ -91,15 +93,16 @@ public class Menu implements ISendable<Player, Menu> {
         return this;
     }
 
-    @Override
-    public @NotNull Menu send(@NotNull Player target) {
-        target.openInventory(inventory);
-        return this;
-    }
-
     @Alternative
     public @NotNull Menu open(@NotNull Player player) {
         return send(player);
+    }
+
+    @Override
+    public @NotNull Menu send(@NotNull Player target) {
+        lastActivity = System.currentTimeMillis();
+        target.openInventory(inventory);
+        return this;
     }
 
     public @NotNull List<@NotNull Player> getViewers() {
