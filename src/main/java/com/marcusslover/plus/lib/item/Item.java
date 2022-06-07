@@ -234,6 +234,12 @@ public class Item {
         return getMeta().getPersistentDataContainer();
     }
 
+    public boolean hasTag(@NotNull String key) {
+        PersistentDataContainer p = getMeta().getPersistentDataContainer();
+        NamespacedKey n = new NamespacedKey("plus", key);
+        return p.has(n);
+    }
+
     public @NotNull Item setTag(@NotNull String key, @NotNull String value) {
         editMeta(itemMeta -> {
             PersistentDataContainer p = itemMeta.getPersistentDataContainer();

@@ -1,17 +1,18 @@
 package com.marcusslover.plus.lib.item;
 
+import com.marcusslover.plus.lib.item.Menu.ClickAdapter;
 import com.marcusslover.plus.lib.text.Text;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Optional;
 import java.util.Set;
 
 public final class MenuManager implements Listener {
@@ -21,6 +22,23 @@ public final class MenuManager implements Listener {
     private MenuManager(@NotNull Plugin plugin) {
         this.plugin = plugin;
         Bukkit.getPluginManager().registerEvents(this, plugin);
+        Bukkit.getScheduler().runTaskTimer(plugin, () -> {
+            long now = System.currentTimeMillis();
+            Iterator<@NotNull Menu> iterator = menus.iterator();
+            while (iterator.hasNext()) {
+                Menu menu = iterator.next();
+                if (!menu.inventory.getViewers().isEmpty()) continue;
+
+                if (menu.lastActivity < 0) {
+                    iterator.remove();
+                } else {
+                    long time = now - menu.lastActivity;
+                    if (time > 1000 * 60 * 5) { // 5 minutes
+                        iterator.remove();
+                    }
+                }
+            }
+        }, 0L, 20 * 60 * 5L);
     }
 
     @Deprecated
@@ -52,25 +70,18 @@ public final class MenuManager implements Listener {
 
     @EventHandler
     public void onClick(@NotNull InventoryClickEvent event) {
-        Iterator<Menu> iterator = menus.iterator();
-        while (iterator.hasNext()) {
-            Menu menu = iterator.next();
-            if (menu.inventory.equals(event.getInventory())) {
-                event.setCancelled(menu.isCancelled);
+        Optional<@NotNull Menu> optionalMenu = menus.stream().filter(menu -> menu.inventory.equals(event.getInventory())).findFirst();
+        if (optionalMenu.isEmpty()) return;
+        Menu menu = optionalMenu.get();
+        menu.lastActivity = System.currentTimeMillis();
 
-                Menu.ClickAdapter mainClickAdapter = menu.mainClickAdapter;
-                if (mainClickAdapter != null) mainClickAdapter.event().accept(event);
+        event.setCancelled(menu.cancelled);
+        ClickAdapter mainClickAdapter = menu.mainClickAdapter;
+        if (mainClickAdapter != null) mainClickAdapter.event().accept(event);
 
-                menu.clickAdapters.stream()
-                        .filter(click -> click.slot() == event.getRawSlot() || click.slot() == -1)
-                        .forEach(click -> click.event().accept(event));
-            }
-        }
-    }
-
-    @EventHandler
-    public void onClose(@NotNull InventoryCloseEvent event) {
-        menus.removeIf(menu -> menu.inventory.equals(event.getInventory()));
+        menu.clickAdapters.stream()
+                .filter(click -> click.slot() == event.getRawSlot() || click.slot() == -1)
+                .forEach(click -> click.event().accept(event));
     }
 
     public @NotNull Set<@NotNull Menu> getMenus() {

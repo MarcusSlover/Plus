@@ -2,6 +2,7 @@ package com.marcusslover.plus.lib.potion;
 
 import com.marcusslover.plus.lib.util.Alternative;
 import com.marcusslover.plus.lib.util.ISendable;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -9,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class Potion implements ISendable<Player, Potion> {
     protected @NotNull PotionEffectType type;
-    protected int durationTicks;
+    protected int duration;
     protected int amplifier;
     protected boolean particles;
     protected boolean transparent;
@@ -38,7 +39,7 @@ public class Potion implements ISendable<Player, Potion> {
 
     public Potion(@NotNull PotionEffectType type, int durationTicks, int amplifier, boolean particles, boolean transparent, boolean icon, boolean force) {
         this.type = type;
-        this.durationTicks = durationTicks;
+        this.duration = durationTicks;
         this.amplifier = amplifier;
         this.particles = particles;
         this.transparent = transparent;
@@ -116,11 +117,11 @@ public class Potion implements ISendable<Player, Potion> {
     }
 
     public long getDurationTicks() {
-        return durationTicks;
+        return duration;
     }
 
     public @NotNull Potion setDurationTicks(int durationTicks) {
-        this.durationTicks = durationTicks;
+        this.duration = durationTicks;
         return this;
     }
 
@@ -138,15 +139,22 @@ public class Potion implements ISendable<Player, Potion> {
         return this.send(player);
     }
 
+    @Alternative
+    public @NotNull Potion apply(@NotNull LivingEntity entity) {
+        return this.applyPotion(entity);
+    }
+
     @Override
     public @NotNull Potion send(@NotNull Player target) {
-        PotionEffect potionEffect = new PotionEffect(type, durationTicks * 20, amplifier)
+        return applyPotion(target);
+    }
+
+    private @NotNull Potion applyPotion(@NotNull LivingEntity entity) {
+        PotionEffect potionEffect = new PotionEffect(type, duration, amplifier)
                 .withParticles(particles)
                 .withAmbient(transparent)
                 .withIcon(icon);
-
-        if (force) target.addPotionEffect(potionEffect, true);
-        else target.addPotionEffect(potionEffect, false);
+        entity.addPotionEffect(potionEffect, force);
         return this;
     }
 }
