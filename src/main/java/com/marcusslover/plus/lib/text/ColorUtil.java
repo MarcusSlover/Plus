@@ -3,10 +3,13 @@ package com.marcusslover.plus.lib.text;
 import org.apache.commons.lang.Validate;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class ColorUtil {
-    public static final Pattern HEX = Pattern.compile("&#([a-fA-F0-9]{6})");
+    public static final Pattern HEX_TO_BUKKIT = Pattern.compile("&#([a-fA-F0-9]{6})");
+    public static final Pattern HEX_FROM_BUKKIT = Pattern.compile("&x(&[a-fA-F0-9]){6}");
     public static final char COLOR_CHAR = '\u00A7';
 
     private ColorUtil() {
@@ -34,7 +37,7 @@ public class ColorUtil {
     }
 
     private static @NotNull String hexColorization(@NotNull String text) {
-        var matcher = HEX.matcher(text);
+        var matcher = HEX_TO_BUKKIT.matcher(text);
         while (matcher.find()) {
             var bukkitColor = new StringBuilder("&x");
             char[] chars = matcher.group(1).toCharArray();
@@ -46,4 +49,20 @@ public class ColorUtil {
         return text;
     }
 
+    public static @NotNull String hexTranslation(@NotNull String text) {
+        var matcher = HEX_FROM_BUKKIT.matcher(text);
+        while (matcher.find()) {
+            String group = matcher.group();
+            String translation = group.replaceAll("&x", "");
+            translation = translation.replaceAll("&", "");
+            translation = "&#" + translation;
+            text = text.replaceAll(group, translation);
+
+        }
+        return text;
+    }
+
+    public static @NotNull List<String> translateList(@NotNull List<String> lore) {
+        return lore.stream().map(ColorUtil::hexTranslation).collect(Collectors.toList());
+    }
 }
