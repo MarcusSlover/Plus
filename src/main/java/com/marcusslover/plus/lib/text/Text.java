@@ -50,6 +50,7 @@ public class Text implements ISendable<CommandSender, Text> {
         return new Text(component);
     }
 
+    @Deprecated
     public static @NotNull List<@NotNull Text> list(@NotNull List<@NotNull Component> lore) {
         return lore.stream().map(Text::new).collect(Collectors.toList());
     }

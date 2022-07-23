@@ -2,6 +2,7 @@ package com.marcusslover.plus.lib.item;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
+import com.marcusslover.plus.lib.text.ColorUtil;
 import com.marcusslover.plus.lib.text.Text;
 import net.kyori.adventure.text.Component;
 import org.bukkit.*;
@@ -370,6 +371,7 @@ public class Item {
         return itemStack.hasItemMeta() && itemStack.getItemMeta().hasLore();
     }
 
+    @Deprecated
     public @NotNull List<@NotNull Text> lore() {
         //noinspection ConstantConditions
         return hasLore() ? Text.list(getMeta().lore()) : new ArrayList<>();
@@ -384,7 +386,7 @@ public class Item {
 
     public @NotNull List<@NotNull String> getLore() {
         //noinspection ConstantConditions
-        return hasLore() ? getMeta().getLore() : new ArrayList<>();
+        return hasLore() ? ColorUtil.translateList(getMeta().getLore()) : new ArrayList<>();
     }
 
     public @NotNull Item setLore(@Nullable List<@NotNull String> lore) {
