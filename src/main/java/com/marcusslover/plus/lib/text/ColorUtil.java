@@ -50,6 +50,7 @@ public class ColorUtil {
     }
 
     public static @NotNull String hexTranslation(@NotNull String text) {
+        text = text.replaceAll("§", "&"); // legacy fix
         var matcher = HEX_FROM_BUKKIT.matcher(text);
         while (matcher.find()) {
             String group = matcher.group();
