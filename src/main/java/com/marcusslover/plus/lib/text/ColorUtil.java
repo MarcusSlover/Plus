@@ -1,6 +1,7 @@
 package com.marcusslover.plus.lib.text;
 
 import org.apache.commons.lang.Validate;
+import org.bukkit.ChatColor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -50,6 +51,7 @@ public class ColorUtil {
     }
 
     public static @NotNull String hexTranslation(@NotNull String text) {
+        text = text.replaceAll("\u00A7", "&"); // legacy fix
         var matcher = HEX_FROM_BUKKIT.matcher(text);
         while (matcher.find()) {
             String group = matcher.group();
