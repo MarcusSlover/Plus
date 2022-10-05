@@ -9,7 +9,7 @@ public class PlayerProfile {
     private final UUID uniqueId;
 
     @NotNull
-    public static PlayerProfile EMPTY = new PlayerProfile("", null);
+    public static final PlayerProfile EMPTY = new PlayerProfile("", null);
 
     public PlayerProfile(String name, UUID uuid) {
         this.name = name;
@@ -30,5 +30,9 @@ public class PlayerProfile {
                "name='" + this.name + '\'' +
                ", uniqueId=" + this.uniqueId +
                '}';
+    }
+
+    public static PlayerProfile of(String name, UUID uuid) {
+        return new PlayerProfile(name, uuid);
     }
 }

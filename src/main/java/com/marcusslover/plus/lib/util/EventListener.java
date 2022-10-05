@@ -15,7 +15,6 @@ import java.util.function.Consumer;
  * A compact way to define a Listener using a lambda
  *
  * @param <T> The event being listened for
- * @author Redempt
  */
 public class EventListener<T extends Event> implements Listener {
 
@@ -126,4 +125,24 @@ public class EventListener<T extends Event> implements Listener {
         HandlerList.unregisterAll(this);
     }
 
+    /**
+     * Creates and registers a Listener for the given event
+     *
+     * @param eventClass The class of the event being listened for
+     * @param priority   The EventPriority for this listener
+     * @param handler    The callback to receive the event
+     */
+    public static <T extends Event> EventListener<T> of(Class<T> eventClass, EventPriority priority, BiConsumer<EventListener<T>, T> handler) {
+        return new EventListener<>(eventClass, priority, handler);
+    }
+
+    /**
+     * Creates and registers a Listener for the given event
+     *
+     * @param eventClass The class of the event being listened for
+     * @param handler    The callback to receive the event
+     */
+    public static <T extends Event> EventListener<T> of(Class<T> eventClass, BiConsumer<EventListener<T>, T> handler) {
+        return new EventListener<>(eventClass, handler);
+    }
 }

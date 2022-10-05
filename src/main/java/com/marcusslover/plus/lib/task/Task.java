@@ -29,7 +29,7 @@ public class Task {
      * Schedules a sync delayed task to run as soon as possible
      *
      * @param plugin The plugin scheduling the task
-     * @param run    The task to run
+     * @param run    The task to run - Do not use bukkit runnable. (Cancelling the bukkit runnable will not cancel the created task)
      * @return The Task that has been scheduled
      */
     public static Task syncDelayed(Plugin plugin, Runnable run) {
@@ -50,7 +50,7 @@ public class Task {
      * Schedules a sync delayed task to run as soon as possible
      *
      * @param plugin The plugin scheduling the task
-     * @param run    The task to run
+     * @param run    The task to run - Do not use bukkit runnable. (Cancelling the bukkit runnable will not cancel the created task)
      * @return The Task that has been scheduled
      */
     public static Task syncDelayed(Plugin plugin, Consumer<Task> run) {
@@ -72,7 +72,7 @@ public class Task {
      * Schedules a sync delayed task to run after a delay
      *
      * @param plugin The plugin scheduling the task
-     * @param run    The task to run
+     * @param run    The task to run - Do not use bukkit runnable. (Cancelling the bukkit runnable will not cancel the created task)
      * @param delay  The delay in ticks to wait before running the task
      * @return The Task that has been scheduled
      */
@@ -97,7 +97,7 @@ public class Task {
      * Schedules a sync delayed task to run after a delay
      *
      * @param plugin The plugin scheduling the task
-     * @param run    The task to run
+     * @param run    The task to run - Do not use bukkit runnable. (Cancelling the bukkit runnable will not cancel the created task)
      * @param delay  The delay in ticks to wait before running the task
      * @return The Task that has been scheduled
      */
@@ -110,7 +110,7 @@ public class Task {
     /**
      * Schedules a sync repeating task to run later
      *
-     * @param run    The task to run
+     * @param run    The task to run - Do not use bukkit runnable. (Cancelling the bukkit runnable will not cancel the created task)
      * @param delay  The delay in ticks to wait before running the task
      * @param period The number of ticks between executions of the task
      * @return The Task that has been scheduled
@@ -123,7 +123,7 @@ public class Task {
      * Schedules a sync repeating task to run later
      *
      * @param plugin The plugin scheduling the task
-     * @param run    The task to run
+     * @param run    The task to run - Do not use bukkit runnable. (Cancelling the bukkit runnable will not cancel the created task)
      * @param delay  The delay in ticks to wait before running the task
      * @param period The number of ticks between executions of the task
      * @return The Task that has been scheduled
@@ -137,7 +137,7 @@ public class Task {
     /**
      * Schedules a sync repeating task to run later
      *
-     * @param run    The task to run
+     * @param run    The task to run - Do not use bukkit runnable. (Cancelling the bukkit runnable will not cancel the created task)
      * @param delay  The delay in ticks to wait before running the task
      * @param period The number of ticks between executions of the task
      * @return The Task that has been scheduled
@@ -150,7 +150,7 @@ public class Task {
      * Schedules a sync repeating task to run later
      *
      * @param plugin The plugin scheduling the task
-     * @param run    The task to run
+     * @param run    The task to run - Do not use bukkit runnable. (Cancelling the bukkit runnable will not cancel the created task)
      * @param delay  The delay in ticks to wait before running the task
      * @param period The number of ticks between executions of the task
      * @return The Task that has been scheduled
@@ -175,7 +175,7 @@ public class Task {
      * Schedules an async delayed task to run as soon as possible
      *
      * @param plugin The plugin scheduling the task
-     * @param run    The task to run
+     * @param run    The task to run - Do not use bukkit runnable. (Cancelling the bukkit runnable will not cancel the created task)
      * @return The Task that has been scheduled
      */
     public static Task asyncDelayed(Plugin plugin, Runnable run) {
@@ -198,7 +198,7 @@ public class Task {
      * Schedules an async delayed task to run as soon as possible
      *
      * @param plugin The plugin scheduling the task
-     * @param run    The task to run
+     * @param run    The task to run - Do not use bukkit runnable. (Cancelling the bukkit runnable will not cancel the created task)
      * @return The Task that has been scheduled
      */
     public static Task asyncDelayed(Plugin plugin, Consumer<Task> run) {
@@ -220,7 +220,7 @@ public class Task {
      * Schedules an async delayed task to run after a delay
      *
      * @param plugin The plugin scheduling the task
-     * @param run    The task to run
+     * @param run    The task to run - Do not use bukkit runnable. (Cancelling the bukkit runnable will not cancel the created task)
      * @param delay  The delay in ticks to wait before running the task
      * @return The Task that has been scheduled
      */
@@ -245,7 +245,7 @@ public class Task {
      * Schedules an async delayed task to run after a delay
      *
      * @param plugin The plugin scheduling the task
-     * @param run    The task to run
+     * @param run    The task to run - Do not use bukkit runnable. (Cancelling the bukkit runnable will not cancel the created task)
      * @param delay  The delay in ticks to wait before running the task
      * @return The Task that has been scheduled
      */
@@ -258,7 +258,7 @@ public class Task {
     /**
      * Schedules an async repeating task to run later
      *
-     * @param run    The task to run
+     * @param run    The task to run - Do not use bukkit runnable. (Cancelling the bukkit runnable will not cancel the created task)
      * @param delay  The delay in ticks to wait before running the task
      * @param period The number of ticks between executions of the task
      * @return The Task that has been scheduled
@@ -271,7 +271,7 @@ public class Task {
      * Schedules an async repeating task to run later
      *
      * @param plugin The plugin scheduling the task
-     * @param run    The task to run
+     * @param run    The task to run - Do not use bukkit runnable. (Cancelling the bukkit runnable will not cancel the created task)
      * @param delay  The delay in ticks to wait before running the task
      * @param period The number of ticks between executions of the task
      * @return The Task that has been scheduled
@@ -285,7 +285,7 @@ public class Task {
     /**
      * Schedules an async repeating task to run later
      *
-     * @param run    The task to run
+     * @param run    The task to run - Do not use bukkit runnable. (Cancelling the bukkit runnable will not cancel the created task)
      * @param delay  The delay in ticks to wait before running the task
      * @param period The number of ticks between executions of the task
      * @return The Task that has been scheduled
@@ -298,7 +298,7 @@ public class Task {
      * Schedules an async repeating task to run later
      *
      * @param plugin The plugin scheduling the task
-     * @param run    The task to run
+     * @param run    The task to run - Do not use bukkit runnable. (Cancelling the bukkit runnable will not cancel the created task)
      * @param delay  The delay in ticks to wait before running the task
      * @param period The number of ticks between executions of the task
      * @return The Task that has been scheduled

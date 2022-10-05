@@ -255,6 +255,33 @@ public class WorldPoint {
                && Float.compare(worldPoint.pitch, this.pitch) == 0;
     }
 
+    /**
+     * WorldPoints allow the storing of sets of coordinates without dealing with
+     * chunk loading or world name storage. Unlike {@link Vector}, Positions allow
+     * us to store a {@link #yaw} and {@link #pitch} as well as being easily serializable.
+     */
+    public WorldPoint of(double x, double y, double z) {
+        return new WorldPoint(x, y, z);
+    }
+
+    /**
+     * WorldPoints allow the storing of sets of coordinates without dealing with
+     * chunk loading or world name storage. Unlike {@link Vector}, Positions allow
+     * us to store a {@link #yaw} and {@link #pitch} as well as being easily serializable.
+     */
+    public WorldPoint of(double x, double y, double z, float yaw, float pitch) {
+        return new WorldPoint(x, y, z, yaw, pitch);
+    }
+
+    /**
+     * WorldPoints allow the storing of sets of coordinates without dealing with
+     * chunk loading or world name storage. Unlike {@link Vector}, Positions allow
+     * us to store a {@link #yaw} and {@link #pitch} as well as being easily serializable.
+     */
+    public WorldPoint of(Location location) {
+        return new WorldPoint(location);
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(this.x, this.y, this.z, this.yaw, this.pitch);
