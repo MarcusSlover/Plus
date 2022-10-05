@@ -11,13 +11,17 @@ public record TabCompleteContext(@NotNull CommandSender sender,
                                  @NotNull String[] args) implements ICommandContextHelper<TabCompleteContext> {
     @Override
     public @NotNull TabCompleteContext asPlayer(@NotNull Consumer<@NotNull Player> player) {
-        if (sender instanceof Player p) player.accept(p);
+        if (this.sender instanceof Player p) {
+            player.accept(p);
+        }
         return this;
     }
 
     @Override
     public @NotNull TabCompleteContext asConsole(@NotNull Consumer<@NotNull ConsoleCommandSender> console) {
-        if (sender instanceof ConsoleCommandSender c) console.accept(c);
+        if (this.sender instanceof ConsoleCommandSender c) {
+            console.accept(c);
+        }
         return this;
     }
 }

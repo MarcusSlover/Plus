@@ -72,7 +72,7 @@ public class Potion implements ISendable<Player, Potion> {
     }
 
     public boolean isForce() {
-        return force;
+        return this.force;
     }
 
     public @NotNull Potion setForce(boolean force) {
@@ -81,7 +81,7 @@ public class Potion implements ISendable<Player, Potion> {
     }
 
     public boolean isIcon() {
-        return icon;
+        return this.icon;
     }
 
     public @NotNull Potion setIcon(boolean icon) {
@@ -90,7 +90,7 @@ public class Potion implements ISendable<Player, Potion> {
     }
 
     public boolean isParticles() {
-        return particles;
+        return this.particles;
     }
 
     public @NotNull Potion setParticles(boolean particles) {
@@ -99,7 +99,7 @@ public class Potion implements ISendable<Player, Potion> {
     }
 
     public boolean isTransparent() {
-        return transparent;
+        return this.transparent;
     }
 
     public @NotNull Potion setTransparent(boolean transparent) {
@@ -108,7 +108,7 @@ public class Potion implements ISendable<Player, Potion> {
     }
 
     public int getAmplifier() {
-        return amplifier;
+        return this.amplifier;
     }
 
     public @NotNull Potion setAmplifier(int amplifier) {
@@ -117,7 +117,7 @@ public class Potion implements ISendable<Player, Potion> {
     }
 
     public long getDurationTicks() {
-        return duration;
+        return this.duration;
     }
 
     public @NotNull Potion setDurationTicks(int durationTicks) {
@@ -126,7 +126,7 @@ public class Potion implements ISendable<Player, Potion> {
     }
 
     public @NotNull PotionEffectType getType() {
-        return type;
+        return this.type;
     }
 
     public @NotNull Potion setType(@NotNull PotionEffectType type) {
@@ -146,15 +146,15 @@ public class Potion implements ISendable<Player, Potion> {
 
     @Override
     public @NotNull Potion send(@NotNull Player target) {
-        return applyPotion(target);
+        return this.applyPotion(target);
     }
 
     private @NotNull Potion applyPotion(@NotNull LivingEntity entity) {
-        PotionEffect potionEffect = new PotionEffect(type, duration, amplifier)
-                .withParticles(particles)
-                .withAmbient(transparent)
-                .withIcon(icon);
-        entity.addPotionEffect(potionEffect, force);
+        PotionEffect potionEffect = new PotionEffect(this.type, this.duration, this.amplifier)
+                .withParticles(this.particles)
+                .withAmbient(this.transparent)
+                .withIcon(this.icon);
+        entity.addPotionEffect(potionEffect, this.force);
         return this;
     }
 }

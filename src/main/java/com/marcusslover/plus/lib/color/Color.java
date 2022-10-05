@@ -60,47 +60,47 @@ public class Color {
     }
 
     public int rgb() {
-        return rgb;
+        return this.rgb;
     }
 
     public int getRGB() {
-        return rgb;
+        return this.rgb;
     }
 
     public int red() {
-        return (rgb >> 16) & 0xFF;
+        return (this.rgb >> 16) & 0xFF;
     }
 
     public int getRed() {
-        return red();
+        return this.red();
     }
 
     public int green() {
-        return (rgb >> 8) & 0xFF;
+        return (this.rgb >> 8) & 0xFF;
     }
 
     public int getGreen() {
-        return green();
+        return this.green();
     }
 
     public int blue() {
-        return (rgb) & 0xFF;
+        return (this.rgb) & 0xFF;
     }
 
     public int getBlue() {
-        return blue();
+        return this.blue();
     }
 
     public int alpha() {
-        return (rgb >> 24) & 0xff;
+        return (this.rgb >> 24) & 0xff;
     }
 
     public int getAlpha() {
-        return alpha();
+        return this.alpha();
     }
 
     public @NotNull String hex() {
-        return "&#" + Integer.toHexString(rgb);
+        return "&#" + Integer.toHexString(this.rgb);
     }
 
     /**
@@ -113,9 +113,9 @@ public class Color {
      */
     public @NotNull Color darker(double value) {
         return new Color(
-                Math.max((int) (red() * value), 0),
-                Math.max((int) (green() * value), 0),
-                Math.max((int) (blue() * value), 0)
+                Math.max((int) (this.red() * value), 0),
+                Math.max((int) (this.green() * value), 0),
+                Math.max((int) (this.blue() * value), 0)
         );
     }
 
@@ -128,15 +128,23 @@ public class Color {
      * @return New, brighter color.
      */
     public @NotNull Color brighter(double value) {
-        int r = red();
-        int g = green();
-        int b = blue();
+        int r = this.red();
+        int g = this.green();
+        int b = this.blue();
 
         int i = (int) (1.0 / (1.0 - value));
-        if (r == 0 && g == 0 && b == 0) return new Color(i, i, i);
-        if (r > 0 && r < i) r = i;
-        if (g > 0 && g < i) g = i;
-        if (b > 0 && b < i) b = i;
+        if (r == 0 && g == 0 && b == 0) {
+            return new Color(i, i, i);
+        }
+        if (r > 0 && r < i) {
+            r = i;
+        }
+        if (g > 0 && g < i) {
+            g = i;
+        }
+        if (b > 0 && b < i) {
+            b = i;
+        }
 
         return new Color(
                 Math.min((int) (r / value), 255),
@@ -148,7 +156,7 @@ public class Color {
     @Override
     public String toString() {
         return "Color{" +
-                "rgb=" + rgb +
-                '}';
+               "rgb=" + this.rgb +
+               '}';
     }
 }

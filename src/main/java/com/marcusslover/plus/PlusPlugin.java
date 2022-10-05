@@ -18,8 +18,10 @@ public final class PlusPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
-        File dataFolder = getDataFolder();
-        if (!dataFolder.exists()) dataFolder.mkdirs();
+        File dataFolder = this.getDataFolder();
+        if (!dataFolder.exists()) {
+            dataFolder.mkdirs();
+        }
 
     }
 }

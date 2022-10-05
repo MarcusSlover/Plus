@@ -23,6 +23,6 @@ public abstract class AbstractFile implements IFile {
     public abstract boolean isSet(@NotNull String key);
 
     public @NotNull File getFile() {
-        return file;
+        return this.file;
     }
 }

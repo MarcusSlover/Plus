@@ -26,8 +26,10 @@ public class JsonFile extends AbstractFile {
 
     @Override
     public boolean isSet(@NotNull String key) {
-        if (jsonElement == null) return false;
-        if (jsonElement instanceof JsonObject jsonObject) {
+        if (this.jsonElement == null) {
+            return false;
+        }
+        if (this.jsonElement instanceof JsonObject jsonObject) {
             return jsonObject.has(key);
         }
         return false;
@@ -40,23 +42,26 @@ public class JsonFile extends AbstractFile {
     @Override
     public void load() {
         try {
-            FileReader reader = new FileReader(file);
-            jsonElement = JsonParser.parseReader(reader);
+            FileReader reader = new FileReader(this.file);
+            this.jsonElement = JsonParser.parseReader(reader);
             reader.close();
         } catch (IOException e) {
             e.printStackTrace();
-            jsonElement = new JsonObject();
+            this.jsonElement = new JsonObject();
         }
     }
 
     @Override
     public void save() {
         try {
-            FileWriter fileWriter = new FileWriter(file);
+            FileWriter fileWriter = new FileWriter(this.file);
             String json;
 
-            if (gson == null) json = jsonElement.toString();
-            else json = gson.toJson(jsonElement);
+            if (this.gson == null) {
+                json = this.jsonElement.toString();
+            } else {
+                json = this.gson.toJson(this.jsonElement);
+            }
 
             fileWriter.write(json);
             fileWriter.flush();
@@ -68,7 +73,7 @@ public class JsonFile extends AbstractFile {
 
     @NotNull
     public JsonElement getJsonElement() {
-        return jsonElement;
+        return this.jsonElement;
     }
 
     public void setJsonElement(@NotNull JsonElement jsonElement) {

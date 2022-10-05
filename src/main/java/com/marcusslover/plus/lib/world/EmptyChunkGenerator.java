@@ -15,7 +15,7 @@ public class EmptyChunkGenerator extends ChunkGenerator {
     @NotNull
     @Override
     public ChunkGenerator.ChunkData generateChunkData(@NotNull World world, @NotNull Random random, int x, int z, @NotNull BiomeGrid biome) {
-        return createChunkData(world);
+        return this.createChunkData(world);
     }
 
     @Override
