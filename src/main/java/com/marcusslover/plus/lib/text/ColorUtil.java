@@ -92,7 +92,7 @@ public class ColorUtil {
     /**
      * Convert color codes and hex codes to Color container (RGB Container)
      *
-     * @param value Must match one of these formats "#FFFFFF" or "&c"
+     * @param value Must match one of these formats "#FFFFFF" or "ampersand-c"
      * @return org.bukkit.Color
      */
     public static Color getRGBFromCode(String value) {
@@ -126,9 +126,9 @@ public class ColorUtil {
     }
 
     /**
-     * Converts "&c" format to a Color object containing RGB values
+     * Converts ampersand-c format to a Color object containing RGB values
      *
-     * @param value Must be in format "&0"
+     * @param value Must be in format "ampersand-0"
      * @return org.bukkit.Color
      */
     public static Color minecraft2Rgb(String value) {

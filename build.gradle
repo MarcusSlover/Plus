@@ -4,6 +4,8 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '7.1.2'
 }
 
+javadoc.options.addStringOption('Xdoclint:none', '-quiet')
+
 group 'com.marcusslover'
 version '3.0-SNAPSHOT'
 ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
