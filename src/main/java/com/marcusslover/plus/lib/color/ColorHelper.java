@@ -8,7 +8,7 @@ import org.bukkit.DyeColor;
 import java.util.HashMap;
 import java.util.regex.Pattern;
 
-public class ColorUtils {
+public class ColorHelper {
     private static final Pattern HEX_PATTERN = Pattern.compile("^#([a-fA-F0-9]{6})$");
     private static final HashMap<DyeColor, ChatColor> dyeChatMap = new HashMap<>(16);
 
