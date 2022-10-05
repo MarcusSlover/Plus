@@ -1,7 +1,7 @@
 package com.marcusslover.plus.lib.file;
 
-import me.endergaming.enderlibs.misc.ServerUtils;
-import me.endergaming.enderlibs.text.MessageUtils;
+import com.marcusslover.plus.lib.util.ServerUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -91,7 +91,7 @@ public class FileUtils {
 //                  noinspection ResultOfMethodCallIgnored
                     file.createNewFile();
                 } catch (Exception e) {
-                    MessageUtils.log(MessageUtils.LogLevel.WARNING, ChatColor.RED + "There was an issue creating " + fileName);
+                    Bukkit.getLogger().warning("There was an issue creating " + fileName);
                     e.printStackTrace();
                 }
             }
