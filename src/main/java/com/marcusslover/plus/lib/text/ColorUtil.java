@@ -1,7 +1,6 @@
 package com.marcusslover.plus.lib.text;
 
 import org.apache.commons.lang.Validate;
-import org.bukkit.ChatColor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;

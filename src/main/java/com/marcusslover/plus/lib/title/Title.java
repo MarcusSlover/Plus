@@ -53,17 +53,17 @@ public class Title implements ISendable<Player, Title> {
 
     @Override
     public @NotNull Title send(@NotNull Player player) {
-        return send(player, TIMES);
+        return this.send(player, TIMES);
     }
 
     public @NotNull Title send(@NotNull Player player, long fadeIn, long fadeStay, long fadeOut) {
         net.kyori.adventure.title.Title.Times of = net.kyori.adventure.title.Title.Times.times(Ticks.duration(fadeIn), Ticks.duration(fadeStay), Ticks.duration(fadeOut));
-        player.showTitle(net.kyori.adventure.title.Title.title(title.comp(), subtitle.comp(), of));
+        player.showTitle(net.kyori.adventure.title.Title.title(this.title.comp(), this.subtitle.comp(), of));
         return this;
     }
 
     public @NotNull Title send(@NotNull Player player, @Nullable net.kyori.adventure.title.Title.Times times) {
-        player.showTitle(net.kyori.adventure.title.Title.title(title.comp(), subtitle.comp(), times));
+        player.showTitle(net.kyori.adventure.title.Title.title(this.title.comp(), this.subtitle.comp(), times));
         return this;
     }
 

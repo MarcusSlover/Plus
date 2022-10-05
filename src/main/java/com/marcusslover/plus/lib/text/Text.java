@@ -71,33 +71,33 @@ public class Text implements ISendable<CommandSender, Text> {
         if (hover == null) {
             this.component = this.component.hoverEvent(null);
         } else {
-            this.component = component.hoverEvent(HoverEvent.showText(hover.component));
+            this.component = this.component.hoverEvent(HoverEvent.showText(hover.component));
         }
         return this;
     }
 
     public @NotNull Text setClick(@Nullable ClickEvent click) {
-        this.component = component.clickEvent(click);
+        this.component = this.component.clickEvent(click);
         return this;
     }
 
     public @NotNull String raw() {
-        return text;
+        return this.text;
     }
 
     public boolean isEmpty() {
-        if (component instanceof TextComponent textComponent) {
+        if (this.component instanceof TextComponent textComponent) {
             return textComponent.content().isEmpty();
         }
         return true;
     }
 
     public @NotNull Component comp() {
-        return component;
+        return this.component;
     }
 
     public @NotNull Text send(@NotNull CommandSender sender) {
-        sender.sendMessage(comp());
+        sender.sendMessage(this.comp());
         return this;
     }
 

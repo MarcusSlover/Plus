@@ -72,11 +72,11 @@ public class Note implements ISendable<Player, Note> {
     }
 
     public @Nullable Sound getSound() {
-        return sound;
+        return this.sound;
     }
 
     public @Nullable String getRawSound() {
-        return rawSound;
+        return this.rawSound;
     }
 
     public @NotNull Note setSound(@NotNull Sound sound) {
@@ -90,7 +90,7 @@ public class Note implements ISendable<Player, Note> {
     }
 
     public float getVolume() {
-        return volume;
+        return this.volume;
     }
 
     public @NotNull Note setVolume(float volume) {
@@ -99,7 +99,7 @@ public class Note implements ISendable<Player, Note> {
     }
 
     public float getPitch() {
-        return pitch;
+        return this.pitch;
     }
 
     public @NotNull Note setPitch(float pitch) {
@@ -108,7 +108,7 @@ public class Note implements ISendable<Player, Note> {
     }
 
     public @NotNull SoundCategory getCategory() {
-        return category;
+        return this.category;
     }
 
     public @NotNull Note setCategory(@NotNull SoundCategory category) {
@@ -129,8 +129,11 @@ public class Note implements ISendable<Player, Note> {
     @Alternative
     public @NotNull Note play(@NotNull Location location) {
         World world = location.getWorld();
-        if (sound != null) world.playSound(location, sound, category, volume, pitch);
-        else if (rawSound != null) world.playSound(location, rawSound, category, volume, pitch);
+        if (this.sound != null) {
+            world.playSound(location, this.sound, this.category, this.volume, this.pitch);
+        } else if (this.rawSound != null) {
+            world.playSound(location, this.rawSound, this.category, this.volume, this.pitch);
+        }
         return this;
     }
 
@@ -140,15 +143,21 @@ public class Note implements ISendable<Player, Note> {
     }
 
     public @NotNull Note send(@NotNull Player player, @NotNull Location location) {
-        if (sound != null) player.playSound(location, sound, category, volume, pitch);
-        else if (rawSound != null) player.playSound(location, rawSound, category, volume, pitch);
+        if (this.sound != null) {
+            player.playSound(location, this.sound, this.category, this.volume, this.pitch);
+        } else if (this.rawSound != null) {
+            player.playSound(location, this.rawSound, this.category, this.volume, this.pitch);
+        }
         return this;
     }
 
     public @NotNull Note send(@NotNull Location location) {
         World world = location.getWorld();
-        if (sound != null) world.playSound(location, sound, category, volume, pitch);
-        else if (rawSound != null) world.playSound(location, rawSound, category, volume, pitch);
+        if (this.sound != null) {
+            world.playSound(location, this.sound, this.category, this.volume, this.pitch);
+        } else if (this.rawSound != null) {
+            world.playSound(location, this.rawSound, this.category, this.volume, this.pitch);
+        }
         return this;
     }
 }

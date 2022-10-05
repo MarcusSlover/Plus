@@ -19,8 +19,8 @@ import java.util.function.Consumer;
  */
 public class EventListener<T extends Event> implements Listener {
 
-    private BiConsumer<EventListener<T>, T> handler;
-    private Class<T> eventClass;
+    private final BiConsumer<EventListener<T>, T> handler;
+    private final Class<T> eventClass;
 
     /**
      * Creates and registers a Listener for the given event

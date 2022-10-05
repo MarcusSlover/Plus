@@ -15,19 +15,23 @@ public class ConfigFile extends AbstractFile {
 
     @Override
     public boolean isSet(@NotNull String key) {
-        if (yamlConfiguration == null) return false;
-        return yamlConfiguration.isSet(key);
+        if (this.yamlConfiguration == null) {
+            return false;
+        }
+        return this.yamlConfiguration.isSet(key);
     }
 
     @Override
     public void load() {
-        yamlConfiguration = YamlConfiguration.loadConfiguration(file);
+        this.yamlConfiguration = YamlConfiguration.loadConfiguration(this.file);
     }
 
     @Override
     public void save() {
         try {
-            if (yamlConfiguration != null) yamlConfiguration.save(file);
+            if (this.yamlConfiguration != null) {
+                this.yamlConfiguration.save(this.file);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -35,7 +39,7 @@ public class ConfigFile extends AbstractFile {
 
     @NotNull
     public YamlConfiguration getYamlConfiguration() {
-        return yamlConfiguration;
+        return this.yamlConfiguration;
     }
 
     public void setYamlConfiguration(@NotNull YamlConfiguration yamlConfiguration) {

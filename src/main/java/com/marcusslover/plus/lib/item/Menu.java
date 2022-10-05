@@ -38,14 +38,17 @@ public class Menu implements ISendable<Player, Menu> {
     }
 
     public Menu(int size, @Nullable Text text) {
-        if (text == null) inventory = Bukkit.createInventory(null, size);
-        else inventory = Bukkit.createInventory(null, size, text.comp());
-        clickAdapters = new LinkedList<>();
-        mainClickAdapter = null;
+        if (text == null) {
+            this.inventory = Bukkit.createInventory(null, size);
+        } else {
+            this.inventory = Bukkit.createInventory(null, size, text.comp());
+        }
+        this.clickAdapters = new LinkedList<>();
+        this.mainClickAdapter = null;
     }
 
     public boolean isCancelled() {
-        return cancelled;
+        return this.cancelled;
     }
 
     public @NotNull Menu setCancelled(boolean cancelled) {
@@ -54,75 +57,79 @@ public class Menu implements ISendable<Player, Menu> {
     }
 
     public @NotNull Inventory inventory() {
-        return inventory;
+        return this.inventory;
     }
 
     public int size() {
-        return inventory.getSize();
+        return this.inventory.getSize();
     }
 
     public @NotNull Menu set(int slot, @Nullable Item item) {
-        return setItem(slot, item, null);
+        return this.setItem(slot, item, null);
     }
 
     public @NotNull Menu setItem(int slot, @Nullable Item item) {
-        return setItem(slot, item, null);
+        return this.setItem(slot, item, null);
     }
 
     public @NotNull Menu set(int slot, @Nullable Item item, @Nullable Consumer<@NotNull InventoryClickEvent> event) {
-        return setItem(slot, item, event);
+        return this.setItem(slot, item, event);
     }
 
     public @NotNull Menu setItem(int slot, @Nullable Item item, @Nullable Consumer<@NotNull InventoryClickEvent> event) {
-        if (item != null) inventory.setItem(slot, item.getItemStack());
-        if (event != null) return onClick(slot, event);
+        if (item != null) {
+            this.inventory.setItem(slot, item.getItemStack());
+        }
+        if (event != null) {
+            return this.onClick(slot, event);
+        }
         return this;
     }
 
     public @NotNull Menu onClick(@NotNull Consumer<@NotNull InventoryClickEvent> event) {
-        return onClick(-1, event);
+        return this.onClick(-1, event);
     }
 
     public @NotNull Menu onClick(int slot, @NotNull Consumer<@NotNull InventoryClickEvent> event) {
-        clickAdapters.add(new ClickAdapter(slot, event));
+        this.clickAdapters.add(new ClickAdapter(slot, event));
         return this;
     }
 
     public @NotNull Menu onMainClick(@NotNull Consumer<@NotNull InventoryClickEvent> event) {
-        mainClickAdapter = new Menu.ClickAdapter(-1, event);
+        this.mainClickAdapter = new Menu.ClickAdapter(-1, event);
         return this;
     }
 
     @Alternative
     public @NotNull Menu open(@NotNull Player player) {
-        return send(player);
+        return this.send(player);
     }
 
     @Override
     public @NotNull Menu send(@NotNull Player target) {
-        lastActivity = System.currentTimeMillis();
-        target.openInventory(inventory);
+        this.lastActivity = System.currentTimeMillis();
+        target.openInventory(this.inventory);
         return this;
     }
 
     public @NotNull List<@NotNull Player> getViewers() {
-        return inventory.getViewers().stream().map(entity -> (Player) entity).collect(Collectors.toList());
+        return this.inventory.getViewers().stream().map(entity -> (Player) entity).collect(Collectors.toList());
     }
 
     public boolean isViewing(@NotNull Player player) {
-        return getViewers().contains(player);
+        return this.getViewers().contains(player);
     }
 
     public @Nullable ClickAdapter getMainClickAdapter() {
-        return mainClickAdapter;
+        return this.mainClickAdapter;
     }
 
     public @NotNull Inventory getInventory() {
-        return inventory;
+        return this.inventory;
     }
 
     public @NotNull LinkedList<@NotNull ClickAdapter> getClickAdapters() {
-        return clickAdapters;
+        return this.clickAdapters;
     }
 
     public record ClickAdapter(int slot, @NotNull Consumer<@NotNull InventoryClickEvent> event) {
