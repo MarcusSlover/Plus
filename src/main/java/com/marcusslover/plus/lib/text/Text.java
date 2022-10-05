@@ -101,4 +101,9 @@ public class Text implements ISendable<CommandSender, Text> {
         return this;
     }
 
+    public @NotNull Text sendActionBar(@NotNull CommandSender sender) {
+        sender.sendActionBar(this.comp());
+        return this;
+    }
+
 }
