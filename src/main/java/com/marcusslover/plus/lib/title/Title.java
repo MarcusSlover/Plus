@@ -17,6 +17,7 @@ public class Title implements ISendable<Player, Title> {
                     Ticks.duration(10));
 
     protected final @NotNull Text title;
+    protected net.kyori.adventure.title.Title.Times times = TIMES;
     protected final @NotNull Text subtitle;
 
     public Title(@NotNull String title) {
@@ -53,9 +54,14 @@ public class Title implements ISendable<Player, Title> {
         return new Title(title, subtitle);
     }
 
+    public @NotNull Title times(long fadeIn, long stay, long fadeOut) {
+        this.times = net.kyori.adventure.title.Title.Times.times(Ticks.duration(fadeIn), Ticks.duration(stay), Ticks.duration(fadeOut));
+        return this;
+    }
+
     @Override
     public @NotNull Title send(@NotNull Player player) {
-        return this.send(player, TIMES);
+        return this.send(player, this.times);
     }
 
     public @NotNull Title send(@NotNull Collection<Player> players) {
