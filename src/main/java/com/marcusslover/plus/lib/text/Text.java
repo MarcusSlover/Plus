@@ -11,6 +11,7 @@ import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -101,9 +102,40 @@ public class Text implements ISendable<CommandSender, Text> {
         return this;
     }
 
+    public @NotNull <T extends CommandSender> Text send(@NotNull Collection<T> players) {
+        for (T sender : players) {
+            this.send(sender);
+        }
+
+        return this;
+    }
+
+    public @NotNull <T extends CommandSender> Text send(@NotNull T... players) {
+        for (T sender : players) {
+            this.send(sender);
+        }
+
+        return this;
+    }
+
     public @NotNull Text sendActionBar(@NotNull CommandSender sender) {
         sender.sendActionBar(this.comp());
         return this;
     }
 
+    public @NotNull <T extends CommandSender> Text sendActionBar(@NotNull Collection<T> senders) {
+        for (T sender : senders) {
+            this.sendActionBar(sender);
+        }
+
+        return this;
+    }
+
+    public @NotNull <T extends CommandSender> Text sendActionBar(@NotNull T... senders) {
+        for (T sender : senders) {
+            this.sendActionBar(sender);
+        }
+
+        return this;
+    }
 }

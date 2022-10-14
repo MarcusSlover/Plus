@@ -56,6 +56,14 @@ public class Title implements ISendable<Player, Title> {
         return this.send(player, TIMES);
     }
 
+    public @NotNull Title send(@NotNull Player... players) {
+        for (Player player : players) {
+            this.send(player);
+        }
+
+        return this;
+    }
+
     public @NotNull Title send(@NotNull Player player, long fadeIn, long fadeStay, long fadeOut) {
         net.kyori.adventure.title.Title.Times of = net.kyori.adventure.title.Title.Times.times(Ticks.duration(fadeIn), Ticks.duration(fadeStay), Ticks.duration(fadeOut));
         player.showTitle(net.kyori.adventure.title.Title.title(this.title.comp(), this.subtitle.comp(), of));
@@ -66,6 +74,4 @@ public class Title implements ISendable<Player, Title> {
         player.showTitle(net.kyori.adventure.title.Title.title(this.title.comp(), this.subtitle.comp(), times));
         return this;
     }
-
-
 }
