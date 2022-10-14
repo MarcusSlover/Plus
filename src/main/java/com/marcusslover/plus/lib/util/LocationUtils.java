@@ -7,6 +7,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -123,12 +124,12 @@ public class LocationUtils {
      * @return The stringified Location
      */
     public static String toAccurateString(Location loc, String separator) {
-        return new StringBuilder().append(loc.getWorld().getName()).append(separator)
-                .append(loc.getX()).append(separator)
-                .append(loc.getY()).append(separator)
-                .append(loc.getZ()).append(separator)
-                .append(loc.getYaw()).append(separator)
-                .append(loc.getPitch()).toString();
+        return loc.getWorld().getName() + separator +
+               loc.getX() + separator +
+               loc.getY() + separator +
+               loc.getZ() + separator +
+               loc.getYaw() + separator +
+               loc.getPitch();
     }
 
     /**
@@ -138,12 +139,12 @@ public class LocationUtils {
      * @return The stringified Location
      */
     public static String toAccurateString(String world, double x, double y, double z, float yaw, float pitch, String separator) {
-        return new StringBuilder().append(world).append(separator)
-                .append(x).append(separator)
-                .append(y).append(separator)
-                .append(z).append(separator)
-                .append(yaw).append(separator)
-                .append(pitch).toString();
+        return world + separator +
+               x + separator +
+               y + separator +
+               z + separator +
+               yaw + separator +
+               pitch;
     }
 
 
@@ -155,10 +156,10 @@ public class LocationUtils {
      * @return The stringified Location
      */
     public static String toString(Location loc, String separator) {
-        return new StringBuilder().append(loc.getWorld().getName()).append(separator)
-                .append(loc.getX()).append(separator)
-                .append(loc.getY()).append(separator)
-                .append(loc.getZ()).toString();
+        return loc.getWorld().getName() + separator +
+               loc.getX() + separator +
+               loc.getY() + separator +
+               loc.getZ();
     }
 
     /**
@@ -169,10 +170,10 @@ public class LocationUtils {
      * @return The stringified location
      */
     public static String toString(Block block, String separator) {
-        return new StringBuilder().append(block.getWorld().getName()).append(separator)
-                .append(block.getX()).append(separator)
-                .append(block.getY()).append(separator)
-                .append(block.getZ()).toString();
+        return block.getWorld().getName() + separator +
+               block.getX() + separator +
+               block.getY() + separator +
+               block.getZ();
     }
 
     /**
@@ -268,5 +269,21 @@ public class LocationUtils {
      */
     public static Vector getDirection(BlockFace face) {
         return new Vector(face.getModX(), face.getModY(), face.getModZ());
+    }
+
+    /**
+     * Returns a list of locations that are in a circle around the given center.
+     */
+    protected @NotNull List<Location> getCircle(@NotNull Location center, double radius, int amount) {
+        World world = center.getWorld();
+        double increment = (2 * Math.PI) / amount;
+        List<Location> locations = new ArrayList<>();
+        for (int i = 0; i < amount; i++) {
+            double angle = i * increment;
+            double x = center.getX() + (radius * Math.cos(angle));
+            double z = center.getZ() + (radius * Math.sin(angle));
+            locations.add(new Location(world, x, center.getY(), z, center.getYaw(), center.getPitch()));
+        }
+        return locations;
     }
 }
