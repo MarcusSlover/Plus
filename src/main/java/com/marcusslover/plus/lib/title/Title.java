@@ -7,6 +7,8 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
+
 public class Title implements ISendable<Player, Title> {
     private static final net.kyori.adventure.title.Title.Times TIMES =
             net.kyori.adventure.title.Title.Times.times(
@@ -54,6 +56,14 @@ public class Title implements ISendable<Player, Title> {
     @Override
     public @NotNull Title send(@NotNull Player player) {
         return this.send(player, TIMES);
+    }
+
+    public @NotNull Title send(@NotNull Collection<Player> players) {
+        for (Player player : players) {
+            this.send(player);
+        }
+
+        return this;
     }
 
     public @NotNull Title send(@NotNull Player... players) {
