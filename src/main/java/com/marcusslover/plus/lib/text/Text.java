@@ -1,5 +1,6 @@
 package com.marcusslover.plus.lib.text;
 
+import com.marcusslover.plus.lib.title.Title;
 import com.marcusslover.plus.lib.util.ISendable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -7,6 +8,7 @@ import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -99,6 +101,26 @@ public class Text implements ISendable<CommandSender, Text> {
 
     public @NotNull Text send(@NotNull CommandSender sender) {
         sender.sendMessage(this.comp());
+        return this;
+    }
+
+    public @NotNull Text sendAll() {
+        for (CommandSender sender : Bukkit.getOnlinePlayers()) {
+            this.send(sender);
+        }
+
+        return this;
+    }
+
+    public @NotNull Text sendAll(String permission) {
+        permission = permission == null ? "" : permission;
+
+        for (CommandSender sender : Bukkit.getOnlinePlayers()) {
+            if (permission.isBlank() || sender.hasPermission(permission)) {
+                this.send(sender);
+            }
+        }
+
         return this;
     }
 
