@@ -3,13 +3,13 @@ package com.marcusslover.plus.lib.title;
 import com.marcusslover.plus.lib.text.Text;
 import com.marcusslover.plus.lib.util.ISendable;
 import net.kyori.adventure.util.Ticks;
-import org.bukkit.entity.Player;
+import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 
-public class Title implements ISendable<Player, Title> {
+public class Title implements ISendable<CommandSender, Title> {
     private static final net.kyori.adventure.title.Title.Times TIMES =
             net.kyori.adventure.title.Title.Times.times(
                     Ticks.duration(10),
@@ -60,33 +60,34 @@ public class Title implements ISendable<Player, Title> {
     }
 
     @Override
-    public @NotNull Title send(@NotNull Player player) {
+    public @NotNull Title send(@NotNull CommandSender player) {
         return this.send(player, this.times);
     }
 
-    public @NotNull Title send(@NotNull Collection<Player> players) {
-        for (Player player : players) {
-            this.send(player);
+    public @NotNull <T extends CommandSender> Title send(@NotNull Collection<T> players) {
+        for (T sender : players) {
+            this.send(sender);
         }
 
         return this;
     }
 
-    public @NotNull Title send(@NotNull Player... players) {
-        for (Player player : players) {
-            this.send(player);
+    @SafeVarargs
+    public final @NotNull <T extends CommandSender> Title send(@NotNull T... players) {
+        for (T sender : players) {
+            this.send(sender);
         }
 
         return this;
     }
 
-    public @NotNull Title send(@NotNull Player player, long fadeIn, long fadeStay, long fadeOut) {
+    public @NotNull Title send(@NotNull CommandSender player, long fadeIn, long fadeStay, long fadeOut) {
         net.kyori.adventure.title.Title.Times of = net.kyori.adventure.title.Title.Times.times(Ticks.duration(fadeIn), Ticks.duration(fadeStay), Ticks.duration(fadeOut));
         player.showTitle(net.kyori.adventure.title.Title.title(this.title.comp(), this.subtitle.comp(), of));
         return this;
     }
 
-    public @NotNull Title send(@NotNull Player player, @Nullable net.kyori.adventure.title.Title.Times times) {
+    public @NotNull Title send(@NotNull CommandSender player, @Nullable net.kyori.adventure.title.Title.Times times) {
         player.showTitle(net.kyori.adventure.title.Title.title(this.title.comp(), this.subtitle.comp(), times));
         return this;
     }

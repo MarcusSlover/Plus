@@ -110,7 +110,8 @@ public class Text implements ISendable<CommandSender, Text> {
         return this;
     }
 
-    public @NotNull <T extends CommandSender> Text send(@NotNull T... players) {
+    @SafeVarargs
+    public final @NotNull <T extends CommandSender> Text send(@NotNull T... players) {
         for (T sender : players) {
             this.send(sender);
         }
@@ -123,16 +124,16 @@ public class Text implements ISendable<CommandSender, Text> {
         return this;
     }
 
-    public @NotNull <T extends CommandSender> Text sendActionBar(@NotNull Collection<T> senders) {
-        for (T sender : senders) {
+    public @NotNull <T extends CommandSender> Text sendActionBar(@NotNull Collection<T> players) {
+        for (T sender : players) {
             this.sendActionBar(sender);
         }
 
         return this;
     }
 
-    public @NotNull <T extends CommandSender> Text sendActionBar(@NotNull T... senders) {
-        for (T sender : senders) {
+    public @NotNull <T extends CommandSender> Text sendActionBar(@NotNull T... players) {
+        for (T sender : players) {
             this.sendActionBar(sender);
         }
 
