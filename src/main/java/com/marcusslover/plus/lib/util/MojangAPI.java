@@ -19,7 +19,9 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public class MojangAPI {
-    static Cache<UUID, PlayerProfile> cache;
+    static Cache<UUID, PlayerProfile> cache = CacheBuilder.newBuilder()
+            .expireAfterWrite(15, TimeUnit.MINUTES)
+            .build();
     static HashMap<String, UUID> nameMap = new HashMap<>();
 
     public static PlayerProfile getPlayerProfile(UUID uuid) {
@@ -112,10 +114,6 @@ public class MojangAPI {
 
     @Nullable
     private static PlayerProfile cacheFetch(UUID uuid) {
-        if (cache == null) {
-            cache = CacheBuilder.newBuilder().expireAfterWrite(15, TimeUnit.MINUTES).build();
-        }
-
         return cache.getIfPresent(uuid);
     }
 
