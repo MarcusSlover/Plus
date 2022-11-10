@@ -326,4 +326,9 @@ public class WorldPoint {
     public void setPitch(float pitch) {
         this.pitch = pitch;
     }
+
+    @Override
+    public WorldPoint clone() {
+        return new WorldPoint(this.x, this.y, this.z, this.yaw, this.pitch);
+    }
 }
