@@ -129,7 +129,11 @@ public class WorldPoint {
      * @return A WorldPoint
      */
     public WorldPoint add(WorldPoint worldPoint) {
-        return new WorldPoint(this.x + worldPoint.getX(), this.y + worldPoint.getY(), this.z + worldPoint.getZ());
+        this.x += worldPoint.getX();
+        this.y += worldPoint.getY();
+        this.z += worldPoint.getZ();
+
+        return this;
     }
 
     /**
@@ -141,7 +145,11 @@ public class WorldPoint {
      * @return A WorldPoint
      */
     public WorldPoint add(double x, double y, double z) {
-        return new WorldPoint(this.x + x, this.y + y, this.z + z);
+        this.x += x;
+        this.y += y;
+        this.z += z;
+
+        return this;
     }
 
     /**
@@ -151,7 +159,11 @@ public class WorldPoint {
      * @return A WorldPoint
      */
     public WorldPoint subtract(WorldPoint worldPoint) {
-        return new WorldPoint(this.x - worldPoint.getX(), this.y - worldPoint.getY(), this.z - worldPoint.getZ());
+        this.x -= worldPoint.getX();
+        this.y -= worldPoint.getY();
+        this.z -= worldPoint.getZ();
+
+        return this;
     }
 
     /**
@@ -163,7 +175,52 @@ public class WorldPoint {
      * @return A WorldPoint
      */
     public WorldPoint subtract(double x, double y, double z) {
-        return new WorldPoint(this.x - x, this.y - y, this.z - z);
+        this.x -= x;
+        this.y -= y;
+        this.z -= z;
+
+        return this;
+    }
+
+    /**
+     * Multiply a WorldPoint by x, y, z
+     * @param x X amount to multiply
+     * @param y Y amount to multiply
+     * @param z Z amount to multiply
+     * @return A WorldPoint
+     */
+    public WorldPoint multiply(double x, double y, double z) {
+        this.x *= x;
+        this.y *= y;
+        this.z *= z;
+
+        return this;
+    }
+
+    /**
+     * Multiply a WorldPoint (x, y, z) by a double value
+     * @param amount The amount to multiply by
+     * @return A WorldPoint
+     */
+    public WorldPoint multiply(double amount) {
+        this.x *= amount;
+        this.y *= amount;
+        this.z *= amount;
+
+        return this;
+    }
+
+    /**
+     * Multiply a WorldPoint by another WorldPoint. (Only affects x, y, z)
+     * @param worldPoint The WorldPoint to multiply by
+     * @return A WorldPoint
+     */
+    public WorldPoint multiply(WorldPoint worldPoint) {
+        this.x *= worldPoint.getX();
+        this.y *= worldPoint.getY();
+        this.z *= worldPoint.getZ();
+
+        return this;
     }
 
     /**
@@ -184,7 +241,7 @@ public class WorldPoint {
      * @param x the X coordinate of the second endpoint
      * @param y the Y coordinate of the second endpoint
      * @param z the Z coordinate of the second endpoint
-     * @return the position in the middle
+     * @return the position in the middle (new instance)
      */
     public WorldPoint midpoint(double x, double y, double z) {
         return new WorldPoint(
@@ -198,7 +255,7 @@ public class WorldPoint {
      * specified WorldPoint.
      *
      * @param worldPoint the other endpoint
-     * @return the WorldPoint in the middle
+     * @return the WorldPoint in the middle (new instance)
      * @throws NullPointerException if the specified {@code WorldPoint} is null
      */
     public WorldPoint midpoint(WorldPoint worldPoint) {
