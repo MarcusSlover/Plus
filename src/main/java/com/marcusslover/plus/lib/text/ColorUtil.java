@@ -4,9 +4,11 @@ import net.md_5.bungee.api.ChatColor;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
+import org.bukkit.Material;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
+import java.util.Arrays;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -17,26 +19,62 @@ public class ColorUtil {
     public static final Pattern HEX_FROM_BUKKIT = Pattern.compile("&x(&[a-fA-F0-9]){6}");
     public static final char COLOR_CHAR = '\u00A7';
 
-    private static final HashMap<DyeColor, ChatColor> dyeChatMap = new HashMap<>(16);
+    private static final EnumMap<DyeColor, ChatColor> dyeChatMap = new EnumMap<DyeColor, ChatColor>(DyeColor.class) {{
+        this.put(DyeColor.BLACK, ChatColor.BLACK);
+        this.put(DyeColor.BLUE, ChatColor.DARK_BLUE);
+        this.put(DyeColor.BROWN, ChatColor.GOLD);
+        this.put(DyeColor.CYAN, ChatColor.AQUA);
+        this.put(DyeColor.GRAY, ChatColor.DARK_GRAY);
+        this.put(DyeColor.GREEN, ChatColor.DARK_GREEN);
+        this.put(DyeColor.LIGHT_BLUE, ChatColor.BLUE);
+        this.put(DyeColor.LIME, ChatColor.GREEN);
+        this.put(DyeColor.MAGENTA, ChatColor.LIGHT_PURPLE);
+        this.put(DyeColor.ORANGE, ChatColor.GOLD);
+        this.put(DyeColor.PINK, ChatColor.LIGHT_PURPLE);
+        this.put(DyeColor.PURPLE, ChatColor.DARK_PURPLE);
+        this.put(DyeColor.RED, ChatColor.DARK_RED);
+        this.put(DyeColor.LIGHT_GRAY, ChatColor.GRAY);
+        this.put(DyeColor.WHITE, ChatColor.WHITE);
+        this.put(DyeColor.YELLOW, ChatColor.YELLOW);
+    }};
 
-    static {
-        dyeChatMap.put(DyeColor.BLACK, ChatColor.BLACK);
-        dyeChatMap.put(DyeColor.BLUE, ChatColor.DARK_BLUE);
-        dyeChatMap.put(DyeColor.BROWN, ChatColor.GOLD);
-        dyeChatMap.put(DyeColor.CYAN, ChatColor.AQUA);
-        dyeChatMap.put(DyeColor.GRAY, ChatColor.DARK_GRAY);
-        dyeChatMap.put(DyeColor.GREEN, ChatColor.DARK_GREEN);
-        dyeChatMap.put(DyeColor.LIGHT_BLUE, ChatColor.BLUE);
-        dyeChatMap.put(DyeColor.LIME, ChatColor.GREEN);
-        dyeChatMap.put(DyeColor.MAGENTA, ChatColor.LIGHT_PURPLE);
-        dyeChatMap.put(DyeColor.ORANGE, ChatColor.GOLD);
-        dyeChatMap.put(DyeColor.PINK, ChatColor.LIGHT_PURPLE);
-        dyeChatMap.put(DyeColor.PURPLE, ChatColor.DARK_PURPLE);
-        dyeChatMap.put(DyeColor.RED, ChatColor.DARK_RED);
-        dyeChatMap.put(DyeColor.LIGHT_GRAY, ChatColor.GRAY);
-        dyeChatMap.put(DyeColor.WHITE, ChatColor.WHITE);
-        dyeChatMap.put(DyeColor.YELLOW, ChatColor.YELLOW);
-    }
+    private static final EnumMap<Material, DyeColor> matDyeMap = new EnumMap<Material, DyeColor>(Material.class) {{
+        Arrays.stream(Material.values()).forEach(material -> {
+            if (material.name().startsWith("WHITE")) {
+                this.put(material, DyeColor.WHITE);
+            } else if (material.name().startsWith("ORANGE")) {
+                this.put(material, DyeColor.ORANGE);
+            } else if (material.name().startsWith("MAGENTA")) {
+                this.put(material, DyeColor.MAGENTA);
+            } else if (material.name().startsWith("LIGHT_BLUE")) {
+                this.put(material, DyeColor.LIGHT_BLUE);
+            } else if (material.name().startsWith("YELLOW")) {
+                this.put(material, DyeColor.YELLOW);
+            } else if (material.name().startsWith("LIME")) {
+                this.put(material, DyeColor.LIME);
+            } else if (material.name().startsWith("PINK")) {
+                this.put(material, DyeColor.PINK);
+            } else if (material.name().startsWith("GRAY")) {
+                this.put(material, DyeColor.GRAY);
+            } else if (material.name().startsWith("LIGHT_GRAY")) {
+                this.put(material, DyeColor.LIGHT_GRAY);
+            } else if (material.name().startsWith("CYAN")) {
+                this.put(material, DyeColor.CYAN);
+            } else if (material.name().startsWith("PURPLE")) {
+                this.put(material, DyeColor.PURPLE);
+            } else if (material.name().startsWith("BLUE")) {
+                this.put(material, DyeColor.BLUE);
+            } else if (material.name().startsWith("BROWN")) {
+                this.put(material, DyeColor.BROWN);
+            } else if (material.name().startsWith("GREEN")) {
+                this.put(material, DyeColor.GREEN);
+            } else if (material.name().startsWith("RED")) {
+                this.put(material, DyeColor.RED);
+            } else if (material.name().startsWith("BLACK")) {
+                this.put(material, DyeColor.BLACK);
+            }
+        });
+    }};
 
     private ColorUtil() {
     }
@@ -157,11 +195,15 @@ public class ColorUtil {
     }
 
     public static ChatColor dyeToChat(DyeColor dye) {
-        if (dyeChatMap.containsKey(dye)) {
-            return dyeChatMap.get(dye);
-        }
+        return dyeChatMap.getOrDefault(dye, ChatColor.RESET);
+    }
 
-        return ChatColor.MAGIC;
+    public static DyeColor materialToDye(Material material) {
+        return matDyeMap.getOrDefault(material, DyeColor.WHITE);
+    }
+
+    public static ChatColor materialToChat(Material material) {
+        return dyeToChat(materialToDye(material));
     }
 
     public static @NotNull List<String> translateList(@NotNull List<String> lore) {
