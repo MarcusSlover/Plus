@@ -39,6 +39,20 @@ public class Title implements ISendable<CommandSender, Title> {
         this.subtitle = subtitle;
     }
 
+    public Title times(@NotNull net.kyori.adventure.title.Title.Times times) {
+        this.times = times;
+        return this;
+    }
+
+    public Title times(int fadeIn, int stay, int fadeOut) {
+        this.times = net.kyori.adventure.title.Title.Times.times(
+                Ticks.duration(fadeIn),
+                Ticks.duration(stay),
+                Ticks.duration(fadeOut));
+
+        return this;
+    }
+
     public static @NotNull Title of(@NotNull String title) {
         return new Title(title);
     }
