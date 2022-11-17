@@ -5,10 +5,7 @@ import com.marcusslover.plus.lib.util.ISendable;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
-import org.bukkit.scoreboard.DisplaySlot;
-import org.bukkit.scoreboard.Objective;
-import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.Team;
+import org.bukkit.scoreboard.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,7 +32,11 @@ public class Sidebar implements ISendable<Player, Sidebar> {
     }
 
     public Sidebar(@NotNull Text title) {
-        this.scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
+        this(title, Bukkit.getScoreboardManager().getNewScoreboard());
+    }
+
+    public Sidebar(@NotNull Text title, @NotNull Scoreboard scoreboard) {
+        this.scoreboard = scoreboard;
         this.objective = this.scoreboard.registerNewObjective(customID + "DS", "dummy", title.comp());
         this.objective.setDisplaySlot(DisplaySlot.SIDEBAR);
 
@@ -92,7 +93,7 @@ public class Sidebar implements ISendable<Player, Sidebar> {
         int currentSize = this.getSize();
         String entry = this.getEntry(currentSize);
 
-        Team team = this.scoreboard.registerNewTeam(currentSize + "T");
+        Team team = this.scoreboard.registerNewTeam(currentSize + "TPLUS");
         team.addEntry(entry);
 
         team.prefix(prefix.comp());
@@ -114,7 +115,7 @@ public class Sidebar implements ISendable<Player, Sidebar> {
         int currentSize = this.getSize();
         String entry = this.getEntry(currentSize);
 
-        Team team = this.scoreboard.registerNewTeam(currentSize + "T");
+        Team team = this.scoreboard.registerNewTeam(currentSize + "TPLUS");
         team.addEntry(entry);
 
         team.prefix(prefix.comp());
@@ -138,7 +139,7 @@ public class Sidebar implements ISendable<Player, Sidebar> {
     }
 
     public @NotNull Sidebar updateField(int index, @NotNull Text prefix, @NotNull Text suffix) {
-        Team team = this.scoreboard.getTeam(index + "T");
+        Team team = this.scoreboard.getTeam(index + "TPLUS");
         if (team == null) {
             return this;
         }
@@ -178,7 +179,12 @@ public class Sidebar implements ISendable<Player, Sidebar> {
     }
 
     public @NotNull Sidebar clearFields() {
-        this.scoreboard.getTeams().forEach(Team::unregister);
+        for (Team team : this.scoreboard.getTeams()) {
+
+            if (team.getName().endsWith("TPLUS")) {
+                team.unregister();
+            }
+        }
         this.fields.clear();
         return this;
     }
