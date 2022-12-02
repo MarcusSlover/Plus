@@ -1,5 +1,6 @@
 package com.marcusslover.plus.lib.command;
 
+import com.marcusslover.plus.lib.text.Text;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
 import org.bukkit.command.CommandSender;
@@ -35,6 +36,8 @@ public final class CommandManager {
         }
         String name = commandAnnotation.name();
         String description = commandAnnotation.description();
+        String permission = commandAnnotation.permission();
+        String pMessage = commandAnnotation.permissionMessage().isEmpty() ? Bukkit.getServer().getPermissionMessage() : commandAnnotation.permissionMessage();
         List<String> aliases = Arrays.stream(commandAnnotation.aliases()).toList();
 
         CommandMap commandMap = Bukkit.getCommandMap();
@@ -42,6 +45,12 @@ public final class CommandManager {
             @Override
             public boolean execute(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] args) {
                 CommandContext commandContext = new CommandContext(sender, commandLabel, args);
+
+                if (!permission.isEmpty() && !sender.hasPermission(permission)) {
+                    Text.of(pMessage).send(sender);
+                    return false;
+                }
+
                 return command.execute(commandContext);
             }
 

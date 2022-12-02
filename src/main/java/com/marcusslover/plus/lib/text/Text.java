@@ -9,6 +9,7 @@ import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -88,6 +89,10 @@ public class Text implements ISendable<CommandSender, Text> {
         return this.text;
     }
 
+    public @NotNull String stripped() {
+        return ChatColor.stripColor(LEGACY.serialize(this.component));
+    }
+
     public boolean isEmpty() {
         if (this.component instanceof TextComponent textComponent) {
             return textComponent.content().isEmpty();
@@ -160,5 +165,10 @@ public class Text implements ISendable<CommandSender, Text> {
         }
 
         return this;
+    }
+
+    @Override
+    public String toString() {
+        return LEGACY.serialize(this.component);
     }
 }

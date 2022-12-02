@@ -22,5 +22,7 @@ public @interface Command {
 
     @NotNull String permission() default "";
 
+    @NotNull String permissionMessage() default "";
+
     @NotNull String[] aliases() default {};
 }
