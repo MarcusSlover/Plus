@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 public class ColorUtil {
     private static final Pattern HEX_PATTERN = Pattern.compile("^#([a-fA-F0-9]{6})$");
-    public static final Pattern HEX_TO_BUKKIT = Pattern.compile("&#([a-fA-F0-9]{6})");
+    public static final Pattern HEX_TO_BUKKIT = Pattern.compile("&#([a-fA-F0-9]{6})|\\{#([a-fA-F0-9]{6})\\}");
     public static final Pattern HEX_FROM_BUKKIT = Pattern.compile("&x(&[a-fA-F0-9]){6}");
     public static final char COLOR_CHAR = '\u00A7';
 
@@ -134,6 +134,7 @@ public class ColorUtil {
      * @return org.bukkit.Color
      */
     public static Color getRGBFromCode(String value) {
+        value = value.replaceAll("[{}]", "").replaceAll("&", "");
         return HEX_PATTERN.matcher(value).matches() ? hex2Rgb(value) : minecraft2Rgb(value);
     }
 
