@@ -8,12 +8,7 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
+import java.util.*;
 
 public final class CommandManager {
     private final @NotNull Set<org.bukkit.command.Command> commandSet = new HashSet<>();
@@ -57,6 +52,12 @@ public final class CommandManager {
             @Override
             public @NotNull List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args) throws IllegalArgumentException {
                 TabCompleteContext tabCompleteContext = new TabCompleteContext(sender, args);
+
+                if (!permission.isEmpty() && !sender.hasPermission(permission)) {
+                    Text.of(pMessage).send(sender);
+                    return Collections.emptyList();
+                }
+
                 return command.tab(tabCompleteContext);
             }
         };
