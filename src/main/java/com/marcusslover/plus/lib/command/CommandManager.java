@@ -54,7 +54,6 @@ public final class CommandManager {
                 TabCompleteContext tabCompleteContext = new TabCompleteContext(sender, args);
 
                 if (!permission.isEmpty() && !sender.hasPermission(permission)) {
-                    Text.of(pMessage).send(sender);
                     return Collections.emptyList();
                 }
 
