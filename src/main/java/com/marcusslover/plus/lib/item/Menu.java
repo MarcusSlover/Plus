@@ -79,7 +79,7 @@ public class Menu implements ISendable<Player, Menu> {
 
     public @NotNull Menu setItem(int slot, @Nullable Item item, @Nullable Consumer<@NotNull InventoryClickEvent> event) {
         if (item != null) {
-            this.inventory.setItem(slot, item.getItemStack());
+            this.inventory.setItem(slot, item.get());
         }
         if (event != null) {
             return this.onClick(slot, event);

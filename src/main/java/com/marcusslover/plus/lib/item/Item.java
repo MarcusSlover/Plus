@@ -29,12 +29,14 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
+@SuppressWarnings({"unused", "UnusedReturnValue"})
 public class Item {
     protected @NotNull ItemStack itemStack;
 
@@ -58,18 +60,21 @@ public class Item {
     public Item(@NotNull Material material, int amount, @Nullable Text name, @Nullable List<@NotNull Text> lore) {
         this(material, amount);
         this.name(name);
-        this.lore(lore);
+
+        if (lore != null) {
+            this.lore(lore.stream().map(Text::raw).toList());
+        }
     }
 
     public Item(@NotNull Material material, int amount, @Nullable String name) {
         this(material, amount);
-        this.setName(name);
+        this.name(name);
     }
 
     public Item(@NotNull Material material, int amount, @Nullable String name, @Nullable List<@NotNull String> lore) {
         this(material, amount);
-        this.setName(name);
-        this.setLore(lore);
+        this.name(name);
+        this.lore(lore);
     }
 
     public Item(@Nullable ItemStack itemStack) {
@@ -109,43 +114,74 @@ public class Item {
     }
 
     public boolean isValid() {
-        //noinspection ConstantConditions
-        return this.itemStack != null && this.itemStack.getType() != Material.AIR;
+        return !this.type().isAir();
     }
 
-    public int getMaxStack() {
+    /**
+     * @return the max item stack of the material used in this item
+     */
+    public int maxStack() {
         return this.itemStack.getType().getMaxStackSize();
     }
 
-    public @NotNull Material getType() {
+    /**
+     * @return the material type of this item
+     */
+    public @NotNull Material type() {
         return this.itemStack.getType();
     }
 
-    public @NotNull Item setType(@NotNull Material material) {
+    /**
+     * Change the material type used in this item.
+     *
+     * @param material the material type of this item
+     * @return this item
+     */
+    public @NotNull Item type(@NotNull Material material) {
         this.itemStack.setType(material);
         return this;
     }
 
-    public int getAmount() {
+    /**
+     * @return the amount of items in the stack
+     */
+    public int amount() {
         return this.itemStack.getAmount();
     }
 
-    public @NotNull Item setAmount(int amount) {
+    /**
+     * Set the amount of the item.
+     *
+     * @param amount the amount items in the stack
+     * @return the item
+     */
+    public @NotNull Item amount(int amount) {
         this.itemStack.setAmount(Math.min(64, Math.max(0, amount)));
         return this;
     }
 
-    public @NotNull Item setDamagePercent(double percent) {
-        return this.editMeta(itemMeta -> {
+    /**
+     * Changes the amount of damage this item has as a percentage.
+     *
+     * @param percent 0.0 - 1.0
+     * @return this item
+     */
+    public @NotNull Item damage(double percent) {
+        double finalPercent = Math.min(1, Math.max(0, percent));
+
+        return this.meta(itemMeta -> {
             if (itemMeta instanceof Damageable damageable) {
                 double max = this.itemStack.getType().getMaxDurability();
-                double damage = max * percent / 100;
+                double damage = max * finalPercent / 100;
                 damageable.setDamage((int) Math.max(0, damage));
             }
         });
     }
 
-    public @Nullable Integer getDamage() {
+    /**
+     * @return the amount of damage this item has as a value.
+     */
+    public @Nullable Integer damage() {
         ItemMeta itemMeta = this.itemStack.getItemMeta();
         if (itemMeta == null) {
             return null;
@@ -156,23 +192,38 @@ public class Item {
         return 0;
     }
 
-    public @NotNull Item setDamage(int damage) {
-        return this.editMeta(itemMeta -> {
+    /**
+     * Changes the amount of damage this item has as a value.
+     *
+     * @param damage item damage
+     * @return this item
+     */
+    public @NotNull Item damage(int damage) {
+        return this.meta(itemMeta -> {
             if (itemMeta instanceof Damageable damageable) {
                 damageable.setDamage(damage);
             }
         });
     }
 
-    public int getEnchant(@NotNull Enchantment enchantment) {
+    /**
+     * Get the level of the applied enchantment.
+     *
+     * @param enchantment enchantment
+     * @return enchantment level
+     */
+    public int enchant(@NotNull Enchantment enchantment) {
         return this.itemStack.getEnchantmentLevel(enchantment);
     }
 
-    public boolean hasEnchant(@NotNull Enchantment enchantment) {
-        return this.getEnchant(enchantment) > 0;
-    }
-
-    public @NotNull Item setEnchant(@NotNull Enchantment enchantment, int level) {
+    /**
+     * Add an enchantment to this item.
+     *
+     * @param enchantment enchantment
+     * @param level       the level of the enchantment. If the level is 0, the enchantment will be removed.
+     * @return this item
+     */
+    public @NotNull Item enchant(@NotNull Enchantment enchantment, int level) {
         if (level <= 0) {
             this.itemStack.removeEnchantment(enchantment);
         } else {
@@ -181,12 +232,33 @@ public class Item {
         return this;
     }
 
-    public @NotNull Item setColor(@Nullable com.marcusslover.plus.lib.color.Color plusColor) {
-        return this.setColor(plusColor != null ? Color.fromRGB(plusColor.rgb()) : null);
+    /**
+     * Clears all enchantments from this item
+     *
+     * @return this item
+     */
+    public @NotNull Item clearEnchants() {
+        this.itemStack.getEnchantments().keySet().forEach(this.itemStack::removeEnchantment);
+        return this;
     }
 
-    public @NotNull Item setColor(@Nullable Color color) {
-        return this.editMeta(itemMeta -> {
+    /**
+     * @return a map of all the enchantments on this item
+     */
+    public @NotNull Map<Enchantment, Integer> enchants() {
+        return this.itemStack.getEnchantments();
+    }
+
+    public boolean hasEnchant(@NotNull Enchantment enchantment) {
+        return this.enchant(enchantment) > 0;
+    }
+
+    public @NotNull Item color(@Nullable com.marcusslover.plus.lib.color.Color plusColor) {
+        return this.color(plusColor != null ? Color.fromRGB(plusColor.rgb()) : null);
+    }
+
+    public @NotNull Item color(@Nullable Color color) {
+        return this.meta(itemMeta -> {
             if (itemMeta instanceof PotionMeta meta) {
                 meta.setColor(color);
                 return;
@@ -202,23 +274,23 @@ public class Item {
     }
 
     public @NotNull Item addAttribute(@NotNull Attribute attribute, @NotNull AttributeModifier modifier) {
-        return this.editMeta(meta -> meta.addAttributeModifier(attribute, modifier));
+        return this.meta(meta -> meta.addAttributeModifier(attribute, modifier));
     }
 
     public @NotNull Item removeAttribute(@NotNull Attribute attribute) {
-        return this.editMeta(meta -> meta.removeAttributeModifier(attribute));
+        return this.meta(meta -> meta.removeAttributeModifier(attribute));
     }
 
     public @NotNull Item removeAttribute(@NotNull EquipmentSlot equipmentSlot) {
-        return this.editMeta(meta -> meta.removeAttributeModifier(equipmentSlot));
+        return this.meta(meta -> meta.removeAttributeModifier(equipmentSlot));
     }
 
     public @NotNull Item addItemFlag(@NotNull ItemFlag itemFlag) {
-        return this.editMeta(itemMeta -> itemMeta.addItemFlags(itemFlag));
+        return this.meta(itemMeta -> itemMeta.addItemFlags(itemFlag));
     }
 
     public @NotNull Item removeItemFlag(@NotNull ItemFlag itemFlag) {
-        return this.editMeta(itemMeta -> itemMeta.removeItemFlags(itemFlag));
+        return this.meta(itemMeta -> itemMeta.removeItemFlags(itemFlag));
     }
 
     public boolean hasItemFlag(@NotNull ItemFlag itemFlag) {
@@ -229,9 +301,12 @@ public class Item {
         return itemMeta.hasItemFlag(itemFlag);
     }
 
+    public @NotNull Item hideItemFlags() {
+        return this.hideItemFlags(true);
+    }
 
-    public @NotNull Item setHideflags(boolean hideflags) {
-        return this.editMeta(itemMeta -> {
+    public @NotNull Item hideItemFlags(boolean hideflags) {
+        return this.meta(itemMeta -> {
             if (!hideflags) {
                 itemMeta.removeItemFlags(ItemFlag.values());
             } else {
@@ -240,7 +315,10 @@ public class Item {
         });
     }
 
-    public boolean isUnbreakable() {
+    /**
+     * @return whether the item is breakable or not.
+     */
+    public boolean unbreakable() {
         ItemMeta itemMeta = this.itemStack.getItemMeta();
         if (itemMeta == null) {
             return false;
@@ -248,22 +326,26 @@ public class Item {
         return itemMeta.isUnbreakable();
     }
 
-    public @NotNull Item setUnbreakable(boolean unbreakable) {
-        return this.editMeta(itemMeta -> itemMeta.setUnbreakable(unbreakable));
+    /**
+     * @param unbreakable whether the item is breakable or not.
+     * @return this item.
+     */
+    public @NotNull Item unbreakable(boolean unbreakable) {
+        return this.meta(itemMeta -> itemMeta.setUnbreakable(unbreakable));
     }
 
     public @NotNull PersistentDataContainer getPersistentDataContainer() {
-        return this.getMeta().getPersistentDataContainer();
+        return this.meta().getPersistentDataContainer();
     }
 
     public boolean hasTag(@NotNull String key) {
-        PersistentDataContainer p = this.getMeta().getPersistentDataContainer();
+        PersistentDataContainer p = this.meta().getPersistentDataContainer();
         NamespacedKey n = new NamespacedKey("plus", key);
         return p.has(n);
     }
 
     public @NotNull Item setTag(@NotNull String key, @NotNull String value) {
-        this.editMeta(itemMeta -> {
+        this.meta(itemMeta -> {
             PersistentDataContainer p = itemMeta.getPersistentDataContainer();
             NamespacedKey n = new NamespacedKey("plus", key);
             p.set(n, PersistentDataType.STRING, value);
@@ -273,7 +355,7 @@ public class Item {
 
     public @NotNull String getTag(@NotNull String key, @NotNull String defaultValue) {
         AtomicReference<String> v = new AtomicReference<>(defaultValue);
-        this.editMeta(itemMeta -> {
+        this.meta(itemMeta -> {
             PersistentDataContainer p = itemMeta.getPersistentDataContainer();
             NamespacedKey n = new NamespacedKey("plus", key);
             if (p.has(n)) {
@@ -284,7 +366,7 @@ public class Item {
     }
 
     public @NotNull Item setTag(@NotNull String key, @NotNull Integer value) {
-        this.editMeta(itemMeta -> {
+        this.meta(itemMeta -> {
             PersistentDataContainer p = itemMeta.getPersistentDataContainer();
             NamespacedKey n = new NamespacedKey("plus", key);
             p.set(n, PersistentDataType.INTEGER, value);
@@ -293,7 +375,7 @@ public class Item {
     }
 
     public @NotNull Item setTag(@NotNull String key, @NotNull Long value) {
-        this.editMeta(itemMeta -> {
+        this.meta(itemMeta -> {
             PersistentDataContainer p = itemMeta.getPersistentDataContainer();
             NamespacedKey n = new NamespacedKey("plus", key);
             p.set(n, PersistentDataType.LONG, value);
@@ -304,7 +386,7 @@ public class Item {
 
     public @NotNull Integer getTag(@NotNull String key, @NotNull Integer defaultValue) {
         AtomicReference<Integer> v = new AtomicReference<>(defaultValue);
-        this.editMeta(itemMeta -> {
+        this.meta(itemMeta -> {
             PersistentDataContainer p = itemMeta.getPersistentDataContainer();
             NamespacedKey n = new NamespacedKey("plus", key);
             if (p.has(n)) {
@@ -315,7 +397,7 @@ public class Item {
     }
 
     public @NotNull Item setTag(@NotNull String key, @NotNull Double value) {
-        this.editMeta(itemMeta -> {
+        this.meta(itemMeta -> {
             PersistentDataContainer p = itemMeta.getPersistentDataContainer();
             NamespacedKey n = new NamespacedKey("plus", key);
             p.set(n, PersistentDataType.DOUBLE, value);
@@ -325,7 +407,7 @@ public class Item {
 
     public @NotNull Double getTag(@NotNull String key, @NotNull Double defaultValue) {
         AtomicReference<Double> v = new AtomicReference<>(defaultValue);
-        this.editMeta(itemMeta -> {
+        this.meta(itemMeta -> {
             PersistentDataContainer p = itemMeta.getPersistentDataContainer();
             NamespacedKey n = new NamespacedKey("plus", key);
             if (p.has(n)) {
@@ -337,7 +419,7 @@ public class Item {
 
     public @NotNull Long getTag(@NotNull String key, @NotNull Long defaultValue) {
         AtomicReference<Long> v = new AtomicReference<>(defaultValue);
-        this.editMeta(itemMeta -> {
+        this.meta(itemMeta -> {
             PersistentDataContainer p = itemMeta.getPersistentDataContainer();
             NamespacedKey n = new NamespacedKey("plus", key);
             if (p.has(n)) {
@@ -355,7 +437,7 @@ public class Item {
         return itemMeta.hasCustomModelData();
     }
 
-    public @Nullable Integer getCustomModelData() {
+    public @Nullable Integer customModelData() {
         ItemMeta itemMeta = this.itemStack.getItemMeta();
         if (itemMeta == null) {
             return null;
@@ -363,8 +445,8 @@ public class Item {
         return itemMeta.getCustomModelData();
     }
 
-    public @NotNull Item setCustomModelData(int customModelData) {
-        return this.editMeta(itemMeta -> itemMeta.setCustomModelData(customModelData));
+    public @NotNull Item customModelData(int customModelData) {
+        return this.meta(itemMeta -> itemMeta.setCustomModelData(customModelData));
     }
 
     public boolean hasName() {
@@ -376,7 +458,7 @@ public class Item {
     }
 
     public @NotNull Item name(@Nullable Text name) {
-        return this.editMeta(itemMeta -> {
+        return this.meta(itemMeta -> {
             if (name != null) {
                 itemMeta.displayName(name.comp());
             } else {
@@ -386,7 +468,7 @@ public class Item {
     }
 
     public @Nullable Text name() {
-        ItemMeta itemMeta = this.getMeta();
+        ItemMeta itemMeta = this.meta();
         if (itemMeta == null) {
             return null;
         }
@@ -400,8 +482,8 @@ public class Item {
         return null;
     }
 
-    public @NotNull Item setName(@Nullable String name) {
-        return this.editMeta(itemMeta -> {
+    public @NotNull Item name(@Nullable String name) {
+        return this.meta(itemMeta -> {
             if (name != null) {
                 if (name.isEmpty() || name.isBlank()) {
                     itemMeta.displayName(null);
@@ -418,29 +500,13 @@ public class Item {
         return this.itemStack.hasItemMeta() && this.itemStack.getItemMeta().hasLore();
     }
 
-    @Deprecated
-    public @NotNull List<@NotNull Text> lore() {
+    public @NotNull List<@NotNull String> lore() {
         //noinspection ConstantConditions
-        return this.hasLore() ? Text.list(this.getMeta().lore()) : new ArrayList<>();
+        return this.hasLore() ? ColorUtil.translateList(this.meta().getLore()) : new ArrayList<>();
     }
 
-    public @NotNull Item lore(@Nullable List<@NotNull Text> lore) {
-        return this.editMeta(itemMeta -> {
-            if (lore != null) {
-                itemMeta.lore(lore.stream().map(Text::comp).collect(Collectors.toList()));
-            } else {
-                itemMeta.lore(null);
-            }
-        });
-    }
-
-    public @NotNull List<@NotNull String> getLore() {
-        //noinspection ConstantConditions
-        return this.hasLore() ? ColorUtil.translateList(this.getMeta().getLore()) : new ArrayList<>();
-    }
-
-    public @NotNull Item setLore(@Nullable List<@NotNull String> lore) {
-        return this.editMeta(itemMeta -> {
+    public @NotNull Item lore(@Nullable Collection<@NotNull String> lore) {
+        return this.meta(itemMeta -> {
             if (lore != null) {
                 if (lore.isEmpty()) {
                     itemMeta.lore(null);
@@ -454,31 +520,23 @@ public class Item {
     }
 
     public @NotNull Item skull(@Nullable PlayerProfile playerProfile) {
-        return this.setSkull(playerProfile);
-    }
-
-    public @NotNull Item setSkull(@Nullable OfflinePlayer player) {
-        return this.editMeta(itemMeta -> {
-            if (itemMeta instanceof SkullMeta skullMeta) {
-                skullMeta.setOwningPlayer(player);
-            }
-        });
-    }
-
-    public @NotNull Item setSkull(@Nullable PlayerProfile playerProfile) {
-        return this.editMeta(itemMeta -> {
+        return this.meta(itemMeta -> {
             if (itemMeta instanceof SkullMeta skullMeta) {
                 skullMeta.setPlayerProfile(playerProfile);
             }
         });
     }
 
-    public @NotNull Item skull(@NotNull String url) {
-        return this.setSkull(url);
+    public @NotNull Item skull(@Nullable OfflinePlayer player) {
+        return this.meta(itemMeta -> {
+            if (itemMeta instanceof SkullMeta skullMeta) {
+                skullMeta.setOwningPlayer(player);
+            }
+        });
     }
 
-    public @NotNull Item setSkull(@NotNull String url) {
-        return this.editMeta(itemMeta -> {
+    public @NotNull Item skull(@NotNull String url) {
+        return this.meta(itemMeta -> {
             if (itemMeta instanceof SkullMeta skullMeta) {
                 String texture = new String(this.getEncodedTexture(url));
                 int len = texture.length();
@@ -497,25 +555,43 @@ public class Item {
         return encoder.encode(String.format("{textures:{SKIN:{url:\"%s\"}}}", url).getBytes());
     }
 
-    public @NotNull Item editMeta(@NotNull Consumer<@NotNull ItemMeta> meta) {
+    public @NotNull Item meta(@NotNull Consumer<@NotNull ItemMeta> meta) {
         this.itemStack.editMeta(meta);
         return this;
     }
 
-    public ItemMeta getMeta() {
+    public @NotNull Item meta(@NotNull ItemMeta meta) {
+        this.itemStack.setItemMeta(meta);
+        return this;
+    }
+
+    public ItemMeta meta() {
         return this.itemStack.getItemMeta();
     }
 
-    public @NotNull ItemStack getItemStack() {
+    public @NotNull ItemStack get() {
         return this.itemStack;
     }
 
-    public @NotNull Item setItemStack(@NotNull ItemStack itemStack) {
+    public @NotNull Item itemStack(@NotNull ItemStack itemStack) {
         this.itemStack = itemStack;
         return this;
     }
 
     public @NotNull Item clone() {
         return new Item(this.itemStack.clone());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+
+        if (obj instanceof Item item) {
+            return this.itemStack.equals(item.itemStack);
+        }
+
+        return super.equals(obj);
     }
 }
