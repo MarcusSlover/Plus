@@ -11,6 +11,7 @@ import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -105,10 +106,38 @@ public class Menu implements ISendable<Player, Menu> {
         return this.send(player);
     }
 
+    @Alternative
+    public @NotNull Menu open(@NotNull Player... players) {
+        return this.send(players);
+    }
+
+    @Alternative
+    public @NotNull Menu open(@NotNull Collection<@NotNull Player> players) {
+        return this.send(players);
+    }
+
     @Override
     public @NotNull Menu send(@NotNull Player target) {
         this.lastActivity = System.currentTimeMillis();
         target.openInventory(this.inventory);
+        return this;
+    }
+
+    @Override
+    public @NotNull Menu send(@NotNull Player... targets) {
+        for (Player target : targets) {
+            this.send(target);
+        }
+
+        return this;
+    }
+
+    @Override
+    public @NotNull Menu send(@NotNull Collection<Player> targets) {
+        for (Player target : targets) {
+            this.send(target);
+        }
+
         return this;
     }
 

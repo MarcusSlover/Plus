@@ -9,6 +9,7 @@ import org.bukkit.scoreboard.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -209,6 +210,24 @@ public class Sidebar implements ISendable<Player, Sidebar> {
     public @NotNull Sidebar send(@NotNull Player player) {
         player.setScoreboard(this.scoreboard);
         SIDEBAR_MAP.put(player.getUniqueId(), this);
+        return this;
+    }
+
+    @Override
+    public @NotNull Sidebar send(@NotNull Player... targets) {
+        for (Player target : targets) {
+            this.send(target);
+        }
+
+        return this;
+    }
+
+    @Override
+    public @NotNull Sidebar send(@NotNull Collection<Player> targets) {
+        for (Player target : targets) {
+            this.send(target);
+        }
+
         return this;
     }
 }

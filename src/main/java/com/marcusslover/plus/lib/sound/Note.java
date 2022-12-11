@@ -10,6 +10,8 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
+
 public class Note implements ISendable<Player, Note> {
     protected @Nullable Sound sound;
     protected @Nullable String rawSound;
@@ -127,6 +129,16 @@ public class Note implements ISendable<Player, Note> {
     }
 
     @Alternative
+    public @NotNull Note play(@NotNull Player... players) {
+        return this.send(players);
+    }
+
+    @Alternative
+    public @NotNull Note play(@NotNull Collection<Player> players) {
+        return this.send(players);
+    }
+
+    @Alternative
     public @NotNull Note play(@NotNull Location location) {
         World world = location.getWorld();
         if (this.sound != null) {
@@ -140,6 +152,24 @@ public class Note implements ISendable<Player, Note> {
     @Override
     public @NotNull Note send(@NotNull Player player) {
         return this.send(player, player.getLocation());
+    }
+
+    @Override
+    public @NotNull Note send(@NotNull Player... targets) {
+        for (Player target : targets) {
+            this.send(target);
+        }
+
+        return this;
+    }
+
+    @Override
+    public @NotNull Note send(@NotNull Collection<Player> targets) {
+        for (Player target : targets) {
+            this.send(target);
+        }
+
+        return this;
     }
 
     public @NotNull Note send(@NotNull Player player, @NotNull Location location) {

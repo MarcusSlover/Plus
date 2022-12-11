@@ -3,7 +3,6 @@ package com.marcusslover.plus.lib.title;
 import com.marcusslover.plus.lib.text.Text;
 import com.marcusslover.plus.lib.util.ISendable;
 import net.kyori.adventure.util.Ticks;
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -79,38 +78,19 @@ public class Title implements ISendable<CommandSender, Title> {
         return this.send(player, this.times);
     }
 
-    public @NotNull Title sendAll() {
-        for (CommandSender sender : Bukkit.getOnlinePlayers()) {
-            this.send(sender);
+    @Override
+    public @NotNull Title send(@NotNull CommandSender... targets) {
+        for (CommandSender target : targets) {
+            this.send(target);
         }
 
         return this;
     }
 
-    public @NotNull Title sendAll(String permission) {
-        permission = permission == null ? "" : permission;
-
-        for (CommandSender sender : Bukkit.getOnlinePlayers()) {
-            if (permission.isBlank() || sender.hasPermission(permission)) {
-                this.send(sender);
-            }
-        }
-
-        return this;
-    }
-
-    public @NotNull <T extends CommandSender> Title send(@NotNull Collection<T> players) {
-        for (T sender : players) {
-            this.send(sender);
-        }
-
-        return this;
-    }
-
-    @SafeVarargs
-    public final @NotNull <T extends CommandSender> Title send(@NotNull T... players) {
-        for (T sender : players) {
-            this.send(sender);
+    @Override
+    public @NotNull Title send(@NotNull Collection<CommandSender> targets) {
+        for (CommandSender target : targets) {
+            this.send(target);
         }
 
         return this;

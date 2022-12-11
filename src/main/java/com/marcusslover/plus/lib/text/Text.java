@@ -1,6 +1,5 @@
 package com.marcusslover.plus.lib.text;
 
-import com.marcusslover.plus.lib.title.Title;
 import com.marcusslover.plus.lib.util.ISendable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -71,7 +70,7 @@ public class Text implements ISendable<CommandSender, Text> {
         return new Text("&f");
     }
 
-    public @NotNull Text setHover(@Nullable Text hover) {
+    public @NotNull Text hover(@Nullable Text hover) {
         if (hover == null) {
             this.component = this.component.hoverEvent(null);
         } else {
@@ -80,8 +79,18 @@ public class Text implements ISendable<CommandSender, Text> {
         return this;
     }
 
-    public @NotNull Text setClick(@Nullable ClickEvent click) {
+    public @NotNull Text click(@Nullable ClickEvent click) {
         this.component = this.component.clickEvent(click);
+        return this;
+    }
+
+    public @NotNull Text append(@NotNull String text) {
+        return this.append(new Text(text));
+    }
+
+    public @NotNull Text append(@NotNull Text text) {
+        this.text += text.text;
+        this.component = this.component.append(text.component);
         return this;
     }
 
@@ -109,39 +118,18 @@ public class Text implements ISendable<CommandSender, Text> {
         return this;
     }
 
-    public @NotNull Text sendAll() {
-        for (CommandSender sender : Bukkit.getOnlinePlayers()) {
-            this.send(sender);
+    @Override
+    public @NotNull Text send(@NotNull CommandSender... targets) {
+        for (CommandSender target : targets) {
+            this.send(target);
         }
 
         return this;
     }
 
-    public @NotNull Text sendAll(String permission) {
-        permission = permission == null ? "" : permission;
-
-        for (CommandSender sender : Bukkit.getOnlinePlayers()) {
-            if (permission.isBlank() || sender.hasPermission(permission)) {
-                this.send(sender);
-            }
-        }
-
-        return this;
-    }
-
-    public @NotNull <T extends CommandSender> Text send(@NotNull Collection<T> players) {
-        for (T sender : players) {
-            this.send(sender);
-        }
-
-        return this;
-    }
-
-    @SafeVarargs
-    public final @NotNull <T extends CommandSender> Text send(@NotNull T... players) {
-        for (T sender : players) {
-            this.send(sender);
-        }
+    @Override
+    public @NotNull Text send(@NotNull Collection<CommandSender> targets) {
+        targets.forEach(this::send);
 
         return this;
     }
