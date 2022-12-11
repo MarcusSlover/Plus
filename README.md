@@ -15,7 +15,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'com.marcusslover:plus:3.0-SNAPSHOT'
+    compileOnly 'com.marcusslover:plus:3.3-SNAPSHOT'
 }
 ```
 ## 🦢 Maven
@@ -28,6 +28,6 @@ dependencies {
 <dependency>
     <groupId>com.marcusslover</groupId>
     <artifactId>plus</artifactId>
-    <version>3.0-SNAPSHOT</version>
+    <version>3.3-SNAPSHOT</version>
 </dependency>
 ```
