@@ -1,5 +1,6 @@
 package com.marcusslover.plus.lib.color;
 
+import net.md_5.bungee.api.ChatColor;
 import org.jetbrains.annotations.NotNull;
 
 public class Color {
@@ -99,8 +100,12 @@ public class Color {
         return this.alpha();
     }
 
-    public @NotNull String hex() {
-        return "&#" + Integer.toHexString(this.rgb);
+    public @NotNull String format() {
+        return "{#" + Integer.toHexString(this.rgb) + "}";
+    }
+
+    public @NotNull String bungee() {
+        return ChatColor.of(Integer.toHexString(this.rgb)).toString();
     }
 
     /**
