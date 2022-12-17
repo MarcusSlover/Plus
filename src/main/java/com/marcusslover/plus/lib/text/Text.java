@@ -99,7 +99,7 @@ public class Text implements ISendable<CommandSender, Text> {
     }
 
     public @NotNull String stripped() {
-        return ChatColor.stripColor(LEGACY.serialize(this.component));
+        return ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', this.raw()));
     }
 
     public boolean isEmpty() {
@@ -111,6 +111,10 @@ public class Text implements ISendable<CommandSender, Text> {
 
     public @NotNull Component comp() {
         return this.component;
+    }
+
+    public @NotNull Text copy() {
+        return new Text(this.text, this.component);
     }
 
     public @NotNull Text send(@NotNull CommandSender sender) {
