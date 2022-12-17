@@ -485,7 +485,7 @@ public class Item {
     public @NotNull Item name(@Nullable String name) {
         return this.meta(itemMeta -> {
             if (name != null) {
-                if (name.isEmpty() || name.isBlank()) {
+                if (name.isEmpty()) {
                     itemMeta.displayName(null);
                 } else {
                     itemMeta.displayName(Text.of(name).comp());
