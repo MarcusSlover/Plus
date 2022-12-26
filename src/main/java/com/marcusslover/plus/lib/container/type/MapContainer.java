@@ -40,7 +40,7 @@ public abstract class MapContainer<K, V> extends AbstractContainer<K> {
 
     /**
      * Creates a new instance of an object.
-     * <p
+     * <p>
      * This function is called when the object with the given key
      * does not exist and has to be created for the first time.
      * </p>

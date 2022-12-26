@@ -28,7 +28,7 @@ public abstract class SingleContainer<V> extends AbstractContainer<V> {
 
     /**
      * Creates a new instance of an object.
-     * <p
+     * <p>
      * This function is called when the object does not exist and has to be created for the first time.
      * </p>
      *
