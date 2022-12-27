@@ -25,12 +25,17 @@ dependencies {
 
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+    testImplementation 'io.papermc.paper:paper-api:1.18.2-R0.1-SNAPSHOT'
 }
 
 java {
     withJavadocJar()
     withSourcesJar()
     toolchain.languageVersion.set(JavaLanguageVersion.of(17))
+}
+
+test {
+    useJUnitPlatform()
 }
 
 publishing {
@@ -55,6 +60,13 @@ publishing {
                         id = 'marcusslover'
                         name = 'MarcusSlover'
                         email = 'jr.marcusorlando@gmail.com'
+                    }
+                }
+                contributors {
+                    contributor {
+                        name = "tecc"
+                        email = "tecc@tecc.me"
+                        url = "https://tecc.me"
                     }
                 }
             }
