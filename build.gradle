@@ -62,6 +62,13 @@ publishing {
                         email = 'jr.marcusorlando@gmail.com'
                     }
                 }
+                contributors {
+                    contributor {
+                        name = "tecc"
+                        email = "tecc@tecc.me"
+                        url = "https://tecc.me"
+                    }
+                }
             }
         }
     }
