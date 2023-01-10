@@ -77,6 +77,7 @@ public class ServerUtils {
      *
      * @return The plugin which called the method
      */
+    @Deprecated
     public static Plugin getCallingPlugin() {
         Exception ex = new Exception();
         try {
