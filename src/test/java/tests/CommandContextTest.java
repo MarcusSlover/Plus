@@ -2,9 +2,10 @@ package tests;
 
 import com.marcusslover.plus.lib.command.CommandContext;
 
+import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import org.junit.jupiter.api.Test;
 
 public class CommandContextTest {
     @SuppressWarnings("DataFlowIssue") // i know that sender can't be null but it doesn't matter here

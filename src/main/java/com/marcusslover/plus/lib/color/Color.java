@@ -1,6 +1,10 @@
 package com.marcusslover.plus.lib.color;
 
-import net.md_5.bungee.api.ChatColor;
+import com.marcusslover.plus.lib.text.ColorUtil;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class Color {
@@ -100,12 +104,57 @@ public class Color {
         return this.alpha();
     }
 
+    /**
+     * @return The hex color as a format plus recognizes
+     * @since 3.3
+     * @deprecated Use {@link #plus()} instead.
+     */
     public @NotNull String format() {
-        return "{#" + Integer.toHexString(this.rgb) + "}";
+        return "&".concat(this.hex());
     }
 
+    /**
+     * @return The hex color as a format plus recognizes
+     */
+    public @NotNull String plus() {
+        return "&".concat(this.hex());
+    }
+
+    /**
+     * @return the hex value of the color #RRGGBB
+     */
+    public @NotNull String hex() {
+        return String.format("#%02X%02X%02X", this.red(), this.green(), this.blue());
+    }
+
+    /**
+     * You will need to use {@link Component#text(String)}.color(color.adventure()) and then serialize it {@link LegacyComponentSerializer#legacySection()}
+     *
+     * @return The Adventure API {@link TextColor}
+     */
+    public @NotNull TextColor adventure() {
+        return TextColor.color(this.red(), this.green(), this.blue());
+    }
+
+    /**
+     * A hacky way of pre-converting the color into a bukkit translatable color.
+     * <font color="FF4843"><b>Note that this pretty much only works with {@link Player#sendMessage(String)}</b></font>
+     *
+     * @return the converted color as a String
+     */
+    public @NotNull String legacy() {
+        return ColorUtil
+                .legacySection()
+                .serialize(Component.text(" ").color(this.adventure()))
+                .trim();
+    }
+
+    /**
+     * @since 3.3
+     * @deprecated Use {@link #adventure()} instead
+     */
     public @NotNull String bungee() {
-        return ChatColor.of(Integer.toHexString(this.rgb)).toString();
+        return this.hex();
     }
 
     /**

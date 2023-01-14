@@ -1,5 +1,6 @@
 package com.marcusslover.plus.lib.text;
 
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.md_5.bungee.api.ChatColor;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Color;
@@ -15,7 +16,7 @@ import java.util.stream.Collectors;
 
 public class ColorUtil {
     private static final Pattern HEX_PATTERN = Pattern.compile("^#([a-fA-F0-9]{6})$");
-    public static final Pattern HEX_TO_BUKKIT = Pattern.compile("&#([a-fA-F0-9]{6})|\\{#([a-fA-F0-9]{6})\\}");
+    public static final Pattern HEX_TO_BUKKIT = Pattern.compile("&#([a-fA-F0-9]{6})");
     public static final Pattern HEX_FROM_BUKKIT = Pattern.compile("&x(&[a-fA-F0-9]){6}");
     public static final char COLOR_CHAR = '\u00A7';
 
@@ -100,8 +101,17 @@ public class ColorUtil {
         return new String(b);
     }
 
+    public static @NotNull LegacyComponentSerializer legacySection() {
+        return LegacyComponentSerializer.legacySection();
+    }
+
+    public static @NotNull LegacyComponentSerializer legacyAmpersand() {
+        return LegacyComponentSerializer.legacyAmpersand();
+    }
+
     private static @NotNull String hexColorization(@NotNull String text) {
         var matcher = HEX_TO_BUKKIT.matcher(text);
+
         while (matcher.find()) {
             var bukkitColor = new StringBuilder("&x");
             char[] chars = matcher.group(1).toCharArray();
@@ -110,6 +120,7 @@ public class ColorUtil {
             }
             text = text.replaceAll(matcher.group(), String.valueOf(bukkitColor));
         }
+
         return text;
     }
 
