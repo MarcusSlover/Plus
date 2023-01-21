@@ -1,10 +1,24 @@
 package com.marcusslover.plus.lib.world;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.util.Vector;
 
+import java.lang.reflect.Type;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -12,8 +26,10 @@ import java.util.Objects;
  * chunk loading or world name storage. Unlike {@link Vector}, Positions allow
  * us to store a {@link #yaw} and {@link #pitch} as well as being easily serializable.
  */
+@Data
 public class WorldPoint {
 
+    @Getter(AccessLevel.NONE) @Setter(AccessLevel.NONE)
     private static final DecimalFormat df = new DecimalFormat("#.00");
     private double x;
     private double y;
@@ -126,7 +142,7 @@ public class WorldPoint {
      * Add a WorldPoint to WorldPoint
      *
      * @param worldPoint WorldPoint to add
-     * @return A WorldPoint
+     * @return This WorldPoint
      */
     public WorldPoint add(WorldPoint worldPoint) {
         this.x += worldPoint.getX();
@@ -142,7 +158,7 @@ public class WorldPoint {
      * @param x X amount to add
      * @param y Y amount to add
      * @param z Z amount to add
-     * @return A WorldPoint
+     * @return This WorldPoint
      */
     public WorldPoint add(double x, double y, double z) {
         this.x += x;
@@ -156,7 +172,7 @@ public class WorldPoint {
      * Subtract a WorldPoint to WorldPoint
      *
      * @param worldPoint WorldPoint to subtract
-     * @return A WorldPoint
+     * @return This WorldPoint
      */
     public WorldPoint subtract(WorldPoint worldPoint) {
         this.x -= worldPoint.getX();
@@ -172,7 +188,7 @@ public class WorldPoint {
      * @param x X amount to subtract
      * @param y Y amount to subtract
      * @param z Z amount to subtract
-     * @return A WorldPoint
+     * @return This WorldPoint
      */
     public WorldPoint subtract(double x, double y, double z) {
         this.x -= x;
@@ -184,10 +200,11 @@ public class WorldPoint {
 
     /**
      * Multiply a WorldPoint by x, y, z
+     *
      * @param x X amount to multiply
      * @param y Y amount to multiply
      * @param z Z amount to multiply
-     * @return A WorldPoint
+     * @return This WorldPoint
      */
     public WorldPoint multiply(double x, double y, double z) {
         this.x *= x;
@@ -199,8 +216,9 @@ public class WorldPoint {
 
     /**
      * Multiply a WorldPoint (x, y, z) by a double value
+     *
      * @param amount The amount to multiply by
-     * @return A WorldPoint
+     * @return This WorldPoint
      */
     public WorldPoint multiply(double amount) {
         this.x *= amount;
@@ -212,13 +230,55 @@ public class WorldPoint {
 
     /**
      * Multiply a WorldPoint by another WorldPoint. (Only affects x, y, z)
+     *
      * @param worldPoint The WorldPoint to multiply by
-     * @return A WorldPoint
+     * @return This WorldPoint
      */
     public WorldPoint multiply(WorldPoint worldPoint) {
         this.x *= worldPoint.getX();
         this.y *= worldPoint.getY();
         this.z *= worldPoint.getZ();
+
+        return this;
+    }
+
+    /**
+     * Divide a WorldPoint by x, y, z
+     *
+     * @return This WorldPoint
+     */
+    public WorldPoint divide(double x, double y, double z) {
+        this.x /= x;
+        this.y /= y;
+        this.z /= z;
+
+        return this;
+    }
+
+    /**
+     * Divide a WorldPoint (x, y, z) by a double value
+     *
+     * @param amount The amount to divide by
+     * @return This WorldPoint
+     */
+    public WorldPoint divide(double amount) {
+        this.x /= amount;
+        this.y /= amount;
+        this.z /= amount;
+
+        return this;
+    }
+
+    /**
+     * Divide a WorldPoint by another WorldPoint. (Only affects x, y, z)
+     *
+     * @param worldPoint The WorldPoint to divide by
+     * @return This WorldPoint
+     */
+    public WorldPoint divide(WorldPoint worldPoint) {
+        this.x /= worldPoint.getX();
+        this.y /= worldPoint.getY();
+        this.z /= worldPoint.getZ();
 
         return this;
     }
@@ -279,6 +339,68 @@ public class WorldPoint {
         return world != null && world.isChunkLoaded((int) this.x >> 4, (int) this.z >> 4);
     }
 
+    /**
+     * Utility method that will floor all values of this {@link WorldPoint}
+     *
+     * @return This {@link WorldPoint}
+     */
+    public WorldPoint zero() {
+        this.x = this.getBlockX();
+        this.y = this.getBlockY();
+        this.z = this.getBlockZ();
+
+        return this;
+    }
+
+    /**
+     * Utility method that will set the coordinates to the top center of the {@link WorldPoint}
+     *
+     * @return This {@link WorldPoint}
+     */
+    public WorldPoint topCenter() {
+        this.zero();
+
+        this.x = this.x < 0 ? this.x - 0.5 : this.x + 0.5;
+
+        this.y += 1;
+
+        this.z = this.z < 0 ? this.z - 0.5 : this.z + 0.5;
+
+        return this;
+    }
+
+    /**
+     * Utility method that will set the coordinates to the bottom center of the {@link WorldPoint}
+     *
+     * @return This {@link WorldPoint}
+     */
+    public WorldPoint bottomCenter() {
+        this.zero();
+
+        this.x = this.x < 0 ? this.x - 0.5 : this.x + 0.5;
+
+        this.z = this.z < 0 ? this.z - 0.5 : this.z + 0.5;
+
+        return this;
+    }
+
+    /**
+     * Utility method that get the center of this {@link WorldPoint} on the x, y, z axis
+     *
+     * @return This {@link WorldPoint}
+     */
+    public WorldPoint center() {
+        this.zero();
+
+        this.x = this.x < 0 ? this.x - 0.5 : this.x + 0.5;
+
+        this.y += 0.5;
+
+        this.z = this.z < 0 ? this.z - 0.5 : this.z + 0.5;
+
+        return this;
+    }
+
     public int getBlockX() {
         return (int) Math.floor(this.x);
     }
@@ -317,7 +439,7 @@ public class WorldPoint {
      * chunk loading or world name storage. Unlike {@link Vector}, Positions allow
      * us to store a {@link #yaw} and {@link #pitch} as well as being easily serializable.
      */
-    public WorldPoint of(double x, double y, double z) {
+    public static WorldPoint of(double x, double y, double z) {
         return new WorldPoint(x, y, z);
     }
 
@@ -326,7 +448,7 @@ public class WorldPoint {
      * chunk loading or world name storage. Unlike {@link Vector}, Positions allow
      * us to store a {@link #yaw} and {@link #pitch} as well as being easily serializable.
      */
-    public WorldPoint of(double x, double y, double z, float yaw, float pitch) {
+    public static WorldPoint of(double x, double y, double z, float yaw, float pitch) {
         return new WorldPoint(x, y, z, yaw, pitch);
     }
 
@@ -335,7 +457,7 @@ public class WorldPoint {
      * chunk loading or world name storage. Unlike {@link Vector}, Positions allow
      * us to store a {@link #yaw} and {@link #pitch} as well as being easily serializable.
      */
-    public WorldPoint of(Location location) {
+    public static WorldPoint of(Location location) {
         return new WorldPoint(location);
     }
 
@@ -344,48 +466,59 @@ public class WorldPoint {
         return Objects.hash(this.x, this.y, this.z, this.yaw, this.pitch);
     }
 
-    public double getX() {
-        return this.x;
-    }
-
-    public double getY() {
-        return this.y;
-    }
-
-    public double getZ() {
-        return this.z;
-    }
-
-    public float getYaw() {
-        return this.yaw;
-    }
-
-    public float getPitch() {
-        return this.pitch;
-    }
-
-    public void setX(double x) {
-        this.x = x;
-    }
-
-    public void setY(double y) {
-        this.y = y;
-    }
-
-    public void setZ(double z) {
-        this.z = z;
-    }
-
-    public void setYaw(float yaw) {
-        this.yaw = yaw;
-    }
-
-    public void setPitch(float pitch) {
-        this.pitch = pitch;
-    }
-
     @Override
     public WorldPoint clone() {
         return new WorldPoint(this.x, this.y, this.z, this.yaw, this.pitch);
+    }
+
+
+    public static final WorldPointAdapter ADAPTER = new WorldPointAdapter();
+
+    private static class WorldPointAdapter implements JsonSerializer<WorldPoint>, JsonDeserializer<WorldPoint> {
+        private WorldPointAdapter() {
+            // Empty
+        }
+
+        @Override
+        public WorldPoint deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+            var _point = json.getAsJsonArray();
+
+            List<Number> numbers = new ArrayList<>();
+            for (var _num : _point) {
+                numbers.add(_num.getAsNumber());
+            }
+
+            if (numbers.size() < 3) {
+                throw new JsonParseException("Invalid WorldPoint: " + json);
+            }
+
+            return new WorldPoint(
+                    numbers.get(0).doubleValue(),
+                    numbers.get(1).doubleValue(),
+                    numbers.get(2).doubleValue(),
+
+                    numbers.size() >= 4 ? numbers.get(3).floatValue() : 0,
+                    numbers.size() >= 5 ? numbers.get(4).floatValue() : 0
+            );
+        }
+
+        @Override
+        public JsonElement serialize(WorldPoint src, Type typeOfSrc, JsonSerializationContext context) {
+            var _point = new JsonArray();
+
+            _point.add(src.getX());
+            _point.add(src.getY());
+            _point.add(src.getZ());
+
+            if (src.getYaw() != 0) {
+                _point.add(src.getYaw());
+            }
+
+            if (src.getPitch() != 0) {
+                _point.add(src.getPitch());
+            }
+
+            return _point;
+        }
     }
 }
