@@ -360,11 +360,9 @@ public class WorldPoint {
     public WorldPoint topCenter() {
         this.zero();
 
-        this.x = this.x < 0 ? this.x - 0.5 : this.x + 0.5;
-
+        this.x += 0.5;
         this.y += 1;
-
-        this.z = this.z < 0 ? this.z - 0.5 : this.z + 0.5;
+        this.z += 0.5;
 
         return this;
     }
@@ -377,9 +375,8 @@ public class WorldPoint {
     public WorldPoint bottomCenter() {
         this.zero();
 
-        this.x = this.x < 0 ? this.x - 0.5 : this.x + 0.5;
-
-        this.z = this.z < 0 ? this.z - 0.5 : this.z + 0.5;
+        this.x += 0.5;
+        this.z += 0.5;
 
         return this;
     }
