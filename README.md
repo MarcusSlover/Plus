@@ -6,7 +6,7 @@
 </p>
 
 # 💻 For Developers
-This library is currently meant to be working with PaperMC 1.18.2.<br/>
+This library is currently meant to be working with PaperMC 1.19.2.<br/>
 
 ## 🐘 Gradle
 ```gradle
@@ -15,7 +15,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'com.marcusslover:plus:3.3-SNAPSHOT'
+    compileOnly 'com.marcusslover:plus:3.5-SNAPSHOT'
 }
 ```
 ## 🦢 Maven
@@ -28,6 +28,6 @@ dependencies {
 <dependency>
     <groupId>com.marcusslover</groupId>
     <artifactId>plus</artifactId>
-    <version>3.3-SNAPSHOT</version>
+    <version>3.5-SNAPSHOT</version>
 </dependency>
 ```
