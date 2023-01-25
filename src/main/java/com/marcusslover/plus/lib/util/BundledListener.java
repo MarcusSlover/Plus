@@ -16,9 +16,9 @@ import java.util.function.Consumer;
  *
  * @param <T> The event being listened for
  */
-public class EventListener<T extends Event> implements Listener {
+public class BundledListener<T extends Event> implements Listener {
 
-    private final BiConsumer<EventListener<T>, T> handler;
+    private final BiConsumer<BundledListener<T>, T> handler;
     private final Class<T> eventClass;
 
     /**
@@ -26,9 +26,9 @@ public class EventListener<T extends Event> implements Listener {
      *
      * @param eventClass The class of the event being listened for
      * @param priority   The EventPriority for this listener
-     * @param handler    The callback to receive the event and this EventListener
+     * @param handler    The callback to receive the event and this BundledListener
      */
-    public EventListener(Class<T> eventClass, EventPriority priority, BiConsumer<EventListener<T>, T> handler) {
+    public BundledListener(Class<T> eventClass, EventPriority priority, BiConsumer<BundledListener<T>, T> handler) {
         this(ServerUtils.getCallingPlugin(), eventClass, priority, handler);
     }
 
@@ -38,9 +38,9 @@ public class EventListener<T extends Event> implements Listener {
      * @param plugin     The plugin registering the listener
      * @param eventClass The class of the event being listened for
      * @param priority   The EventPriority for this listener
-     * @param handler    The callback to receive the event and this EventListener
+     * @param handler    The callback to receive the event and this BundledListener
      */
-    public EventListener(Plugin plugin, Class<T> eventClass, EventPriority priority, BiConsumer<EventListener<T>, T> handler) {
+    public BundledListener(Plugin plugin, Class<T> eventClass, EventPriority priority, BiConsumer<BundledListener<T>, T> handler) {
         this.handler = handler;
         this.eventClass = eventClass;
         Bukkit.getPluginManager().registerEvent(eventClass, this, priority, (l, e) -> this.handleEvent((T) e), plugin);
@@ -53,7 +53,7 @@ public class EventListener<T extends Event> implements Listener {
      * @param priority   The EventPriority for this listener
      * @param handler    The callback to receive the event
      */
-    public EventListener(Class<T> eventClass, EventPriority priority, Consumer<T> handler) {
+    public BundledListener(Class<T> eventClass, EventPriority priority, Consumer<T> handler) {
         this(ServerUtils.getCallingPlugin(), eventClass, priority, handler);
     }
 
@@ -65,7 +65,7 @@ public class EventListener<T extends Event> implements Listener {
      * @param priority   The EventPriority for this listener
      * @param handler    The callback to receive the event
      */
-    public EventListener(Plugin plugin, Class<T> eventClass, EventPriority priority, Consumer<T> handler) {
+    public BundledListener(Plugin plugin, Class<T> eventClass, EventPriority priority, Consumer<T> handler) {
         this(plugin, eventClass, priority, (l, e) -> handler.accept(e));
     }
 
@@ -73,9 +73,9 @@ public class EventListener<T extends Event> implements Listener {
      * Creates and registers a Listener for the given event
      *
      * @param eventClass The class of the event being listened for
-     * @param handler    The callback to receive the event and this EventListener
+     * @param handler    The callback to receive the event and this BundledListener
      */
-    public EventListener(Class<T> eventClass, BiConsumer<EventListener<T>, T> handler) {
+    public BundledListener(Class<T> eventClass, BiConsumer<BundledListener<T>, T> handler) {
         this(ServerUtils.getCallingPlugin(), eventClass, handler);
     }
 
@@ -84,9 +84,9 @@ public class EventListener<T extends Event> implements Listener {
      *
      * @param plugin     The plugin registering the listener
      * @param eventClass The class of the event being listened for
-     * @param handler    The callback to receive the event and this EventListener
+     * @param handler    The callback to receive the event and this BundledListener
      */
-    public EventListener(Plugin plugin, Class<T> eventClass, BiConsumer<EventListener<T>, T> handler) {
+    public BundledListener(Plugin plugin, Class<T> eventClass, BiConsumer<BundledListener<T>, T> handler) {
         this(plugin, eventClass, EventPriority.NORMAL, handler);
     }
 
@@ -96,7 +96,7 @@ public class EventListener<T extends Event> implements Listener {
      * @param eventClass The class of the event being listened for
      * @param handler    The callback to receive the event
      */
-    public EventListener(Class<T> eventClass, Consumer<T> handler) {
+    public BundledListener(Class<T> eventClass, Consumer<T> handler) {
         this(ServerUtils.getCallingPlugin(), eventClass, handler);
     }
 
@@ -107,7 +107,7 @@ public class EventListener<T extends Event> implements Listener {
      * @param eventClass The class of the event being listened for
      * @param handler    The callback to receive the event
      */
-    public EventListener(Plugin plugin, Class<T> eventClass, Consumer<T> handler) {
+    public BundledListener(Plugin plugin, Class<T> eventClass, Consumer<T> handler) {
         this(plugin, eventClass, EventPriority.NORMAL, handler);
     }
 
@@ -132,8 +132,8 @@ public class EventListener<T extends Event> implements Listener {
      * @param priority   The EventPriority for this listener
      * @param handler    The callback to receive the event
      */
-    public static <T extends Event> EventListener<T> of(Class<T> eventClass, EventPriority priority, BiConsumer<EventListener<T>, T> handler) {
-        return new EventListener<>(eventClass, priority, handler);
+    public static <T extends Event> BundledListener<T> of(Class<T> eventClass, EventPriority priority, BiConsumer<BundledListener<T>, T> handler) {
+        return new BundledListener<>(eventClass, priority, handler);
     }
 
     /**
@@ -142,7 +142,7 @@ public class EventListener<T extends Event> implements Listener {
      * @param eventClass The class of the event being listened for
      * @param handler    The callback to receive the event
      */
-    public static <T extends Event> EventListener<T> of(Class<T> eventClass, BiConsumer<EventListener<T>, T> handler) {
-        return new EventListener<>(eventClass, handler);
+    public static <T extends Event> BundledListener<T> of(Class<T> eventClass, BiConsumer<BundledListener<T>, T> handler) {
+        return new BundledListener<>(eventClass, handler);
     }
 }
