@@ -7,7 +7,7 @@ plugins {
 javadoc.options.addStringOption('Xdoclint:none', '-quiet')
 
 group 'com.marcusslover'
-version '3.4-SNAPSHOT'
+version '3.5-SNAPSHOT'
 ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 
 repositories {

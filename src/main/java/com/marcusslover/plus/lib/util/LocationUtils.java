@@ -45,7 +45,7 @@ public class LocationUtils {
             callback.accept(new Location(world, x, y, z));
             return;
         }
-        new EventListener<>(WorldLoadEvent.class, (l, e) -> {
+        new BundledListener<>(WorldLoadEvent.class, (l, e) -> {
             if (e.getWorld().getName().equals(split[0])) {
                 World w = Bukkit.getWorld(split[0]);
                 callback.accept(new Location(w, x, y, z));
@@ -215,7 +215,7 @@ public class LocationUtils {
             return;
         }
         initialized = true;
-        new EventListener<>(WorldLoadEvent.class, e -> {
+        new BundledListener<>(WorldLoadEvent.class, e -> {
             List<Consumer<World>> list = waiting.remove(e.getWorld().getName());
             if (list == null) {
                 return;
