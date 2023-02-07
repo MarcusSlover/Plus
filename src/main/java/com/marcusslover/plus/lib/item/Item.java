@@ -339,6 +339,10 @@ public class Item {
     }
 
     public boolean hasTag(@NotNull String key) {
+        if (this.meta() == null) {
+            return false;
+        }
+
         PersistentDataContainer p = this.meta().getPersistentDataContainer();
         NamespacedKey n = new NamespacedKey("plus", key);
         return p.has(n);
