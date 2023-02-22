@@ -37,7 +37,7 @@ public record CommandContext(@NotNull CommandSender sender, @NotNull String labe
      * @param consumedArguments The amount of consumed arguments
      * @return A child context with this context as the parent, the last consumed argument as the label,
      * and all unconsumed arguments as args.
-     * @author tecc
+     * Created by tecc
      */
     public @NotNull CommandContext child(int consumedArguments) {
         List<String> originalArgs = List.of(this.args());
