@@ -11,11 +11,9 @@ import java.util.function.Consumer;
 
 @AllArgsConstructor
 public class EventList {
-    private final ReadWriteLock lock = new ReadWriteLock();
-
-    private boolean isAsync;
-
     final List<WrappedListener> observers = new CopyOnWriteArrayList<>();
+    private final ReadWriteLock lock = new ReadWriteLock();
+    private boolean isAsync;
 
     public void add(WrappedListener listener) {
         this.observers.add(listener);

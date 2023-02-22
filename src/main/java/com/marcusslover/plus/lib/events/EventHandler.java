@@ -13,11 +13,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -34,6 +30,10 @@ public class EventHandler implements Listener {
 
     public EventHandler() {
         instance = this;
+    }
+
+    public static EventHandler get() {
+        return instance == null ? instance = new EventHandler() : instance;
     }
 
     public void subscribe(@NotNull EventListener observer) {
@@ -203,9 +203,5 @@ public class EventHandler implements Listener {
         Bukkit.getPluginManager().registerEvents(this, plugin);
 
         return this;
-    }
-
-    public static EventHandler get() {
-        return instance == null ? instance = new EventHandler() : instance;
     }
 }

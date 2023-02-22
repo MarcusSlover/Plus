@@ -2,11 +2,8 @@ package com.marcusslover.plus.lib.events;
 
 import com.marcusslover.plus.lib.server.ServerUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.HandlerList;
-import org.bukkit.event.Listener;
+import org.bukkit.event.*;
 import org.bukkit.plugin.Plugin;
 
 import java.util.function.BiConsumer;
@@ -112,20 +109,6 @@ public class BundledListener<T extends Event> implements Listener {
         this(plugin, eventClass, EventPriority.NORMAL, handler);
     }
 
-    @EventHandler
-    public void handleEvent(T event) {
-        if (this.eventClass.isAssignableFrom(event.getClass())) {
-            this.handler.accept(this, event);
-        }
-    }
-
-    /**
-     * Unregisters this listener
-     */
-    public void unregister() {
-        HandlerList.unregisterAll(this);
-    }
-
     /**
      * Creates and registers a Listener for the given event
      *
@@ -145,5 +128,19 @@ public class BundledListener<T extends Event> implements Listener {
      */
     public static <T extends Event> BundledListener<T> of(Class<T> eventClass, BiConsumer<BundledListener<T>, T> handler) {
         return new BundledListener<>(eventClass, handler);
+    }
+
+    @EventHandler
+    public void handleEvent(T event) {
+        if (this.eventClass.isAssignableFrom(event.getClass())) {
+            this.handler.accept(this, event);
+        }
+    }
+
+    /**
+     * Unregisters this listener
+     */
+    public void unregister() {
+        HandlerList.unregisterAll(this);
     }
 }

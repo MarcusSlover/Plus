@@ -15,11 +15,10 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class ColorUtil {
-    private static final Pattern HEX_PATTERN = Pattern.compile("^#([a-fA-F0-9]{6})$");
     public static final Pattern HEX_TO_BUKKIT = Pattern.compile("&#([a-fA-F0-9]{6})");
     public static final Pattern HEX_FROM_BUKKIT = Pattern.compile("&x(&[a-fA-F0-9]){6}");
     public static final char COLOR_CHAR = '\u00A7';
-
+    private static final Pattern HEX_PATTERN = Pattern.compile("^#([a-fA-F0-9]{6})$");
     private static final EnumMap<DyeColor, ChatColor> dyeChatMap = new EnumMap<DyeColor, ChatColor>(DyeColor.class) {{
         this.put(DyeColor.BLACK, ChatColor.BLACK);
         this.put(DyeColor.BLUE, ChatColor.DARK_BLUE);

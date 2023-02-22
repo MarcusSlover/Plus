@@ -1,12 +1,6 @@
 package com.marcusslover.plus.lib.world;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
+import com.google.gson.*;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
@@ -29,7 +23,9 @@ import java.util.Objects;
 @Data
 public class WorldPoint {
 
-    @Getter(AccessLevel.NONE) @Setter(AccessLevel.NONE)
+    public static final WorldPointAdapter ADAPTER = new WorldPointAdapter();
+    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
     private static final DecimalFormat df = new DecimalFormat("#.00");
     private double x;
     private double y;
@@ -74,6 +70,33 @@ public class WorldPoint {
         this.z = Double.parseDouble(parts[2]);
         this.yaw = Float.parseFloat(parts[3]);
         this.pitch = Float.parseFloat(parts[4]);
+    }
+
+    /**
+     * WorldPoints allow the storing of sets of coordinates without dealing with
+     * chunk loading or world name storage. Unlike {@link Vector}, Positions allow
+     * us to store a {@link #yaw} and {@link #pitch} as well as being easily serializable.
+     */
+    public static WorldPoint of(double x, double y, double z) {
+        return new WorldPoint(x, y, z);
+    }
+
+    /**
+     * WorldPoints allow the storing of sets of coordinates without dealing with
+     * chunk loading or world name storage. Unlike {@link Vector}, Positions allow
+     * us to store a {@link #yaw} and {@link #pitch} as well as being easily serializable.
+     */
+    public static WorldPoint of(double x, double y, double z, float yaw, float pitch) {
+        return new WorldPoint(x, y, z, yaw, pitch);
+    }
+
+    /**
+     * WorldPoints allow the storing of sets of coordinates without dealing with
+     * chunk loading or world name storage. Unlike {@link Vector}, Positions allow
+     * us to store a {@link #yaw} and {@link #pitch} as well as being easily serializable.
+     */
+    public static WorldPoint of(Location location) {
+        return new WorldPoint(location);
     }
 
     /**
@@ -290,8 +313,8 @@ public class WorldPoint {
      */
     public boolean isBetween(WorldPoint min, WorldPoint max) {
         return this.x > min.getX() && this.x < max.getX()
-               && this.y > min.getY() && this.y < max.getY()
-               && this.z > min.getZ() && this.z < max.getZ();
+                && this.y > min.getY() && this.y < max.getY()
+                && this.z > min.getZ() && this.z < max.getZ();
     }
 
     /**
@@ -425,37 +448,10 @@ public class WorldPoint {
         }
         WorldPoint worldPoint = (WorldPoint) o;
         return Double.compare(worldPoint.x, this.x) == 0
-               && Double.compare(worldPoint.y, this.y) == 0
-               && Double.compare(worldPoint.z, this.z) == 0
-               && Float.compare(worldPoint.yaw, this.yaw) == 0
-               && Float.compare(worldPoint.pitch, this.pitch) == 0;
-    }
-
-    /**
-     * WorldPoints allow the storing of sets of coordinates without dealing with
-     * chunk loading or world name storage. Unlike {@link Vector}, Positions allow
-     * us to store a {@link #yaw} and {@link #pitch} as well as being easily serializable.
-     */
-    public static WorldPoint of(double x, double y, double z) {
-        return new WorldPoint(x, y, z);
-    }
-
-    /**
-     * WorldPoints allow the storing of sets of coordinates without dealing with
-     * chunk loading or world name storage. Unlike {@link Vector}, Positions allow
-     * us to store a {@link #yaw} and {@link #pitch} as well as being easily serializable.
-     */
-    public static WorldPoint of(double x, double y, double z, float yaw, float pitch) {
-        return new WorldPoint(x, y, z, yaw, pitch);
-    }
-
-    /**
-     * WorldPoints allow the storing of sets of coordinates without dealing with
-     * chunk loading or world name storage. Unlike {@link Vector}, Positions allow
-     * us to store a {@link #yaw} and {@link #pitch} as well as being easily serializable.
-     */
-    public static WorldPoint of(Location location) {
-        return new WorldPoint(location);
+                && Double.compare(worldPoint.y, this.y) == 0
+                && Double.compare(worldPoint.z, this.z) == 0
+                && Float.compare(worldPoint.yaw, this.yaw) == 0
+                && Float.compare(worldPoint.pitch, this.pitch) == 0;
     }
 
     @Override
@@ -467,9 +463,6 @@ public class WorldPoint {
     public WorldPoint clone() {
         return new WorldPoint(this.x, this.y, this.z, this.yaw, this.pitch);
     }
-
-
-    public static final WorldPointAdapter ADAPTER = new WorldPointAdapter();
 
     private static class WorldPointAdapter implements JsonSerializer<WorldPoint>, JsonDeserializer<WorldPoint> {
         private WorldPointAdapter() {
