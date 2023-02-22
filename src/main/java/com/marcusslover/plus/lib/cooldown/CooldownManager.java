@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Lets you easily manage player & global cooldowns.
+ * Lets you easily manage player global cooldowns.
  *
  * @author MarcusSlover
  */
