@@ -1,21 +1,18 @@
 package com.marcusslover.plus.lib.sidebar;
 
-import com.marcusslover.plus.lib.text.Text;
 import com.marcusslover.plus.lib.common.ISendable;
+import com.marcusslover.plus.lib.text.Text;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
-import org.bukkit.scoreboard.*;
+import org.bukkit.scoreboard.DisplaySlot;
+import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public class Sidebar implements ISendable<Player, Sidebar> {
     private static final @NotNull ChatColor[] COLOR = ChatColor.values();

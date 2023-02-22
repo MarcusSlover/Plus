@@ -31,6 +31,7 @@ public @interface Event {
 
     /**
      * Whether the event handler method should ignore cancelled events.
+     *
      * @return true if the event handler method should ignore cancelled events.
      */
     boolean ignoreCancelled() default true;
@@ -46,6 +47,7 @@ public @interface Event {
 
     /**
      * The priority of the event listener.
+     *
      * @return The priority of the event listener.
      */
     EventPriority injectionPriority() default EventPriority.NORMAL;

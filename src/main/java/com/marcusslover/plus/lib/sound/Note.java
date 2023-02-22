@@ -76,10 +76,6 @@ public class Note implements ISendable<Player, Note> {
         return this.sound;
     }
 
-    public @Nullable String getRawSound() {
-        return this.rawSound;
-    }
-
     public @NotNull Note setSound(@NotNull Sound sound) {
         this.sound = sound;
         return this;
@@ -88,6 +84,10 @@ public class Note implements ISendable<Player, Note> {
     public @NotNull Note setSound(@NotNull String sound) {
         this.rawSound = sound;
         return this;
+    }
+
+    public @Nullable String getRawSound() {
+        return this.rawSound;
     }
 
     public float getVolume() {

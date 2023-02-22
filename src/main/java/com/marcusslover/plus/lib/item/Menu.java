@@ -1,8 +1,8 @@
 package com.marcusslover.plus.lib.item;
 
-import com.marcusslover.plus.lib.text.Text;
 import com.marcusslover.plus.lib.common.ISendable;
 import com.marcusslover.plus.lib.common.RequiresManager;
+import com.marcusslover.plus.lib.text.Text;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;

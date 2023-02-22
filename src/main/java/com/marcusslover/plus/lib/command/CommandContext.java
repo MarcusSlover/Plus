@@ -11,7 +11,8 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public record CommandContext(@NotNull CommandSender sender, @NotNull String label,
-                             @NotNull String[] args,  @Nullable CommandContext parent) implements ICommandContextHelper<CommandContext> {
+                             @NotNull String[] args,
+                             @Nullable CommandContext parent) implements ICommandContextHelper<CommandContext> {
     public CommandContext(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
         this(sender, label, args, null);
     }
@@ -32,9 +33,10 @@ public record CommandContext(@NotNull CommandSender sender, @NotNull String labe
 
     /**
      * Creates a child context.
+     *
      * @param consumedArguments The amount of consumed arguments
      * @return A child context with this context as the parent, the last consumed argument as the label,
-     *         and all unconsumed arguments as args.
+     * and all unconsumed arguments as args.
      * @author tecc
      */
     public @NotNull CommandContext child(int consumedArguments) {

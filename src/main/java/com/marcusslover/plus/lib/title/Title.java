@@ -1,7 +1,7 @@
 package com.marcusslover.plus.lib.title;
 
-import com.marcusslover.plus.lib.text.Text;
 import com.marcusslover.plus.lib.common.ISendable;
+import com.marcusslover.plus.lib.text.Text;
 import net.kyori.adventure.util.Ticks;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
@@ -17,8 +17,8 @@ public class Title implements ISendable<CommandSender, Title> {
                     Ticks.duration(10));
 
     protected final @NotNull Text title;
-    protected net.kyori.adventure.title.Title.Times times = TIMES;
     protected final @NotNull Text subtitle;
+    protected net.kyori.adventure.title.Title.Times times = TIMES;
 
     public Title(@NotNull String title) {
         this(title, "");
@@ -38,20 +38,6 @@ public class Title implements ISendable<CommandSender, Title> {
         this.subtitle = subtitle;
     }
 
-    public Title times(@NotNull net.kyori.adventure.title.Title.Times times) {
-        this.times = times;
-        return this;
-    }
-
-    public Title times(int fadeIn, int stay, int fadeOut) {
-        this.times = net.kyori.adventure.title.Title.Times.times(
-                Ticks.duration(fadeIn),
-                Ticks.duration(stay),
-                Ticks.duration(fadeOut));
-
-        return this;
-    }
-
     public static @NotNull Title of(@NotNull String title) {
         return new Title(title);
     }
@@ -66,6 +52,20 @@ public class Title implements ISendable<CommandSender, Title> {
 
     public static @NotNull Title of(@NotNull Text title, @NotNull Text subtitle) {
         return new Title(title, subtitle);
+    }
+
+    public Title times(@NotNull net.kyori.adventure.title.Title.Times times) {
+        this.times = times;
+        return this;
+    }
+
+    public Title times(int fadeIn, int stay, int fadeOut) {
+        this.times = net.kyori.adventure.title.Title.Times.times(
+                Ticks.duration(fadeIn),
+                Ticks.duration(stay),
+                Ticks.duration(fadeOut));
+
+        return this;
     }
 
     public @NotNull Title times(long fadeIn, long stay, long fadeOut) {

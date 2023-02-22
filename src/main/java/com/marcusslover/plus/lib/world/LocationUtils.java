@@ -18,6 +18,9 @@ import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
 public class LocationUtils {
+    private static final Map<String, List<Consumer<World>>> waiting = new HashMap<>();
+    private static boolean initialized = false;
+
     /**
      * Gets the chunk X and Z of a location
      *
@@ -126,11 +129,11 @@ public class LocationUtils {
      */
     public static String toAccurateString(Location loc, String separator) {
         return loc.getWorld().getName() + separator +
-               loc.getX() + separator +
-               loc.getY() + separator +
-               loc.getZ() + separator +
-               loc.getYaw() + separator +
-               loc.getPitch();
+                loc.getX() + separator +
+                loc.getY() + separator +
+                loc.getZ() + separator +
+                loc.getYaw() + separator +
+                loc.getPitch();
     }
 
     /**
@@ -141,13 +144,12 @@ public class LocationUtils {
      */
     public static String toAccurateString(String world, double x, double y, double z, float yaw, float pitch, String separator) {
         return world + separator +
-               x + separator +
-               y + separator +
-               z + separator +
-               yaw + separator +
-               pitch;
+                x + separator +
+                y + separator +
+                z + separator +
+                yaw + separator +
+                pitch;
     }
-
 
     /**
      * Converts a Location to a String
@@ -158,9 +160,9 @@ public class LocationUtils {
      */
     public static String toString(Location loc, String separator) {
         return loc.getWorld().getName() + separator +
-               loc.getX() + separator +
-               loc.getY() + separator +
-               loc.getZ();
+                loc.getX() + separator +
+                loc.getY() + separator +
+                loc.getZ();
     }
 
     /**
@@ -172,9 +174,9 @@ public class LocationUtils {
      */
     public static String toString(Block block, String separator) {
         return block.getWorld().getName() + separator +
-               block.getX() + separator +
-               block.getY() + separator +
-               block.getZ();
+                block.getX() + separator +
+                block.getY() + separator +
+                block.getZ();
     }
 
     /**
@@ -207,9 +209,6 @@ public class LocationUtils {
     public static String toString(Location loc) {
         return toString(loc, " ");
     }
-
-    private static final Map<String, List<Consumer<World>>> waiting = new HashMap<>();
-    private static boolean initialized = false;
 
     private static void initializeListener() {
         if (initialized) {
@@ -253,16 +252,6 @@ public class LocationUtils {
     }
 
     /**
-     * This will modify the passed in location to be at the center of the block.
-     */
-    public Location centerLocation(Location location) {
-        location.setX(getCenterCord(location.getBlockX()));
-        location.setY(getCenterCord(location.getBlockY()));
-        location.setZ(getCenterCord(location.getBlockZ()));
-        return location;
-    }
-
-    /**
      * Gets the Vector direction of a BlockFace. For use in versions below 1.13.
      *
      * @param face The block face
@@ -270,6 +259,16 @@ public class LocationUtils {
      */
     public static Vector getDirection(BlockFace face) {
         return new Vector(face.getModX(), face.getModY(), face.getModZ());
+    }
+
+    /**
+     * This will modify the passed in location to be at the center of the block.
+     */
+    public Location centerLocation(Location location) {
+        location.setX(getCenterCord(location.getBlockX()));
+        location.setY(getCenterCord(location.getBlockY()));
+        location.setZ(getCenterCord(location.getBlockZ()));
+        return location;
     }
 
     /**

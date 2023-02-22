@@ -10,12 +10,29 @@ public class Pair<A, B> {
         this.b = b;
     }
 
+    public static Pair<?, ?> fromString(String s) {
+        String[] nums = s.split(",");
+        return new Pair<>(Integer.parseInt(nums[0]), Integer.parseInt(nums[1]));
+    }
+
+    public static <A, B> Pair<A, B> of(A a, B b) {
+        return new Pair<>(a, b);
+    }
+
     public A getA() {
         return this.a;
     }
 
+    public void setA(A a) {
+        this.a = a;
+    }
+
     public A getFirst() {
         return this.a;
+    }
+
+    public void setFirst(A a) {
+        this.a = a;
     }
 
     public B getSecond() {
@@ -32,14 +49,6 @@ public class Pair<A, B> {
 
     public B getRight() {
         return this.b;
-    }
-
-    public void setFirst(A a) {
-        this.a = a;
-    }
-
-    public void setA(A a) {
-        this.a = a;
     }
 
     public B getB() {
@@ -64,7 +73,7 @@ public class Pair<A, B> {
             return false;
         }
 
-		return this.a.equals(p.getA()) && this.b.equals(p.getB());
+        return this.a.equals(p.getA()) && this.b.equals(p.getB());
     }
 
     @Override
@@ -74,18 +83,9 @@ public class Pair<A, B> {
         return hash * 31 + this.b.hashCode();
     }
 
-    public static Pair<?, ?> fromString(String s) {
-        String[] nums = s.split(",");
-        return new Pair<>(Integer.parseInt(nums[0]), Integer.parseInt(nums[1]));
-    }
-
     @Override
     public String toString() {
         return this.a + "," + this.b;
-    }
-
-    public static <A, B> Pair<A, B> of(A a, B b) {
-        return new Pair<>(a, b);
     }
 
 }

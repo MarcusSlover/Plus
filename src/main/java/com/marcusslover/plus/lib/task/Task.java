@@ -15,6 +15,16 @@ import java.util.function.Consumer;
  */
 public class Task {
 
+    private final int task;
+    private final TaskType type;
+    private final Plugin plugin;
+
+    private Task(int task, TaskType type, Plugin plugin) {
+        this.task = task;
+        this.type = type;
+        this.plugin = plugin;
+    }
+
     /**
      * Schedules a sync delayed task to run as soon as possible
      *
@@ -307,14 +317,13 @@ public class Task {
         return asyncRepeating(plugin, t -> run.run(), delay, period);
     }
 
-    private final int task;
-    private final TaskType type;
-    private final Plugin plugin;
-
-    private Task(int task, TaskType type, Plugin plugin) {
-        this.task = task;
-        this.type = type;
-        this.plugin = plugin;
+    /**
+     * Throws an exception if the runnable is of type {@link BukkitRunnable}
+     */
+    private static void checkRunnable(Runnable run) {
+        if (run instanceof BukkitRunnable) {
+            throw new InvalidParameterException("Cannot schedule a BukkitRunnable as a Task please use \"() -> {}\" or \"new Runnable() {}\"... or crazy idea just use the consumer method.");
+        }
     }
 
     /**
@@ -350,16 +359,6 @@ public class Task {
      */
     public Plugin getPlugin() {
         return this.plugin;
-    }
-
-
-    /**
-     * Throws an exception if the runnable is of type {@link BukkitRunnable}
-     */
-    private static void checkRunnable(Runnable run) {
-        if (run instanceof BukkitRunnable) {
-            throw new InvalidParameterException("Cannot schedule a BukkitRunnable as a Task please use \"() -> {}\" or \"new Runnable() {}\"... or crazy idea just use the consumer method.");
-        }
     }
 
     /**
