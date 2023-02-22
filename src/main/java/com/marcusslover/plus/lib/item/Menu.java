@@ -25,19 +25,19 @@ public class Menu implements ISendable<Player, Menu> {
 
     long lastActivity = -1L;
 
-    public Menu() {
+    Menu() {
         this(3 * 9);
     }
 
-    public Menu(int size) {
+    Menu(int size) {
         this(size, (String) null);
     }
 
-    public Menu(int size, @Nullable String name) {
+    Menu(int size, @Nullable String name) {
         this(size, (name == null) ? null : new Text(name));
     }
 
-    public Menu(int size, @Nullable Text text) {
+    Menu(int size, @Nullable Text text) {
         if (text == null) {
             this.inventory = Bukkit.createInventory(null, size);
         } else {
