@@ -1,5 +1,6 @@
-package com.marcusslover.plus.lib.util;
+package com.marcusslover.plus.lib.events;
 
+import com.marcusslover.plus.lib.server.ServerUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;

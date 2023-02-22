@@ -1,4 +1,4 @@
-package com.marcusslover.plus.lib.util;
+package com.marcusslover.plus.lib.common;
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;

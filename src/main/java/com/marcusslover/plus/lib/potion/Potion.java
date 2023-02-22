@@ -1,8 +1,6 @@
 package com.marcusslover.plus.lib.potion;
 
-import com.marcusslover.plus.lib.util.Alternative;
-import com.marcusslover.plus.lib.util.ISendable;
-import org.bukkit.entity.LivingEntity;
+import com.marcusslover.plus.lib.common.ISendable;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -136,13 +134,11 @@ public class Potion implements ISendable<LivingEntity, Potion> {
         return this;
     }
 
-    @Alternative
     public @NotNull Potion apply(@NotNull LivingEntity entity) {
         this.send(entity);
         return this;
     }
 
-    @Alternative
     public @NotNull Potion apply(@NotNull Collection<LivingEntity> entities) {
         for (LivingEntity entity : entities) {
             this.send(entity);
@@ -151,7 +147,6 @@ public class Potion implements ISendable<LivingEntity, Potion> {
         return this;
     }
 
-    @Alternative
     public @NotNull Potion apply(@NotNull LivingEntity... entities) {
         for (LivingEntity entity : entities) {
             this.send(entity);

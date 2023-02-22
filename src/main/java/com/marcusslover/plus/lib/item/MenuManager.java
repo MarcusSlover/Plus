@@ -19,7 +19,7 @@ public final class MenuManager implements Listener {
     private final @NotNull Plugin plugin;
     private final @NotNull Set<@NotNull Menu> menus = new HashSet<>();
 
-    private MenuManager(@NotNull Plugin plugin) {
+    public MenuManager(@NotNull Plugin plugin) {
         this.plugin = plugin;
         Bukkit.getPluginManager().registerEvents(this, plugin);
         Bukkit.getScheduler().runTaskTimer(plugin, () -> {
@@ -48,6 +48,7 @@ public final class MenuManager implements Listener {
         return new MenuManager(plugin);
     }
 
+    @Deprecated
     public static @NotNull MenuManager createManager(@NotNull Plugin plugin) {
         return new MenuManager(plugin);
     }

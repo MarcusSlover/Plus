@@ -1,4 +1,4 @@
-package com.marcusslover.plus.lib.util;
+package com.marcusslover.plus.lib.text;
 
 import org.jetbrains.annotations.NotNull;
 

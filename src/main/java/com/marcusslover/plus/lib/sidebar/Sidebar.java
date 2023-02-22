@@ -1,7 +1,7 @@
 package com.marcusslover.plus.lib.sidebar;
 
 import com.marcusslover.plus.lib.text.Text;
-import com.marcusslover.plus.lib.util.ISendable;
+import com.marcusslover.plus.lib.common.ISendable;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;

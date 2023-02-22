@@ -1,4 +1,4 @@
-package com.marcusslover.plus.lib.util;
+package com.marcusslover.plus.lib.common;
 
 public class Pair<A, B> {
 
@@ -12,6 +12,30 @@ public class Pair<A, B> {
 
     public A getA() {
         return this.a;
+    }
+
+    public A getFirst() {
+        return this.a;
+    }
+
+    public B getSecond() {
+        return this.b;
+    }
+
+    public B getLast() {
+        return this.b;
+    }
+
+    public A getLeft() {
+        return this.a;
+    }
+
+    public B getRight() {
+        return this.b;
+    }
+
+    public void setFirst(A a) {
+        this.a = a;
     }
 
     public void setA(A a) {

@@ -1,4 +1,4 @@
-package com.marcusslover.plus.lib.util;
+package com.marcusslover.plus.lib.common;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;

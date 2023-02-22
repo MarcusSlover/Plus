@@ -1,4 +1,4 @@
-package com.marcusslover.plus.lib.util;
+package com.marcusslover.plus.lib.mojang;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.google.gson.JsonElement;
