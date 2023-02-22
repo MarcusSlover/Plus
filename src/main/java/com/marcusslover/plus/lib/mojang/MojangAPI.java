@@ -1,4 +1,4 @@
-package com.marcusslover.plus.lib.util;
+package com.marcusslover.plus.lib.mojang;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;

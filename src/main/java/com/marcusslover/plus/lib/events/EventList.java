@@ -1,6 +1,6 @@
 package com.marcusslover.plus.lib.events;
 
-import com.marcusslover.plus.lib.util.ReadWriteLock;
+import com.marcusslover.plus.lib.common.ReadWriteLock;
 import lombok.AllArgsConstructor;
 
 import java.util.Comparator;

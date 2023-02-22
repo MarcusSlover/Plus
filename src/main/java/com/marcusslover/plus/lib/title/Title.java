@@ -1,7 +1,7 @@
 package com.marcusslover.plus.lib.title;
 
 import com.marcusslover.plus.lib.text.Text;
-import com.marcusslover.plus.lib.util.ISendable;
+import com.marcusslover.plus.lib.common.ISendable;
 import net.kyori.adventure.util.Ticks;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;

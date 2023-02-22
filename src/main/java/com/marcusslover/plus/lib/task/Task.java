@@ -1,6 +1,6 @@
 package com.marcusslover.plus.lib.task;
 
-import com.marcusslover.plus.lib.util.ServerUtils;
+import com.marcusslover.plus.lib.server.ServerUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;

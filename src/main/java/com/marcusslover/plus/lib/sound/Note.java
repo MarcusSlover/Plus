@@ -1,7 +1,6 @@
 package com.marcusslover.plus.lib.sound;
 
-import com.marcusslover.plus.lib.util.Alternative;
-import com.marcusslover.plus.lib.util.ISendable;
+import com.marcusslover.plus.lib.common.ISendable;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -118,27 +117,22 @@ public class Note implements ISendable<Player, Note> {
         return this;
     }
 
-    @Alternative
     public @NotNull Note play(@NotNull Player player) {
         return this.send(player);
     }
 
-    @Alternative
     public @NotNull Note play(@NotNull Player player, @NotNull Location location) {
         return this.send(player, location);
     }
 
-    @Alternative
     public @NotNull Note play(@NotNull Player... players) {
         return this.send(players);
     }
 
-    @Alternative
     public @NotNull Note play(@NotNull Collection<Player> players) {
         return this.send(players);
     }
 
-    @Alternative
     public @NotNull Note play(@NotNull Location location) {
         World world = location.getWorld();
         if (this.sound != null) {

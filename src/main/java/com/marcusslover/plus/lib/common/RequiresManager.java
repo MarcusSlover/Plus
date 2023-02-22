@@ -1,4 +1,4 @@
-package com.marcusslover.plus.lib.util;
+package com.marcusslover.plus.lib.common;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;

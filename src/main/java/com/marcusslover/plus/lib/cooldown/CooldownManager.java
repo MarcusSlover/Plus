@@ -1,4 +1,4 @@
-package com.marcusslover.plus.lib.util;
+package com.marcusslover.plus.lib.cooldown;
 
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;

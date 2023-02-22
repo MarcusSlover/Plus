@@ -16,10 +16,11 @@ public final class CommandManager {
     @NotNull
     private final Plugin plugin;
 
-    private CommandManager(@NotNull Plugin plugin) {
+    public CommandManager(@NotNull Plugin plugin) {
         this.plugin = plugin;
     }
 
+    @Deprecated
     public static @NotNull CommandManager get(@NotNull Plugin plugin) {
         return new CommandManager(plugin);
     }
