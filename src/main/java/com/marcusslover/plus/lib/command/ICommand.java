@@ -11,6 +11,15 @@ import java.util.List;
 public interface ICommand extends ITabCompleterHelper {
     boolean execute(@NotNull CommandContext cmd);
 
+    /**
+     * Called when the command is registered.
+     * Allows you to build a specific structure for the command.
+     * @param builder An empty command builder.
+     */
+    default void onRegister(@NotNull CommandBuilder builder) {
+
+    }
+
     default @NotNull List<@NotNull String> tab(@NotNull TabCompleteContext tab) {
         return Collections.emptyList();
     }
