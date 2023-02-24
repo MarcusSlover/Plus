@@ -101,6 +101,10 @@ public class Text implements ISendable<CommandSender, Text> {
         return ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', this.raw()));
     }
 
+    public @NotNull String legacy() {
+        return Text.legacy(this.text);
+    }
+
     public boolean isEmpty() {
         if (this.component instanceof TextComponent textComponent) {
             return textComponent.content().isEmpty();
