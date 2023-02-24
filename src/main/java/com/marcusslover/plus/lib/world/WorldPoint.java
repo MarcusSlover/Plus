@@ -1,6 +1,12 @@
 package com.marcusslover.plus.lib.world;
 
-import com.google.gson.*;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
@@ -313,8 +319,8 @@ public class WorldPoint {
      */
     public boolean isBetween(WorldPoint min, WorldPoint max) {
         return this.x > min.getX() && this.x < max.getX()
-                && this.y > min.getY() && this.y < max.getY()
-                && this.z > min.getZ() && this.z < max.getZ();
+               && this.y > min.getY() && this.y < max.getY()
+               && this.z > min.getZ() && this.z < max.getZ();
     }
 
     /**
@@ -448,10 +454,10 @@ public class WorldPoint {
         }
         WorldPoint worldPoint = (WorldPoint) o;
         return Double.compare(worldPoint.x, this.x) == 0
-                && Double.compare(worldPoint.y, this.y) == 0
-                && Double.compare(worldPoint.z, this.z) == 0
-                && Float.compare(worldPoint.yaw, this.yaw) == 0
-                && Float.compare(worldPoint.pitch, this.pitch) == 0;
+               && Double.compare(worldPoint.y, this.y) == 0
+               && Double.compare(worldPoint.z, this.z) == 0
+               && Float.compare(worldPoint.yaw, this.yaw) == 0
+               && Float.compare(worldPoint.pitch, this.pitch) == 0;
     }
 
     @Override

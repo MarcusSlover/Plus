@@ -65,7 +65,9 @@ public abstract class SingleContainer<V> extends AbstractContainer<V> {
      * Unloads the data from the cache and saves it to the file.
      */
     public void saveData() {
-        if (this.cache == null) return;
+        if (this.cache == null) {
+            return;
+        }
         V data = this.retrieveLocally();
         this.writeData(data);
         this.cleanLocally();

@@ -147,7 +147,7 @@ public class MojangProfileAPI {
          * @return The updated Mojang profile.
          */
         public @NotNull CompletableFuture<@Nullable MojangProfile> update() {
-            return getUniqueId(name).thenApply(mojangProfile -> mojangProfile);
+            return getUniqueId(this.name).thenApply(mojangProfile -> mojangProfile);
         }
 
         /**
@@ -156,7 +156,7 @@ public class MojangProfileAPI {
          * @return The Paper profile.
          */
         public @NotNull PlayerProfile asPaperProfile() {
-            return Bukkit.createProfile(uuid, name);
+            return Bukkit.createProfile(this.uuid, this.name);
         }
 
         /**
@@ -167,7 +167,7 @@ public class MojangProfileAPI {
          */
         @Deprecated
         public @NotNull org.bukkit.profile.PlayerProfile asBukkitProfile() {
-            return Bukkit.createPlayerProfile(uuid, name);
+            return Bukkit.createPlayerProfile(this.uuid, this.name);
         }
     }
 
