@@ -210,7 +210,7 @@ public class Color {
     @Override
     public String toString() {
         return "Color{" +
-                "rgb=" + this.rgb +
-                '}';
+               "rgb=" + this.rgb +
+               '}';
     }
 }

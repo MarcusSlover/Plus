@@ -12,7 +12,13 @@ import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 
 public class Sidebar implements ISendable<Player, Sidebar> {
     private static final @NotNull ChatColor[] COLOR = ChatColor.values();

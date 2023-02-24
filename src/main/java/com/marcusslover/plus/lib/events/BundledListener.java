@@ -2,8 +2,11 @@ package com.marcusslover.plus.lib.events;
 
 import com.marcusslover.plus.lib.server.ServerUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.*;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 
 import java.util.function.BiConsumer;

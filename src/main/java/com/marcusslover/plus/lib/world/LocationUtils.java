@@ -129,11 +129,11 @@ public class LocationUtils {
      */
     public static String toAccurateString(Location loc, String separator) {
         return loc.getWorld().getName() + separator +
-                loc.getX() + separator +
-                loc.getY() + separator +
-                loc.getZ() + separator +
-                loc.getYaw() + separator +
-                loc.getPitch();
+               loc.getX() + separator +
+               loc.getY() + separator +
+               loc.getZ() + separator +
+               loc.getYaw() + separator +
+               loc.getPitch();
     }
 
     /**
@@ -144,11 +144,11 @@ public class LocationUtils {
      */
     public static String toAccurateString(String world, double x, double y, double z, float yaw, float pitch, String separator) {
         return world + separator +
-                x + separator +
-                y + separator +
-                z + separator +
-                yaw + separator +
-                pitch;
+               x + separator +
+               y + separator +
+               z + separator +
+               yaw + separator +
+               pitch;
     }
 
     /**
@@ -160,9 +160,9 @@ public class LocationUtils {
      */
     public static String toString(Location loc, String separator) {
         return loc.getWorld().getName() + separator +
-                loc.getX() + separator +
-                loc.getY() + separator +
-                loc.getZ();
+               loc.getX() + separator +
+               loc.getY() + separator +
+               loc.getZ();
     }
 
     /**
@@ -174,9 +174,9 @@ public class LocationUtils {
      */
     public static String toString(Block block, String separator) {
         return block.getWorld().getName() + separator +
-                block.getX() + separator +
-                block.getY() + separator +
-                block.getZ();
+               block.getX() + separator +
+               block.getY() + separator +
+               block.getZ();
     }
 
     /**
