@@ -40,12 +40,20 @@ public class Color {
         this(java.awt.Color.HSBtoRGB(hue, saturation, brightness));
     }
 
+    public Color(TextColor adventureColor) {
+        this(adventureColor.value());
+    }
+
     public static @NotNull Color of(@NotNull java.awt.Color javaColor) {
         return new Color(javaColor);
     }
 
     public static @NotNull Color of(@NotNull org.bukkit.Color bukkitColor) {
         return new Color(bukkitColor);
+    }
+
+    public static @NotNull Color of(@NotNull TextColor adventureColor) {
+        return new Color(adventureColor);
     }
 
     public static @NotNull Color of(@NotNull String hex) {
@@ -68,56 +76,20 @@ public class Color {
         return this.rgb;
     }
 
-    public int getRGB() {
-        return this.rgb;
-    }
-
     public int red() {
         return (this.rgb >> 16) & 0xFF;
-    }
-
-    public int getRed() {
-        return this.red();
     }
 
     public int green() {
         return (this.rgb >> 8) & 0xFF;
     }
 
-    public int getGreen() {
-        return this.green();
-    }
-
     public int blue() {
         return (this.rgb) & 0xFF;
     }
 
-    public int getBlue() {
-        return this.blue();
-    }
-
     public int alpha() {
         return (this.rgb >> 24) & 0xff;
-    }
-
-    public int getAlpha() {
-        return this.alpha();
-    }
-
-    /**
-     * @return The hex color as a format plus recognizes
-     * @since 3.3
-     * @deprecated Use {@link #plus()} instead.
-     */
-    public @NotNull String format() {
-        return "&".concat(this.hex());
-    }
-
-    /**
-     * @return The hex color as a format plus recognizes
-     */
-    public @NotNull String plus() {
-        return "&".concat(this.hex());
     }
 
     /**
@@ -128,12 +100,33 @@ public class Color {
     }
 
     /**
+     * @return The hex color as a format plus recognizes
+     */
+    public @NotNull String plus() {
+        return "&".concat(this.hex());
+    }
+
+    /**
      * You will need to use {@link Component#text(String)}.color(color.adventure()) and then serialize it {@link LegacyComponentSerializer#legacySection()}
      *
      * @return The Adventure API {@link TextColor}
      */
     public @NotNull TextColor adventure() {
         return TextColor.color(this.red(), this.green(), this.blue());
+    }
+
+    /**
+     * @return The Bukkit API {@link org.bukkit.Color}
+     */
+    public @NotNull org.bukkit.Color bukkit() {
+        return org.bukkit.Color.fromRGB(this.red(), this.green(), this.blue());
+    }
+
+    /**
+     * @return The Java AWT {@link java.awt.Color}
+     */
+    public @NotNull java.awt.Color java() {
+        return new java.awt.Color(this.red(), this.green(), this.blue());
     }
 
     /**
@@ -147,14 +140,6 @@ public class Color {
                 .legacySection()
                 .serialize(Component.text(" ").color(this.adventure()))
                 .trim();
-    }
-
-    /**
-     * @since 3.3
-     * @deprecated Use {@link #adventure()} instead
-     */
-    public @NotNull String bungee() {
-        return this.hex();
     }
 
     /**

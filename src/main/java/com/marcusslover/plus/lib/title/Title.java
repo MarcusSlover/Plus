@@ -2,14 +2,13 @@ package com.marcusslover.plus.lib.title;
 
 import com.marcusslover.plus.lib.common.ISendable;
 import com.marcusslover.plus.lib.text.Text;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.util.Ticks;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-
-public class Title implements ISendable<CommandSender, Title> {
+public class Title implements ISendable<Title> {
     private static final net.kyori.adventure.title.Title.Times TIMES =
             net.kyori.adventure.title.Title.Times.times(
                     Ticks.duration(10),
@@ -33,10 +32,79 @@ public class Title implements ISendable<CommandSender, Title> {
     }
 
     public Title(@NotNull Text title, @NotNull Text subtitle) {
-
         this.title = title;
         this.subtitle = subtitle;
     }
+
+    public net.kyori.adventure.title.Title adventure() {
+        return net.kyori.adventure.title.Title.title(
+                this.title.comp(),
+                this.subtitle.comp(),
+                this.times
+        );
+    }
+
+    public Title times(@NotNull net.kyori.adventure.title.Title.Times times) {
+        this.times = times;
+        return this;
+    }
+
+    public Title times(int fadeIn, int stay, int fadeOut) {
+        this.times = net.kyori.adventure.title.Title.Times.times(
+                Ticks.duration(fadeIn),
+                Ticks.duration(stay),
+                Ticks.duration(fadeOut)
+        );
+
+        return this;
+    }
+
+    public @NotNull Title times(long fadeIn, long stay, long fadeOut) {
+        this.times = net.kyori.adventure.title.Title.Times.times(
+                Ticks.duration(fadeIn),
+                Ticks.duration(stay),
+                Ticks.duration(fadeOut)
+        );
+
+        return this;
+    }
+
+    public @NotNull Title send(@NotNull CommandSender player, long fadeIn, long fadeStay, long fadeOut) {
+        net.kyori.adventure.title.Title.Times of = net.kyori.adventure.title.Title.Times.times(Ticks.duration(fadeIn), Ticks.duration(fadeStay), Ticks.duration(fadeOut));
+        player.showTitle(net.kyori.adventure.title.Title.title(
+                this.title.comp(),
+                this.subtitle.comp(),
+                of
+        ));
+
+        return this;
+    }
+
+    public @NotNull Title send(@NotNull CommandSender player, @Nullable net.kyori.adventure.title.Title.Times times) {
+        player.showTitle(net.kyori.adventure.title.Title.title(
+                this.title.comp(),
+                this.subtitle.comp(),
+                times
+        ));
+
+        return this;
+    }
+
+    @Override
+    public @NotNull <T extends CommandSender> Title send(@NotNull T target) {
+        target.showTitle(this.adventure());
+
+        return this;
+    }
+
+    @Override
+    public @NotNull Title send(Audience audience) {
+        audience.showTitle(this.adventure());
+
+        return this;
+    }
+
+    /* Static Constructors */
 
     public static @NotNull Title of(@NotNull String title) {
         return new Title(title);
@@ -52,58 +120,5 @@ public class Title implements ISendable<CommandSender, Title> {
 
     public static @NotNull Title of(@NotNull Text title, @NotNull Text subtitle) {
         return new Title(title, subtitle);
-    }
-
-    public Title times(@NotNull net.kyori.adventure.title.Title.Times times) {
-        this.times = times;
-        return this;
-    }
-
-    public Title times(int fadeIn, int stay, int fadeOut) {
-        this.times = net.kyori.adventure.title.Title.Times.times(
-                Ticks.duration(fadeIn),
-                Ticks.duration(stay),
-                Ticks.duration(fadeOut));
-
-        return this;
-    }
-
-    public @NotNull Title times(long fadeIn, long stay, long fadeOut) {
-        this.times = net.kyori.adventure.title.Title.Times.times(Ticks.duration(fadeIn), Ticks.duration(stay), Ticks.duration(fadeOut));
-        return this;
-    }
-
-    @Override
-    public @NotNull Title send(@NotNull CommandSender player) {
-        return this.send(player, this.times);
-    }
-
-    @Override
-    public @NotNull Title send(@NotNull CommandSender... targets) {
-        for (CommandSender target : targets) {
-            this.send(target);
-        }
-
-        return this;
-    }
-
-    @Override
-    public @NotNull Title send(@NotNull Collection<CommandSender> targets) {
-        for (CommandSender target : targets) {
-            this.send(target);
-        }
-
-        return this;
-    }
-
-    public @NotNull Title send(@NotNull CommandSender player, long fadeIn, long fadeStay, long fadeOut) {
-        net.kyori.adventure.title.Title.Times of = net.kyori.adventure.title.Title.Times.times(Ticks.duration(fadeIn), Ticks.duration(fadeStay), Ticks.duration(fadeOut));
-        player.showTitle(net.kyori.adventure.title.Title.title(this.title.comp(), this.subtitle.comp(), of));
-        return this;
-    }
-
-    public @NotNull Title send(@NotNull CommandSender player, @Nullable net.kyori.adventure.title.Title.Times times) {
-        player.showTitle(net.kyori.adventure.title.Title.title(this.title.comp(), this.subtitle.comp(), times));
-        return this;
     }
 }

@@ -1,39 +1,40 @@
 package com.marcusslover.plus.lib.common;
 
-import net.kyori.adventure.audience.Audience;
 import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
+import org.bukkit.entity.LivingEntity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.function.Predicate;
 
-public interface ISendable<V extends ISendable<V>> {
-    @NotNull <T extends CommandSender> V send(@NotNull T target);
+public interface IApplicable<T extends LivingEntity, V> {
+    @NotNull V apply(@NotNull T target);
 
-    @NotNull V send(Audience audience);
-
-    default @NotNull <T extends CommandSender> V send(@NotNull T... targets) {
+    default @NotNull V apply(@NotNull T... targets) {
         for (var target : targets) {
-            this.send(target);
+            this.apply(target);
         }
 
         return (V) this;
     }
 
-    default @NotNull <T extends CommandSender> V send(@NotNull Collection<T> targets) {
+    default @NotNull V apply(@NotNull Collection<T> targets) {
         for (var target : targets) {
-            this.send(target);
+            this.apply(target);
         }
 
         return (V) this;
     }
 
-    default @NotNull <T extends CommandSender> V sendAll(@NotNull Predicate<T> predicate) {
+    default @NotNull V sendAll(@NotNull Predicate<T> predicate) {
         for (var sender : Bukkit.getOnlinePlayers()) {
+            if (sender == null) {
+                continue;
+            }
+
             if (predicate.test((T) sender)) {
-                this.send(sender);
+                this.apply((T) sender);
             }
         }
 

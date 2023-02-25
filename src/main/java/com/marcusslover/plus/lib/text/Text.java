@@ -1,6 +1,7 @@
 package com.marcusslover.plus.lib.text;
 
 import com.marcusslover.plus.lib.common.ISendable;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -16,7 +17,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Text implements ISendable<CommandSender, Text> {
+public class Text implements ISendable<Text> {
     private static final @NotNull LegacyComponentSerializer LEGACY = LegacyComponentSerializer.builder()
             .hexColors()
             .character('&')
@@ -42,14 +43,6 @@ public class Text implements ISendable<CommandSender, Text> {
     public Text(@NotNull String text, @NotNull Component component) {
         this.text = text;
         this.component = component.decoration(TextDecoration.ITALIC, false);
-    }
-
-    public static @NotNull Text of(@NotNull String text) {
-        return new Text(text);
-    }
-
-    public static @NotNull Text of(@NotNull Component component) {
-        return new Text(component);
     }
 
     @Deprecated
@@ -101,6 +94,10 @@ public class Text implements ISendable<CommandSender, Text> {
         return ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', this.raw()));
     }
 
+    public @NotNull String legacy() {
+        return Text.legacy(this.text);
+    }
+
     public boolean isEmpty() {
         if (this.component instanceof TextComponent textComponent) {
             return textComponent.content().isEmpty();
@@ -116,42 +113,39 @@ public class Text implements ISendable<CommandSender, Text> {
         return new Text(this.text, this.component);
     }
 
-    public @NotNull Text send(@NotNull CommandSender sender) {
-        sender.sendMessage(this.comp());
+    @Override
+    public @NotNull <T extends CommandSender> Text send(@NotNull T target) {
+        target.sendMessage(this.comp());
         return this;
     }
 
     @Override
-    public @NotNull Text send(@NotNull CommandSender... targets) {
-        for (CommandSender target : targets) {
-            this.send(target);
-        }
+    public @NotNull Text send(Audience audience) {
+        audience.sendMessage(this.comp());
 
         return this;
     }
 
-    @Override
-    public @NotNull Text send(@NotNull Collection<CommandSender> targets) {
-        targets.forEach(this::send);
-
+    public @NotNull <T extends CommandSender> Text sendActionBar(@NotNull T target) {
+        target.sendActionBar(this.comp());
         return this;
     }
 
-    public @NotNull Text sendActionBar(@NotNull CommandSender sender) {
-        sender.sendActionBar(this.comp());
+    public @NotNull Text sendActionBar(@NotNull Audience audience) {
+        audience.sendActionBar(this.comp());
         return this;
     }
 
-    public @NotNull <T extends CommandSender> Text sendActionBar(@NotNull Collection<T> players) {
-        for (T sender : players) {
+    public @NotNull <T extends CommandSender> Text sendActionBar(@NotNull Collection<T> targets) {
+        for (T sender : targets) {
             this.sendActionBar(sender);
         }
 
         return this;
     }
 
-    public @NotNull <T extends CommandSender> Text sendActionBar(@NotNull T... players) {
-        for (T sender : players) {
+    public @NotNull <T extends CommandSender> Text sendActionBar(@NotNull T... targets) {
+        for (T sender : targets) {
             this.sendActionBar(sender);
         }
 
@@ -161,5 +155,15 @@ public class Text implements ISendable<CommandSender, Text> {
     @Override
     public String toString() {
         return LEGACY.serialize(this.component);
+    }
+
+    /* Static Constructors */
+
+    public static @NotNull Text of(@NotNull String text) {
+        return new Text(text);
+    }
+
+    public static @NotNull Text of(@NotNull Component component) {
+        return new Text(component);
     }
 }
