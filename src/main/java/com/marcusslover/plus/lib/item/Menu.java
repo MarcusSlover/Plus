@@ -4,6 +4,7 @@ import com.marcusslover.plus.lib.common.ISendable;
 import com.marcusslover.plus.lib.common.RequiresManager;
 import com.marcusslover.plus.lib.text.Text;
 import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -48,6 +49,17 @@ public class Menu implements ISendable<Menu> {
         this.clickAdapters = new LinkedList<>();
         this.mainClickAdapter = null;
     }
+
+    Menu(int size, @Nullable Component component) {
+        if (component == null) {
+            this.inventory = Bukkit.createInventory(null, size);
+        } else {
+            this.inventory = Bukkit.createInventory(null, size, component);
+        }
+        this.clickAdapters = new LinkedList<>();
+        this.mainClickAdapter = null;
+    }
+
 
     public boolean isCancelled() {
         return this.cancelled;
