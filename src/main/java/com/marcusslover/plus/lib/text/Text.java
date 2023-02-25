@@ -16,7 +16,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Text implements ISendable<CommandSender, Text> {
+public class Text implements ISendable<Text> {
     private static final @NotNull LegacyComponentSerializer LEGACY = LegacyComponentSerializer.builder()
             .hexColors()
             .character('&')
@@ -120,42 +120,27 @@ public class Text implements ISendable<CommandSender, Text> {
         return new Text(this.text, this.component);
     }
 
-    public @NotNull Text send(@NotNull CommandSender sender) {
-        sender.sendMessage(this.comp());
-        return this;
-    }
-
     @Override
-    public @NotNull Text send(@NotNull CommandSender... targets) {
-        for (CommandSender target : targets) {
-            this.send(target);
-        }
-
+    public @NotNull <T extends CommandSender> Text send(@NotNull T target) {
+        target.sendMessage(this.comp());
         return this;
     }
 
-    @Override
-    public @NotNull Text send(@NotNull Collection<CommandSender> targets) {
-        targets.forEach(this::send);
-
+    public @NotNull <T extends CommandSender> Text sendActionBar(@NotNull T target) {
+        target.sendActionBar(this.comp());
         return this;
     }
 
-    public @NotNull Text sendActionBar(@NotNull CommandSender sender) {
-        sender.sendActionBar(this.comp());
-        return this;
-    }
-
-    public @NotNull <T extends CommandSender> Text sendActionBar(@NotNull Collection<T> players) {
-        for (T sender : players) {
+    public @NotNull <T extends CommandSender> Text sendActionBar(@NotNull Collection<T> targets) {
+        for (T sender : targets) {
             this.sendActionBar(sender);
         }
 
         return this;
     }
 
-    public @NotNull <T extends CommandSender> Text sendActionBar(@NotNull T... players) {
-        for (T sender : players) {
+    public @NotNull <T extends CommandSender> Text sendActionBar(@NotNull T... targets) {
+        for (T sender : targets) {
             this.sendActionBar(sender);
         }
 

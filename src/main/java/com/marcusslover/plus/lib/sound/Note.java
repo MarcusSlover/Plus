@@ -1,17 +1,21 @@
 package com.marcusslover.plus.lib.sound;
 
 import com.marcusslover.plus.lib.common.ISendable;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.sound.Sound.Source;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 
-public class Note implements ISendable<Player, Note> {
+/* Todo this class needs to be switched to Adventure API */
+public class Note implements ISendable<Note> {
     protected @Nullable Sound sound;
     protected @Nullable String rawSound;
     protected float volume;
@@ -143,29 +147,6 @@ public class Note implements ISendable<Player, Note> {
         return this;
     }
 
-    @Override
-    public @NotNull Note send(@NotNull Player player) {
-        return this.send(player, player.getLocation());
-    }
-
-    @Override
-    public @NotNull Note send(@NotNull Player... targets) {
-        for (Player target : targets) {
-            this.send(target);
-        }
-
-        return this;
-    }
-
-    @Override
-    public @NotNull Note send(@NotNull Collection<Player> targets) {
-        for (Player target : targets) {
-            this.send(target);
-        }
-
-        return this;
-    }
-
     public @NotNull Note send(@NotNull Player player, @NotNull Location location) {
         if (this.sound != null) {
             player.playSound(location, this.sound, this.category, this.volume, this.pitch);
@@ -182,6 +163,20 @@ public class Note implements ISendable<Player, Note> {
         } else if (this.rawSound != null) {
             world.playSound(location, this.rawSound, this.category, this.volume, this.pitch);
         }
+        return this;
+    }
+
+    @Override
+    public @NotNull <T extends CommandSender> Note send(@NotNull T target) {
+        var key = this.sound != null ? Key.key(this.sound.getKey().getNamespace(), this.sound.getKey().getKey()) : Key.key(this.rawSound);
+
+        target.playSound(net.kyori.adventure.sound.Sound.sound(
+                key,
+                Source.MASTER,
+                this.volume,
+                this.pitch
+        ));
+
         return this;
     }
 }
