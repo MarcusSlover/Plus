@@ -4,6 +4,8 @@ import com.marcusslover.plus.lib.common.ISendable;
 import com.marcusslover.plus.lib.common.RequiresManager;
 import com.marcusslover.plus.lib.text.Text;
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
@@ -17,7 +19,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @RequiresManager
-public class Menu implements ISendable<Player, Menu> {
+public class Menu implements ISendable<Menu> {
     protected @NotNull Inventory inventory;
     protected @NotNull LinkedList<@NotNull ClickAdapter> clickAdapters;
     protected @Nullable ClickAdapter mainClickAdapter;
@@ -112,31 +114,6 @@ public class Menu implements ISendable<Player, Menu> {
         return this.send(players);
     }
 
-    @Override
-    public @NotNull Menu send(@NotNull Player target) {
-        this.lastActivity = System.currentTimeMillis();
-        target.openInventory(this.inventory);
-        return this;
-    }
-
-    @Override
-    public @NotNull Menu send(@NotNull Player... targets) {
-        for (Player target : targets) {
-            this.send(target);
-        }
-
-        return this;
-    }
-
-    @Override
-    public @NotNull Menu send(@NotNull Collection<Player> targets) {
-        for (Player target : targets) {
-            this.send(target);
-        }
-
-        return this;
-    }
-
     public @NotNull List<@NotNull Player> getViewers() {
         return this.inventory.getViewers().stream().map(entity -> (Player) entity).collect(Collectors.toList());
     }
@@ -155,6 +132,18 @@ public class Menu implements ISendable<Player, Menu> {
 
     public @NotNull LinkedList<@NotNull ClickAdapter> getClickAdapters() {
         return this.clickAdapters;
+    }
+
+    @Override
+    public @NotNull <T extends CommandSender> Menu send(@NotNull T target) {
+        if (!(target instanceof Player player)) {
+            return this;
+        }
+
+        this.lastActivity = System.currentTimeMillis();
+        player.openInventory(this.inventory);
+
+        return this;
     }
 
     public record ClickAdapter(int slot, @NotNull Consumer<@NotNull InventoryClickEvent> event) {

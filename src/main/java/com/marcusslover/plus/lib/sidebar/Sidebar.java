@@ -4,6 +4,7 @@ import com.marcusslover.plus.lib.common.ISendable;
 import com.marcusslover.plus.lib.text.Text;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
@@ -20,7 +21,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-public class Sidebar implements ISendable<Player, Sidebar> {
+public class Sidebar implements ISendable<Sidebar> {
     private static final @NotNull ChatColor[] COLOR = ChatColor.values();
     private static final @NotNull Map<UUID, Sidebar> SIDEBAR_MAP = new HashMap<>();
 
@@ -210,27 +211,13 @@ public class Sidebar implements ISendable<Player, Sidebar> {
     }
 
     @Override
-    public @NotNull Sidebar send(@NotNull Player player) {
+    public @NotNull <T extends CommandSender> Sidebar send(@NotNull T target) {
+        if (!(target instanceof Player player)) {
+            return this;
+        }
+
         player.setScoreboard(this.scoreboard);
         SIDEBAR_MAP.put(player.getUniqueId(), this);
-        return this;
-    }
-
-    @Override
-    public @NotNull Sidebar send(@NotNull Player... targets) {
-        for (Player target : targets) {
-            this.send(target);
-        }
-
-        return this;
-    }
-
-    @Override
-    public @NotNull Sidebar send(@NotNull Collection<Player> targets) {
-        for (Player target : targets) {
-            this.send(target);
-        }
-
         return this;
     }
 }

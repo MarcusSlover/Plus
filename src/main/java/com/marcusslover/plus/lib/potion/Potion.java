@@ -1,14 +1,14 @@
 package com.marcusslover.plus.lib.potion;
 
-import com.marcusslover.plus.lib.common.ISendable;
+import com.marcusslover.plus.lib.common.IApplicable;
+import com.marcusslover.plus.lib.text.Text;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
-
-public class Potion implements ISendable<LivingEntity, Potion> {
+public class Potion implements IApplicable<LivingEntity, Potion> {
     protected @NotNull PotionEffectType type;
     protected int duration;
     protected int amplifier;
@@ -22,6 +22,8 @@ public class Potion implements ISendable<LivingEntity, Potion> {
     }
 
     public Potion(@NotNull PotionEffectType type, int durationTicks, int amplifier) {
+
+
         this(type, durationTicks, amplifier, true);
     }
 
@@ -134,56 +136,15 @@ public class Potion implements ISendable<LivingEntity, Potion> {
         return this;
     }
 
+    @Override
     public @NotNull Potion apply(@NotNull LivingEntity entity) {
-        this.send(entity);
-        return this;
-    }
-
-    public @NotNull Potion apply(@NotNull Collection<LivingEntity> entities) {
-        for (LivingEntity entity : entities) {
-            this.send(entity);
-        }
-
-        return this;
-    }
-
-    public @NotNull Potion apply(@NotNull LivingEntity... entities) {
-        for (LivingEntity entity : entities) {
-            this.send(entity);
-        }
-
-        return this;
-    }
-
-    @Override
-    public @NotNull Potion send(@NotNull LivingEntity target) {
-        return this.applyPotion(target);
-    }
-
-    @Override
-    public @NotNull Potion send(@NotNull LivingEntity... targets) {
-        for (LivingEntity target : targets) {
-            this.send(target);
-        }
-
-        return this;
-    }
-
-    @Override
-    public @NotNull Potion send(@NotNull Collection<LivingEntity> targets) {
-        for (LivingEntity target : targets) {
-            this.send(target);
-        }
-
-        return this;
-    }
-
-    private @NotNull Potion applyPotion(@NotNull LivingEntity entity) {
         PotionEffect potionEffect = new PotionEffect(this.type, this.duration, this.amplifier)
                 .withParticles(this.particles)
                 .withAmbient(this.transparent)
                 .withIcon(this.icon);
+
         entity.addPotionEffect(potionEffect, this.force);
+
         return this;
     }
 }

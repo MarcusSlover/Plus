@@ -1,25 +1,25 @@
 package com.marcusslover.plus.lib.common;
 
 import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
+import org.bukkit.entity.LivingEntity;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 
-public interface ISendable<V extends ISendable<V>> {
-    @NotNull <T extends CommandSender> V send(@NotNull T target);
+public interface IApplicable<T extends LivingEntity, V> {
+    @NotNull V apply(@NotNull T target);
 
-    default @NotNull <T extends CommandSender> V send(@NotNull T... targets) {
+    default @NotNull V apply(@NotNull T... targets) {
         for (var target : targets) {
-            this.send(target);
+            this.apply(target);
         }
 
         return (V) this;
     }
 
-    default @NotNull <T extends CommandSender> V send(@NotNull Collection<T> targets) {
+    default @NotNull V apply(@NotNull Collection<T> targets) {
         for (var target : targets) {
-            this.send(target);
+            this.apply(target);
         }
 
         return (V) this;
@@ -34,7 +34,7 @@ public interface ISendable<V extends ISendable<V>> {
 
         for (var sender : Bukkit.getOnlinePlayers()) {
             if (permission.isBlank() || sender.hasPermission(permission)) {
-                this.send(sender);
+                this.apply((T) sender);
             }
         }
 
