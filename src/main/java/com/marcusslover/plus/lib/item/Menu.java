@@ -3,9 +3,9 @@ package com.marcusslover.plus.lib.item;
 import com.marcusslover.plus.lib.common.ISendable;
 import com.marcusslover.plus.lib.common.RequiresManager;
 import com.marcusslover.plus.lib.text.Text;
+import net.kyori.adventure.audience.Audience;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
@@ -142,6 +142,17 @@ public class Menu implements ISendable<Menu> {
 
         this.lastActivity = System.currentTimeMillis();
         player.openInventory(this.inventory);
+
+        return this;
+    }
+
+    @Override
+    public @NotNull Menu send(Audience audience) {
+        audience.forEachAudience(member -> {
+            if (member instanceof Player player) {
+                this.send(player);
+            }
+        });
 
         return this;
     }
