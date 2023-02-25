@@ -319,8 +319,8 @@ public class WorldPoint {
      */
     public boolean isBetween(WorldPoint min, WorldPoint max) {
         return this.x > min.getX() && this.x < max.getX()
-               && this.y > min.getY() && this.y < max.getY()
-               && this.z > min.getZ() && this.z < max.getZ();
+                && this.y > min.getY() && this.y < max.getY()
+                && this.z > min.getZ() && this.z < max.getZ();
     }
 
     /**
@@ -454,10 +454,10 @@ public class WorldPoint {
         }
         WorldPoint worldPoint = (WorldPoint) o;
         return Double.compare(worldPoint.x, this.x) == 0
-               && Double.compare(worldPoint.y, this.y) == 0
-               && Double.compare(worldPoint.z, this.z) == 0
-               && Float.compare(worldPoint.yaw, this.yaw) == 0
-               && Float.compare(worldPoint.pitch, this.pitch) == 0;
+                && Double.compare(worldPoint.y, this.y) == 0
+                && Double.compare(worldPoint.z, this.z) == 0
+                && Float.compare(worldPoint.yaw, this.yaw) == 0
+                && Float.compare(worldPoint.pitch, this.pitch) == 0;
     }
 
     @Override
