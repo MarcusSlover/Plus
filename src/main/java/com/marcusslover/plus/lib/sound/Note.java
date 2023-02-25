@@ -10,8 +10,6 @@ import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.function.Predicate;
-
 @Data
 @Accessors(fluent = true)
 public class Note implements ISendable<Note> {
