@@ -2,6 +2,7 @@ package com.marcusslover.plus.lib.sidebar;
 
 import com.marcusslover.plus.lib.common.ISendable;
 import com.marcusslover.plus.lib.text.Text;
+import net.kyori.adventure.audience.Audience;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -218,6 +219,17 @@ public class Sidebar implements ISendable<Sidebar> {
 
         player.setScoreboard(this.scoreboard);
         SIDEBAR_MAP.put(player.getUniqueId(), this);
+        return this;
+    }
+
+    @Override
+    public @NotNull Sidebar send(Audience audience) {
+        audience.forEachAudience(member -> {
+            if (member instanceof Player player) {
+                this.send(player);
+            }
+        });
+
         return this;
     }
 }

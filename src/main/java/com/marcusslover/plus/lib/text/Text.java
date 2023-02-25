@@ -1,6 +1,7 @@
 package com.marcusslover.plus.lib.text;
 
 import com.marcusslover.plus.lib.common.ISendable;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -42,14 +43,6 @@ public class Text implements ISendable<Text> {
     public Text(@NotNull String text, @NotNull Component component) {
         this.text = text;
         this.component = component.decoration(TextDecoration.ITALIC, false);
-    }
-
-    public static @NotNull Text of(@NotNull String text) {
-        return new Text(text);
-    }
-
-    public static @NotNull Text of(@NotNull Component component) {
-        return new Text(component);
     }
 
     @Deprecated
@@ -126,6 +119,13 @@ public class Text implements ISendable<Text> {
         return this;
     }
 
+    @Override
+    public @NotNull Text send(Audience audience) {
+        audience.sendMessage(this.comp());
+
+        return this;
+    }
+
     public @NotNull <T extends CommandSender> Text sendActionBar(@NotNull T target) {
         target.sendActionBar(this.comp());
         return this;
@@ -150,5 +150,15 @@ public class Text implements ISendable<Text> {
     @Override
     public String toString() {
         return LEGACY.serialize(this.component);
+    }
+
+    /* Static Constructors */
+
+    public static @NotNull Text of(@NotNull String text) {
+        return new Text(text);
+    }
+
+    public static @NotNull Text of(@NotNull Component component) {
+        return new Text(component);
     }
 }
