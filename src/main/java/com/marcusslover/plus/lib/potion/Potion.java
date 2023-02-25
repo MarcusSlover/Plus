@@ -1,8 +1,6 @@
 package com.marcusslover.plus.lib.potion;
 
 import com.marcusslover.plus.lib.common.IApplicable;
-import com.marcusslover.plus.lib.text.Text;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
