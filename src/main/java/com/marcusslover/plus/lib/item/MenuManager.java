@@ -1,47 +1,83 @@
 package com.marcusslover.plus.lib.item;
 
-import com.marcusslover.plus.lib.item.Menu.ClickAdapter;
-import com.marcusslover.plus.lib.text.Text;
-import net.kyori.adventure.text.Component;
-import org.bukkit.Bukkit;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
+import com.marcusslover.plus.lib.events.Events;
+import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Optional;
 import java.util.Set;
 
-public final class MenuManager implements Listener {
+public final class MenuManager {
     private final @NotNull Plugin plugin;
     private final @NotNull Set<@NotNull Menu> menus = new HashSet<>();
 
     public MenuManager(@NotNull Plugin plugin) {
         this.plugin = plugin;
-        Bukkit.getPluginManager().registerEvents(this, plugin);
-        Bukkit.getScheduler().runTaskTimer(plugin, () -> {
-            long now = System.currentTimeMillis();
-            Iterator<@NotNull Menu> iterator = this.menus.iterator();
-            while (iterator.hasNext()) {
-                Menu menu = iterator.next();
-                if (!menu.inventory.getViewers().isEmpty()) {
-                    continue;
-                }
+        Events.listen(InventoryCloseEvent.class).handler(event -> {
+            InventoryView view = event.getView();
+            for (Menu gameMenu : MenuManager.this.menus) {
 
-                if (menu.lastActivity < 0) {
-                    iterator.remove();
-                } else {
-                    long time = now - menu.lastActivity;
-                    if (time > 1000 * 60 * 5) { // 5 minutes
-                        iterator.remove();
+                gameMenu.canvasMap().forEach((uuid, canvas) -> {
+                    Inventory inventory = canvas.assosiatedInventory();
+                    if (inventory == null) {
+                        return;
                     }
-                }
+                    if (!inventory.equals(view.getTopInventory())) {
+                        return;
+                    }
+                    canvas.assosiatedInventory(null);
+                    gameMenu.canvasMap().remove(uuid);
+                });
             }
-        }, 0L, 20 * 60 * 5L);
+        }).asRegistered(plugin);
+
+        Events.listen(InventoryClickEvent.class).handler(event -> {
+            InventoryView view = event.getView();
+            for (Menu menu : MenuManager.this.menus) {
+                menu.canvasMap().forEach((uuid, canvas) -> {
+                    Inventory inventory = canvas.assosiatedInventory();
+                    if (inventory == null) {
+                        return;
+                    }
+                    if (!inventory.equals(view.getTopInventory())) {
+                        return;
+                    }
+                    event.setCancelled(true);
+                    int slot = event.getRawSlot();
+                    int size = inventory.getSize();
+
+                    Canvas.GenericClick genericClick = canvas.genericClick();
+                    if (genericClick != null) {
+                        genericClick.onClick((Player) event.getWhoClicked(), event, canvas);
+                    }
+
+                    if (slot > size) {
+                        Canvas.SelfInventory selfInventory = canvas.selfInventory();
+                        if (selfInventory != null) {
+                            selfInventory.onClick((Player) event.getWhoClicked(), event, canvas);
+                        }
+                        return;
+                    }
+
+                    canvas.buttons().stream()
+                            .filter(button -> button.within(slot))
+                            .findFirst()
+                            .ifPresent(button -> {
+                                Player player = (Player) event.getWhoClicked();
+                                Canvas.ButtonClick buttonClick = button.buttonClick();
+                                if (buttonClick == null) {
+                                    return;
+                                }
+                                buttonClick.onClick(player, event, canvas, button);
+                            });
+                });
+            }
+        }).asRegistered(plugin);
     }
 
     @Deprecated
@@ -54,50 +90,107 @@ public final class MenuManager implements Listener {
         return new MenuManager(plugin);
     }
 
+    /**
+     * Gets the plugin associated with the manager.
+     *
+     * @return the plugin
+     */
     public @NotNull Plugin getPlugin() {
         return this.plugin;
     }
 
-    public @NotNull Menu createMenu(int size) {
-        return this.createMenu(size, (String) null);
-    }
-
-    public @NotNull Menu createMenu(int size, @Nullable String name) {
-        return this.createMenu(size, (name == null) ? null : Text.of(name));
-    }
-
-    public @NotNull Menu createMenu(int size, @Nullable Text text) {
-        Menu menu = new Menu(size, text);
+    /**
+     * Adds a menu to the manager.
+     *
+     * @param menu the menu
+     * @return the manager
+     */
+    public @NotNull MenuManager addMenu(@NotNull Menu menu) {
         this.menus.add(menu);
-        return menu;
+        return this;
     }
 
-    public @NotNull Menu createMenu(int size, @Nullable Component component) {
-        Menu menu = new Menu(size, component);
-        this.menus.add(menu);
-        return menu;
+    /**
+     * Removes a menu from the manager.
+     *
+     * @param menu the menu
+     * @return the manager
+     */
+    public @NotNull MenuManager removeMenu(@NotNull Menu menu) {
+        this.menus.remove(menu);
+        return this;
     }
 
-    @EventHandler
-    public void onClick(@NotNull InventoryClickEvent event) {
-        Optional<@NotNull Menu> optionalMenu = this.menus.stream().filter(menu -> menu.inventory.equals(event.getInventory())).findFirst();
-        if (optionalMenu.isEmpty()) {
-            return;
+    /**
+     * Opens a menu to the player.
+     *
+     * @param player the player
+     * @param clazz  the class
+     */
+    public void open(@NotNull Player player, @NotNull Class<? extends Menu> clazz) {
+        this.menus.stream()
+                .filter(menu -> menu.getClass().equals(clazz))
+                .findFirst()
+                .ifPresent(menu -> this.internallyOpen(player, menu));
+    }
+
+    /**
+     * Opens a menu to the player.
+     *
+     * @param player the player
+     * @param menu   the menu
+     */
+    public void internallyOpen(@NotNull Player player, @NotNull Menu menu) {
+        InventoryView openInventory = player.getOpenInventory();
+        @SuppressWarnings("deprecation") String currentTitle = openInventory.getTitle();
+        Canvas canvas = menu.canvasMap().get(player.getUniqueId());
+
+        if (canvas == null) {
+            canvas = new Canvas(6);
+            menu.canvasMap().put(player.getUniqueId(), canvas);
+            try {
+                menu.open(canvas, player);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            // craft inventory
+            Inventory inventory = canvas.craftInventory();
+            canvas.assosiatedInventory(inventory);
+            player.openInventory(inventory);
+        } else {
+            Inventory topInventory = openInventory.getTopInventory();
+            this.updateInventory(topInventory, canvas);
         }
-        Menu menu = optionalMenu.get();
-        menu.lastActivity = System.currentTimeMillis();
-
-        event.setCancelled(menu.cancelled);
-        ClickAdapter mainClickAdapter = menu.mainClickAdapter;
-        if (mainClickAdapter != null) {
-            mainClickAdapter.event().accept(event);
-        }
-
-        menu.clickAdapters.stream()
-                .filter(click -> click.slot() == event.getRawSlot() || click.slot() == -1)
-                .forEach(click -> click.event().accept(event));
     }
 
+    /**
+     * Updates the inventory.
+     *
+     * @param inventory the inventory
+     * @param canvas    the canvas
+     */
+    private void updateInventory(@NotNull Inventory inventory, @NotNull Canvas canvas) {
+        inventory.clear(); // clear inventory
+
+        for (Button button : canvas.buttons()) {
+            Item item = button.item();
+            if (item == null) {
+                continue;
+            }
+            Button.DetectableArea matrix = button.detectableArea();
+            Set<Integer> slots = matrix.slots();
+
+            for (Integer slot : slots) {
+                inventory.setItem(slot, item.get());
+            }
+        }
+    }
+
+    /**
+     * Gets the menus.
+     *
+     * @return the menus
+     */
     public @NotNull Set<@NotNull Menu> getMenus() {
         return this.menus;
     }
