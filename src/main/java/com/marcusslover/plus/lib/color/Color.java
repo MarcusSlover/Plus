@@ -105,17 +105,17 @@ public class Color {
     }
 
     /**
-     * @return The hex color as a format plus recognizes
-     */
-    public @NotNull String plus() {
-        return "&".concat(this.hex());
-    }
-
-    /**
      * @return the hex value of the color #RRGGBB
      */
     public @NotNull String hex() {
         return String.format("#%02X%02X%02X", this.red(), this.green(), this.blue());
+    }
+
+    /**
+     * @return The hex color as a format plus recognizes
+     */
+    public @NotNull String plus() {
+        return "&".concat(this.hex());
     }
 
     /**
@@ -125,6 +125,20 @@ public class Color {
      */
     public @NotNull TextColor adventure() {
         return TextColor.color(this.red(), this.green(), this.blue());
+    }
+
+    /**
+     * @return The Bukkit API {@link org.bukkit.Color}
+     */
+    public @NotNull org.bukkit.Color bukkit() {
+        return org.bukkit.Color.fromRGB(this.red(), this.green(), this.blue());
+    }
+
+    /**
+     * @return The Java AWT {@link java.awt.Color}
+     */
+    public @NotNull java.awt.Color java() {
+        return new java.awt.Color(this.red(), this.green(), this.blue());
     }
 
     /**
