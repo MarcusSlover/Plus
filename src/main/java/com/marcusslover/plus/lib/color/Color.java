@@ -40,12 +40,20 @@ public class Color {
         this(java.awt.Color.HSBtoRGB(hue, saturation, brightness));
     }
 
+    public Color(TextColor adventureColor) {
+        this(adventureColor.value());
+    }
+
     public static @NotNull Color of(@NotNull java.awt.Color javaColor) {
         return new Color(javaColor);
     }
 
     public static @NotNull Color of(@NotNull org.bukkit.Color bukkitColor) {
         return new Color(bukkitColor);
+    }
+
+    public static @NotNull Color of(@NotNull TextColor adventureColor) {
+        return new Color(adventureColor);
     }
 
     public static @NotNull Color of(@NotNull String hex) {
