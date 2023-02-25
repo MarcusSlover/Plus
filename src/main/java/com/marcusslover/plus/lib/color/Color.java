@@ -68,40 +68,20 @@ public class Color {
         return this.rgb;
     }
 
-    public int getRGB() {
-        return this.rgb;
-    }
-
     public int red() {
         return (this.rgb >> 16) & 0xFF;
-    }
-
-    public int getRed() {
-        return this.red();
     }
 
     public int green() {
         return (this.rgb >> 8) & 0xFF;
     }
 
-    public int getGreen() {
-        return this.green();
-    }
-
     public int blue() {
         return (this.rgb) & 0xFF;
     }
 
-    public int getBlue() {
-        return this.blue();
-    }
-
     public int alpha() {
         return (this.rgb >> 24) & 0xff;
-    }
-
-    public int getAlpha() {
-        return this.alpha();
     }
 
     /**
