@@ -131,6 +131,11 @@ public class Text implements ISendable<Text> {
         return this;
     }
 
+    public @NotNull Text sendActionBar(@NotNull Audience audience) {
+        audience.sendActionBar(this.comp());
+        return this;
+    }
+
     public @NotNull <T extends CommandSender> Text sendActionBar(@NotNull Collection<T> targets) {
         for (T sender : targets) {
             this.sendActionBar(sender);
