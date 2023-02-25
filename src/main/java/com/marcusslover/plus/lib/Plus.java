@@ -14,11 +14,6 @@ public final class Plus {
 
     private Plus() {
         instance = this;
-
-        var x = Note.of(Sound.sound(Key.key("minecraft", "block.note_block.bell"), Sound.Source.BLOCK, 1.0F, 1.0F));
-        x = Note.of("minecraft:block.note_block.bell", 1.0F, 1.0F, Sound.Source.BLOCK);
-        x = Note.of("minecraft:block.note_block.bell", 1.0F, 1.0F);
-
     }
 
     @NotNull
