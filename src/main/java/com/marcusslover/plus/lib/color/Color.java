@@ -106,15 +106,6 @@ public class Color {
 
     /**
      * @return The hex color as a format plus recognizes
-     * @since 3.3
-     * @deprecated Use {@link #plus()} instead.
-     */
-    public @NotNull String format() {
-        return "&".concat(this.hex());
-    }
-
-    /**
-     * @return The hex color as a format plus recognizes
      */
     public @NotNull String plus() {
         return "&".concat(this.hex());
@@ -147,14 +138,6 @@ public class Color {
                 .legacySection()
                 .serialize(Component.text(" ").color(this.adventure()))
                 .trim();
-    }
-
-    /**
-     * @since 3.3
-     * @deprecated Use {@link #adventure()} instead
-     */
-    public @NotNull String bungee() {
-        return this.hex();
     }
 
     /**
