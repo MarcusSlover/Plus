@@ -2,6 +2,7 @@ package com.marcusslover.plus.lib.item;
 
 import com.marcusslover.plus.lib.item.Menu.ClickAdapter;
 import com.marcusslover.plus.lib.text.Text;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -67,6 +68,12 @@ public final class MenuManager implements Listener {
 
     public @NotNull Menu createMenu(int size, @Nullable Text text) {
         Menu menu = new Menu(size, text);
+        this.menus.add(menu);
+        return menu;
+    }
+
+    public @NotNull Menu createMenu(int size, @Nullable Component component) {
+        Menu menu = new Menu(size, component);
         this.menus.add(menu);
         return menu;
     }
