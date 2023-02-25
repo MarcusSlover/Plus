@@ -119,6 +119,8 @@ public class Text implements ISendable<Text> {
         return this;
     }
 
+    /* Static Constructors */
+
     public @NotNull <T extends CommandSender> Text sendActionBar(@NotNull T... targets) {
         for (T sender : targets) {
             this.sendActionBar(sender);

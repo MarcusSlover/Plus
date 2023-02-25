@@ -19,6 +19,24 @@ import org.jetbrains.annotations.NotNull;
 public class Note implements ISendable<Note> {
     protected final Sound sound;
 
+    public static Note of(@NotNull Sound sound) {
+        return new Note(sound);
+    }
+
+    public static Note of(@NotNull String sound) {
+        return new Note(Sound.sound(Key.key(sound), Sound.Source.MASTER, 1F, 1F));
+    }
+
+    public static Note of(@NotNull String sound, float volume, float pitch) {
+        return new Note(Sound.sound(Key.key(sound), Sound.Source.MASTER, volume, pitch));
+    }
+
+    /* Static Constructors */
+
+    public static Note of(@NotNull String sound, float volume, float pitch, Sound.Source source) {
+        return new Note(Sound.sound(Key.key(sound), source, volume, pitch));
+    }
+
     public @NotNull Note send(@NotNull Location location) {
         location.getWorld().playSound(this.sound, location.getX(), location.getY(), location.getZ());
 

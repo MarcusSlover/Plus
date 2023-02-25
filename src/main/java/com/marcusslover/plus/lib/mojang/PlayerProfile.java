@@ -30,8 +30,8 @@ public class PlayerProfile {
     @Override
     public String toString() {
         return "PlayerProfile{" +
-               "name='" + this.name + '\'' +
-               ", uniqueId=" + this.uniqueId +
-               '}';
+                "name='" + this.name + '\'' +
+                ", uniqueId=" + this.uniqueId +
+                '}';
     }
 }
