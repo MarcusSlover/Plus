@@ -1,13 +1,19 @@
 package tests;
 
+import com.marcusslover.plus.lib.events.Events;
 import com.marcusslover.plus.lib.item.Canvas;
 import com.marcusslover.plus.lib.item.Canvas.PopulatorContext.DefaultViewStrategy;
 import com.marcusslover.plus.lib.item.Item;
 import com.marcusslover.plus.lib.item.Menu;
+import com.marcusslover.plus.lib.item.MenuManager;
 import com.marcusslover.plus.lib.sound.Note;
 import com.marcusslover.plus.lib.text.Text;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.permissions.ServerOperator;
+import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -42,6 +48,23 @@ public class MenuTest extends Menu {
                        // Handle exception
                     });
                 });
-        ;
+
+        this.sendAll(ServerOperator::isOp);
+
+
+        var plugin = this.plugin();
+        assert plugin != null;
+
+
+        Events.listen(InventoryClickEvent.class)
+                .priority(EventPriority.LOW)
+                .handler(event -> {
+                    // Do something
+                })
+                .bind(plugin);
+    }
+
+    private Plugin plugin() {
+        return null;
     }
 }

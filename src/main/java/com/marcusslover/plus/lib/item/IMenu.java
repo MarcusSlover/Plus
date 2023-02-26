@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Represents a menu.
  */
-public interface IMenu extends ISendable<IMenu> {
+public interface IMenu extends ISendable<Menu> {
     /**
      * Opens the menu to the player.
      *

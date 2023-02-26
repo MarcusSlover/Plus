@@ -1,8 +1,13 @@
 package com.marcusslover.plus.lib.item;
 
+import com.marcusslover.plus.lib.events.EventHandler;
+import com.marcusslover.plus.lib.events.EventListener;
 import com.marcusslover.plus.lib.events.Events;
+import com.marcusslover.plus.lib.events.annotations.Event;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
@@ -13,83 +18,94 @@ import org.jetbrains.annotations.NotNull;
 import java.util.HashSet;
 import java.util.Set;
 
-public final class MenuManager {
-    private final @NotNull Plugin plugin;
+public final class MenuManager implements EventListener {
     private final @NotNull Set<@NotNull Menu> menus = new HashSet<>();
+    private final @NotNull Plugin plugin;
+    @Getter
+    private final EventHandler eventHandler;
+
+    public MenuManager(@NotNull Plugin plugin, @NotNull EventHandler handler) {
+        this.plugin = plugin;
+        this.eventHandler = handler;
+
+        this.eventHandler.subscribe(this);
+    }
 
     public MenuManager(@NotNull Plugin plugin) {
-        this.plugin = plugin;
-        Events.listen(InventoryCloseEvent.class).handler(event -> {
-            InventoryView view = event.getView();
-            for (Menu gameMenu : MenuManager.this.menus) {
+        this(plugin, EventHandler.get(plugin));
+    }
 
-                gameMenu.canvasMap().forEach((uuid, canvas) -> {
-                    Inventory inventory = canvas.assosiatedInventory();
-                    if (inventory == null) {
-                        return;
-                    }
-                    if (!inventory.equals(view.getTopInventory())) {
-                        return;
-                    }
-                    canvas.assosiatedInventory(null);
-                    gameMenu.canvasMap().remove(uuid);
-                });
-            }
-        }).asRegistered(plugin);
+    @Event(injectionPriority = EventPriority.NORMAL)
+    private void onInventoryClose(InventoryCloseEvent event) {
+        InventoryView view = event.getView();
+        for (Menu gameMenu : MenuManager.this.menus) {
+            gameMenu.canvasMap().forEach((uuid, canvas) -> {
+                Inventory inventory = canvas.assosiatedInventory();
+                if (inventory == null) {
+                    return;
+                }
+                if (!inventory.equals(view.getTopInventory())) {
+                    return;
+                }
+                canvas.assosiatedInventory(null);
+                gameMenu.canvasMap().remove(uuid);
+            });
+        }
+    }
 
-        Events.listen(InventoryClickEvent.class).handler(event -> {
-            InventoryView view = event.getView();
-            for (Menu menu : MenuManager.this.menus) {
-                menu.canvasMap().forEach((uuid, canvas) -> {
-                    Inventory inventory = canvas.assosiatedInventory();
-                    if (inventory == null) {
-                        return;
-                    }
-                    if (!inventory.equals(view.getTopInventory())) {
-                        return;
-                    }
-                    event.setCancelled(true);
-                    int slot = event.getRawSlot();
-                    int size = inventory.getSize();
+    @Event(injectionPriority = EventPriority.NORMAL)
+    private void onInventoryClick(InventoryClickEvent event) {
+        InventoryView view = event.getView();
+        for (Menu menu : MenuManager.this.menus) {
+            menu.canvasMap().forEach((uuid, canvas) -> {
+                Inventory inventory = canvas.assosiatedInventory();
+                if (inventory == null) {
+                    return;
+                }
+                if (!inventory.equals(view.getTopInventory())) {
+                    return;
+                }
+                event.setCancelled(true);
+                int slot = event.getRawSlot();
+                int size = inventory.getSize();
 
-                    Item item = Item.of(event.getCurrentItem());
+                Item item = Item.of(event.getCurrentItem());
 
-                    Canvas.GenericClick genericClick = canvas.genericClick();
-                    if (genericClick != null) {
-                        genericClick.onClick((Player) event.getWhoClicked(), item, event, canvas);
+                Canvas.GenericClick genericClick = canvas.genericClick();
+                if (genericClick != null) {
+                    genericClick.onClick((Player) event.getWhoClicked(), item, event, canvas);
+                }
+
+                if (slot > size) {
+                    Canvas.SelfInventory selfInventory = canvas.selfInventory();
+                    if (selfInventory != null) {
+                        selfInventory.onClick((Player) event.getWhoClicked(), item, event, canvas);
                     }
+                    return;
+                }
 
-                    if (slot > size) {
-                        Canvas.SelfInventory selfInventory = canvas.selfInventory();
-                        if (selfInventory != null) {
-                            selfInventory.onClick((Player) event.getWhoClicked(), item, event, canvas);
-                        }
-                        return;
-                    }
-
-                    canvas.buttons().stream()
-                            .filter(button -> button.within(slot))
-                            .findFirst()
-                            .ifPresent(button -> {
-                                Player player = (Player) event.getWhoClicked();
-                                Canvas.ClickContext context = button.clickContext();
-                                Canvas.ButtonClick click = context.click();
-                                if (click == null) {
-                                    return;
+                canvas.buttons().stream()
+                        .filter(button -> button.within(slot))
+                        .findFirst()
+                        .ifPresent(button -> {
+                            Player player = (Player) event.getWhoClicked();
+                            Canvas.ClickContext context = button.clickContext();
+                            Canvas.ButtonClick click = context.click();
+                            if (click == null) {
+                                return;
+                            }
+                            try {
+                                click.onClick(player, item, event);
+                            } catch (Exception e) {
+                                if (context.throwableConsumer() != null) {
+                                    context.throwableConsumer().accept(e);
+                                } else {
+                                    e.printStackTrace();
                                 }
-                                try {
-                                    click.onClick(player, item, event);
-                                } catch (Throwable e) {
-                                    if (context.throwableConsumer() != null) {
-                                        context.throwableConsumer().accept(e);
-                                    } else {
-                                        Bukkit.getLogger().warning(e.getMessage());
-                                    }
-                                }
-                            });
-                });
-            }
-        }).asRegistered(plugin);
+                            }
+                        });
+            });
+        }
     }
 
     @Deprecated

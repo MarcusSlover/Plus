@@ -8,6 +8,7 @@ import lombok.experimental.Accessors;
 import net.kyori.adventure.audience.Audience;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.units.qual.C;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,7 +35,7 @@ public abstract class Menu implements IMenu {
     }
 
     @Override
-    public @NotNull <T extends CommandSender> IMenu send(@NotNull T target) {
+    public @NotNull <T extends CommandSender> Menu send(@NotNull T target) {
         if (target instanceof Player player) {
             if (this.manager == null) {
                 return this;
@@ -45,7 +46,7 @@ public abstract class Menu implements IMenu {
     }
 
     @Override
-    public @NotNull IMenu send(Audience audience) {
+    public @NotNull Menu send(Audience audience) {
         if (audience instanceof Player player) {
             if (this.manager == null) {
                 return this;

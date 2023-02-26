@@ -13,19 +13,6 @@ public class Events {
      * @return the event reference
      */
     public static <T extends Event> @NotNull EventReference<T> listen(@NotNull Class<T> type) {
-        //noinspection unchecked
-        return listen(type, new Class[0]);
-    }
-
-    /**
-     * Listens to multiple events.
-     *
-     * @param type    the event type
-     * @param classes the classes
-     * @param <T>     the type of the event
-     * @return the event reference
-     */
-    public static <T extends Event> @NotNull EventReference<T> listen(@NotNull Class<T> type, @NotNull Class<? extends T>... classes) {
-        return EventReference.of(type, classes);
+        return EventReference.of(type);
     }
 }

@@ -23,6 +23,10 @@ public class EventList {
         this.observers.remove(listener);
     }
 
+    public void remove(EventListener listener) {
+        this.observers.removeIf(wrappedListener -> wrappedListener.getListener().equals(listener));
+    }
+
     void forEach(Consumer<WrappedListener> action) {
         Objects.requireNonNull(action);
         for (var t : this.observers) {
