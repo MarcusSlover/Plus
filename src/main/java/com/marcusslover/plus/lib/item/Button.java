@@ -17,33 +17,51 @@ import java.util.UUID;
 @Data
 @Accessors(fluent = true, chain = true)
 public class Button {
-    private final @NotNull Button.DetectableArea detectableArea; // The area where the button is detectable
+    private @NotNull Button.DetectableArea detectableArea; // The area where the button is detectable
     private @Nullable Item item = null; // The item that represents the button
-    private @Nullable Canvas.ButtonClick buttonClick = null; // The click event of the button
+    private Canvas.ClickContext clickContext; // The click event of the button
 
-    /**
-     * Creates a button with the given coordinates.
-     *
-     * @param y The y coordinate
-     * @param x The x coordinate
-     * @return The button
-     */
-    public static @NotNull Button pos(int y, int x) {
-        return new Button(new DetectableArea(new Vector(x, 0, y), new Vector(x, 0, y)));
+    public @NotNull Button slot(int slot) {
+        int x = transformX(slot);
+        int y = transformY(slot);
+        return this.slot(x, y);
+    }
+
+    public @NotNull Button slot(int x, int y) {
+        return this.slot(x, y, false);
+    }
+
+    public @NotNull Button slot(int min_or_x, int max_or_y, boolean rawSlot) {
+        if (rawSlot) {
+            int x1 = transformX(min_or_x);
+            int y1 = transformY(min_or_x);
+            int x2 = transformX(max_or_y);
+            int y2 = transformY(max_or_y);
+            return this.slot(x1, y1, x2, y2);
+        } else {
+            this.detectableArea = DetectableArea.of(min_or_x, max_or_y);
+            return this;
+        }
+    }
+
+    public @NotNull Button slot(int x1, int y1, int x2, int y2) {
+        int minX = Math.min(x1, x2);
+        int minY = Math.min(y1, y2);
+        int maxX = Math.max(x1, x2);
+        int maxY = Math.max(y1, y2);
+        this.detectableArea = DetectableArea.of(new Vector(minX, 0, minY), new Vector(maxX, 0, maxY));
+        return this;
     }
 
     /**
      * Creates a button with the given coordinates.
-     * Works like {@link #pos(int, int)} but with a range.
      *
-     * @param minY The minimum y coordinate
-     * @param minX The minimum x coordinate
-     * @param maxY The maximum y coordinate
-     * @param maxX The maximum x coordinate
+     * @param x The x coordinate
+     * @param y The y coordinate
      * @return The button
      */
-    public static @NotNull Button pos(int minY, int minX, int maxY, int maxX) {
-        return new Button(new DetectableArea(new Vector(minX, 0, minY), new Vector(maxX, 0, maxY)));
+    public static @NotNull Button create(int x, int y) {
+        return create(x, y, false);
     }
 
     /**
@@ -52,25 +70,46 @@ public class Button {
      * @param slot The slot
      * @return The button
      */
-    public static @NotNull Button slot(int slot) {
-        int y = transformY(slot);
-        int x = transformX(slot);
-        return new Button(new DetectableArea(new Vector(x, 0, y), new Vector(x, 0, y)));
+    public static @NotNull Button create(int slot) {
+        return create(transformX(slot), transformY(slot), true);
     }
 
     /**
      * Creates a button with the given slots.
      *
-     * @param min The minimum slot
-     * @param max The maximum slot
+     * @param min_or_x The minimum slot or minimum x coordinate
+     * @param max_or_y The maximum slot or maximum x coordinate
+     * @param rawSlot  True if the slots are raw slots (0-53) or false if they are x and y coordinates.
      * @return The button
      */
-    public static @NotNull Button field(int min, int max) {
-        int minY = transformY(min);
-        int minX = transformX(min);
-        int maxY = transformY(max);
-        int maxX = transformX(max);
-        return new Button(new DetectableArea(new Vector(minX, 0, minY), new Vector(maxX, 0, maxY)));
+    public static @NotNull Button create(int min_or_x, int max_or_y, boolean rawSlot) {
+        if (rawSlot) {
+            int x1 = transformX(min_or_x);
+            int y1 = transformY(min_or_x);
+            int x2 = transformX(max_or_y);
+            int y2 = transformY(max_or_y);
+            return Button.create(x1, y1, x2, y2);
+        } else {
+            return new Button(DetectableArea.of(min_or_x, max_or_y));
+        }
+    }
+
+    /**
+     * Creates a button with the given coordinates.
+     * Works like {@link #create(int, int)} but with a region.
+     *
+     * @param x1 The minimum x coordinate
+     * @param y1 The minimum y coordinate
+     * @param x2 The maximum x coordinate
+     * @param y2 The maximum y coordinate
+     * @return The button
+     */
+    public static @NotNull Button create(int x1, int y1, int x2, int y2) {
+        int minX = Math.min(x1, x2);
+        int minY = Math.min(y1, y2);
+        int maxX = Math.max(x1, x2);
+        int maxY = Math.max(y1, y2);
+        return new Button(DetectableArea.of(new Vector(minX, 0, minY), new Vector(maxX, 0, maxY)));
     }
 
     /**
@@ -127,6 +166,34 @@ public class Button {
         private final @NotNull Vector min; // two-dimensional array
         private final @NotNull Vector max; // two-dimensional array
         private int size = 0; // for matrix scaling
+
+        /**
+         * Creates a new detectable area with the given vectors.
+         * @param min The minimum vector
+         * @param max The maximum vector
+         */
+        public DetectableArea(@NotNull Vector min, @NotNull Vector max) {
+            this.min = min;
+            this.max = max;
+        }
+
+        /**
+         * Creates a new detectable area with the given coordinates.
+         *
+         * @param x The x coordinate
+         * @param y The y coordinate
+         */
+        public DetectableArea(int x, int y) {
+            this(new Vector(x, 0, y), new Vector(x, 0, y));
+        }
+
+        public static @NotNull DetectableArea of(@NotNull Vector min, @NotNull Vector max) {
+            return new DetectableArea(min, max);
+        }
+
+        public static @NotNull DetectableArea of(int x, int y) {
+            return new DetectableArea(x, y);
+        }
 
         /**
          * Gets the minimum vector.

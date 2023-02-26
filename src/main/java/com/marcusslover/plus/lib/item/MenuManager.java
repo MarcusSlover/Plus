@@ -1,6 +1,7 @@
 package com.marcusslover.plus.lib.item;
 
 import com.marcusslover.plus.lib.events.Events;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -51,15 +52,17 @@ public final class MenuManager {
                     int slot = event.getRawSlot();
                     int size = inventory.getSize();
 
+                    Item item = Item.of(event.getCurrentItem());
+
                     Canvas.GenericClick genericClick = canvas.genericClick();
                     if (genericClick != null) {
-                        genericClick.onClick((Player) event.getWhoClicked(), event, canvas);
+                        genericClick.onClick((Player) event.getWhoClicked(), item, event, canvas);
                     }
 
                     if (slot > size) {
                         Canvas.SelfInventory selfInventory = canvas.selfInventory();
                         if (selfInventory != null) {
-                            selfInventory.onClick((Player) event.getWhoClicked(), event, canvas);
+                            selfInventory.onClick((Player) event.getWhoClicked(), item, event, canvas);
                         }
                         return;
                     }
@@ -69,11 +72,20 @@ public final class MenuManager {
                             .findFirst()
                             .ifPresent(button -> {
                                 Player player = (Player) event.getWhoClicked();
-                                Canvas.ButtonClick buttonClick = button.buttonClick();
-                                if (buttonClick == null) {
+                                Canvas.ClickContext context = button.clickContext();
+                                Canvas.ButtonClick click = context.click();
+                                if (click == null) {
                                     return;
                                 }
-                                buttonClick.onClick(player, event, canvas, button);
+                                try {
+                                    click.onClick(player, item, event);
+                                } catch (Throwable e) {
+                                    if (context.throwableConsumer() != null) {
+                                        context.throwableConsumer().accept(e);
+                                    } else {
+                                        Bukkit.getLogger().warning(e.getMessage());
+                                    }
+                                }
                             });
                 });
             }
@@ -106,6 +118,7 @@ public final class MenuManager {
      * @return the manager
      */
     public @NotNull MenuManager addMenu(@NotNull Menu menu) {
+        menu.hookManager(this);
         this.menus.add(menu);
         return this;
     }
@@ -117,6 +130,7 @@ public final class MenuManager {
      * @return the manager
      */
     public @NotNull MenuManager removeMenu(@NotNull Menu menu) {
+        menu.hookManager(null);
         this.menus.remove(menu);
         return this;
     }
