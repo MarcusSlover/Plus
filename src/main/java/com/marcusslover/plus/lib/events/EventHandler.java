@@ -35,7 +35,7 @@ public class EventHandler implements Listener {
     private final Logger logger;
     private Method notifyMethod;
 
-    public EventHandler(Plugin plugin) {
+    private EventHandler(Plugin plugin) {
         this.plugin = plugin;
         this.logger = Logger.getLogger(plugin.getName().concat("@" + PREFIX));
         handlers.put(plugin, this);
