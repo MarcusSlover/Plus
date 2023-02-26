@@ -2,13 +2,15 @@ package com.marcusslover.plus.lib.item;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
+import com.marcusslover.plus.lib.common.Taggable;
 import com.marcusslover.plus.lib.text.ColorUtil;
 import com.marcusslover.plus.lib.text.Text;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
@@ -23,7 +25,6 @@ import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,31 +34,24 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 @SuppressWarnings({"unused", "UnusedReturnValue"})
-public class Item {
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+public class Item extends Taggable<Item, ItemMeta> {
+
     protected @NotNull ItemStack itemStack;
 
-    public Item() {
-        this(Material.STONE);
+    private Item(@NotNull Material material, int amount) {
+        this(new ItemStack(material, amount));
     }
 
-    public Item(@NotNull Material material) {
-        this(material, 1);
-    }
-
-    public Item(@NotNull Material material, int amount) {
-        this.itemStack = new ItemStack(material, amount);
-    }
-
-    public Item(@NotNull Material material, int amount, @Nullable Text name) {
+    private Item(@NotNull Material material, int amount, @Nullable Text name) {
         this(material, amount);
         this.name(name);
     }
 
-    public Item(@NotNull Material material, int amount, @Nullable Text name, @Nullable List<@NotNull Text> lore) {
+    private Item(@NotNull Material material, int amount, @Nullable Text name, @Nullable List<@NotNull Text> lore) {
         this(material, amount);
         this.name(name);
 
@@ -66,51 +60,15 @@ public class Item {
         }
     }
 
-    public Item(@NotNull Material material, int amount, @Nullable String name) {
+    private Item(@NotNull Material material, int amount, @Nullable String name) {
         this(material, amount);
         this.name(name);
     }
 
-    public Item(@NotNull Material material, int amount, @Nullable String name, @Nullable List<@NotNull String> lore) {
+    private Item(@NotNull Material material, int amount, @Nullable String name, @Nullable List<@NotNull String> lore) {
         this(material, amount);
         this.name(name);
         this.lore(lore);
-    }
-
-    public Item(@Nullable ItemStack itemStack) {
-        this.itemStack = itemStack == null ? new ItemStack(Material.AIR) : itemStack;
-    }
-
-    public static @NotNull Item of() {
-        return new Item();
-    }
-
-    public static @NotNull Item of(@NotNull Material material) {
-        return new Item(material);
-    }
-
-    public static @NotNull Item of(@NotNull Material material, int amount) {
-        return new Item(material, amount);
-    }
-
-    public static @NotNull Item of(@NotNull Material material, int amount, @Nullable Text name) {
-        return new Item(material, amount, name);
-    }
-
-    public static @NotNull Item of(@NotNull Material material, int amount, @Nullable Text name, @Nullable List<@NotNull Text> lore) {
-        return new Item(material, amount, name, lore);
-    }
-
-    public static @NotNull Item of(@NotNull Material material, int amount, @Nullable String name) {
-        return new Item(material, amount, name);
-    }
-
-    public static @NotNull Item of(@NotNull Material material, int amount, @Nullable String name, @Nullable List<@NotNull String> lore) {
-        return new Item(material, amount, name, lore);
-    }
-
-    public static @NotNull Item of(@Nullable ItemStack itemStack) {
-        return new Item(itemStack);
     }
 
     public boolean isValid() {
@@ -338,100 +296,6 @@ public class Item {
         return this.meta().getPersistentDataContainer();
     }
 
-    public boolean hasTag(@NotNull String key) {
-        if (this.meta() == null) {
-            return false;
-        }
-
-        PersistentDataContainer p = this.meta().getPersistentDataContainer();
-        NamespacedKey n = new NamespacedKey("plus", key);
-        return p.has(n);
-    }
-
-    public @NotNull Item setTag(@NotNull String key, @NotNull String value) {
-        this.meta(itemMeta -> {
-            PersistentDataContainer p = itemMeta.getPersistentDataContainer();
-            NamespacedKey n = new NamespacedKey("plus", key);
-            p.set(n, PersistentDataType.STRING, value);
-        });
-        return this;
-    }
-
-    public @NotNull String getTag(@NotNull String key, @NotNull String defaultValue) {
-        AtomicReference<String> v = new AtomicReference<>(defaultValue);
-        this.meta(itemMeta -> {
-            PersistentDataContainer p = itemMeta.getPersistentDataContainer();
-            NamespacedKey n = new NamespacedKey("plus", key);
-            if (p.has(n)) {
-                v.set(p.get(n, PersistentDataType.STRING));
-            }
-        });
-        return v.get();
-    }
-
-    public @NotNull Item setTag(@NotNull String key, @NotNull Integer value) {
-        this.meta(itemMeta -> {
-            PersistentDataContainer p = itemMeta.getPersistentDataContainer();
-            NamespacedKey n = new NamespacedKey("plus", key);
-            p.set(n, PersistentDataType.INTEGER, value);
-        });
-        return this;
-    }
-
-    public @NotNull Item setTag(@NotNull String key, @NotNull Long value) {
-        this.meta(itemMeta -> {
-            PersistentDataContainer p = itemMeta.getPersistentDataContainer();
-            NamespacedKey n = new NamespacedKey("plus", key);
-            p.set(n, PersistentDataType.LONG, value);
-        });
-        return this;
-    }
-
-
-    public @NotNull Integer getTag(@NotNull String key, @NotNull Integer defaultValue) {
-        AtomicReference<Integer> v = new AtomicReference<>(defaultValue);
-        this.meta(itemMeta -> {
-            PersistentDataContainer p = itemMeta.getPersistentDataContainer();
-            NamespacedKey n = new NamespacedKey("plus", key);
-            if (p.has(n)) {
-                v.set(p.get(n, PersistentDataType.INTEGER));
-            }
-        });
-        return v.get();
-    }
-
-    public @NotNull Item setTag(@NotNull String key, @NotNull Double value) {
-        this.meta(itemMeta -> {
-            PersistentDataContainer p = itemMeta.getPersistentDataContainer();
-            NamespacedKey n = new NamespacedKey("plus", key);
-            p.set(n, PersistentDataType.DOUBLE, value);
-        });
-        return this;
-    }
-
-    public @NotNull Double getTag(@NotNull String key, @NotNull Double defaultValue) {
-        AtomicReference<Double> v = new AtomicReference<>(defaultValue);
-        this.meta(itemMeta -> {
-            PersistentDataContainer p = itemMeta.getPersistentDataContainer();
-            NamespacedKey n = new NamespacedKey("plus", key);
-            if (p.has(n)) {
-                v.set(p.get(n, PersistentDataType.DOUBLE));
-            }
-        });
-        return v.get();
-    }
-
-    public @NotNull Long getTag(@NotNull String key, @NotNull Long defaultValue) {
-        AtomicReference<Long> v = new AtomicReference<>(defaultValue);
-        this.meta(itemMeta -> {
-            PersistentDataContainer p = itemMeta.getPersistentDataContainer();
-            NamespacedKey n = new NamespacedKey("plus", key);
-            if (p.has(n)) {
-                v.set(p.get(n, PersistentDataType.LONG));
-            }
-        });
-        return v.get();
-    }
 
     public boolean hasCustomModelData() {
         ItemMeta itemMeta = this.itemStack.getItemMeta();
@@ -481,7 +345,7 @@ public class Item {
             if (component == null) {
                 return null;
             }
-            return new Text(component);
+            return Text.of(component);
         }
         return null;
     }
@@ -559,18 +423,21 @@ public class Item {
         return encoder.encode(String.format("{textures:{SKIN:{url:\"%s\"}}}", url).getBytes());
     }
 
+    @Override
     public @NotNull Item meta(@NotNull Consumer<@NotNull ItemMeta> meta) {
         this.itemStack.editMeta(meta);
         return this;
     }
 
+    @Override
+    public @Nullable ItemMeta meta() {
+        return this.itemStack.getItemMeta();
+    }
+
+    @Override
     public @NotNull Item meta(@NotNull ItemMeta meta) {
         this.itemStack.setItemMeta(meta);
         return this;
-    }
-
-    public ItemMeta meta() {
-        return this.itemStack.getItemMeta();
     }
 
     public @NotNull ItemStack get() {
@@ -597,5 +464,47 @@ public class Item {
         }
 
         return super.equals(obj);
+    }
+
+    /* Static Constructors */
+    public static @NotNull Item of() {
+        return new Item(Material.STONE, 1);
+    }
+
+    public static @NotNull Item of(@NotNull Material material) {
+        return new Item(material, 1);
+    }
+
+    public static @NotNull Item of(@NotNull Material material, int amount) {
+        return new Item(material, amount);
+    }
+
+    public static @NotNull Item of(@NotNull Material material, int amount, @Nullable Text name) {
+        return new Item(material, amount, name);
+    }
+
+    public static @NotNull Item of(@NotNull Material material, int amount, @Nullable Text name, @Nullable List<@NotNull Text> lore) {
+        return new Item(material, amount, name, lore);
+    }
+
+    public static @NotNull Item of(@NotNull Material material, int amount, @Nullable String name) {
+        return new Item(material, amount, name);
+    }
+
+    public static @NotNull Item of(@NotNull Material material, int amount, @Nullable String name, @Nullable List<@NotNull String> lore) {
+        return new Item(material, amount, name, lore);
+    }
+
+    public static @NotNull Item of(@Nullable ItemStack itemStack) {
+        if (itemStack == null) {
+            return Item.of();
+        } else {
+            return new Item(itemStack);
+        }
+    }
+
+    @Override
+    protected @NotNull Item holder() {
+        return this;
     }
 }
