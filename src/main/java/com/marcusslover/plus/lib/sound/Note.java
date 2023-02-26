@@ -1,7 +1,10 @@
 package com.marcusslover.plus.lib.sound;
 
 import com.marcusslover.plus.lib.common.ISendable;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.key.Key;
@@ -12,6 +15,7 @@ import org.jetbrains.annotations.NotNull;
 
 @Data
 @Accessors(fluent = true)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Note implements ISendable<Note> {
     protected final Sound sound;
 

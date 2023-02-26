@@ -8,49 +8,52 @@ import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static net.kyori.adventure.title.Title.Times;
+import static net.kyori.adventure.title.Title.title;
+
 public class Title implements ISendable<Title> {
-    private static final net.kyori.adventure.title.Title.Times TIMES =
-            net.kyori.adventure.title.Title.Times.times(
-                    Ticks.duration(10),
-                    Ticks.duration(40),
-                    Ticks.duration(10));
+    private static final Times DEFAULT_TIMES = Times.times(
+            Ticks.duration(10),
+            Ticks.duration(40),
+            Ticks.duration(10)
+    );
 
     protected final @NotNull Text title;
     protected final @NotNull Text subtitle;
-    protected net.kyori.adventure.title.Title.Times times = TIMES;
+    protected Times times = DEFAULT_TIMES;
 
-    public Title(@NotNull String title) {
+    private Title(@NotNull String title) {
         this(title, "");
     }
 
-    public Title(@NotNull Text text) {
+    private Title(@NotNull Text text) {
         this(text, Text.empty());
     }
 
-    public Title(@NotNull String title, @NotNull String subtitle) {
-        this(new Text(title), new Text(subtitle));
+    private Title(@NotNull String title, @NotNull String subtitle) {
+        this(Text.of(title), Text.of(subtitle));
     }
 
-    public Title(@NotNull Text title, @NotNull Text subtitle) {
+    private Title(@NotNull Text title, @NotNull Text subtitle) {
         this.title = title;
         this.subtitle = subtitle;
     }
 
     public net.kyori.adventure.title.Title adventure() {
-        return net.kyori.adventure.title.Title.title(
+        return title(
                 this.title.comp(),
                 this.subtitle.comp(),
                 this.times
         );
     }
 
-    public Title times(@NotNull net.kyori.adventure.title.Title.Times times) {
+    public Title times(@NotNull Times times) {
         this.times = times;
         return this;
     }
 
     public Title times(int fadeIn, int stay, int fadeOut) {
-        this.times = net.kyori.adventure.title.Title.Times.times(
+        this.times = Times.times(
                 Ticks.duration(fadeIn),
                 Ticks.duration(stay),
                 Ticks.duration(fadeOut)
@@ -60,7 +63,7 @@ public class Title implements ISendable<Title> {
     }
 
     public @NotNull Title times(long fadeIn, long stay, long fadeOut) {
-        this.times = net.kyori.adventure.title.Title.Times.times(
+        this.times = Times.times(
                 Ticks.duration(fadeIn),
                 Ticks.duration(stay),
                 Ticks.duration(fadeOut)
@@ -70,8 +73,8 @@ public class Title implements ISendable<Title> {
     }
 
     public @NotNull Title send(@NotNull CommandSender player, long fadeIn, long fadeStay, long fadeOut) {
-        net.kyori.adventure.title.Title.Times of = net.kyori.adventure.title.Title.Times.times(Ticks.duration(fadeIn), Ticks.duration(fadeStay), Ticks.duration(fadeOut));
-        player.showTitle(net.kyori.adventure.title.Title.title(
+        Times of = Times.times(Ticks.duration(fadeIn), Ticks.duration(fadeStay), Ticks.duration(fadeOut));
+        player.showTitle(title(
                 this.title.comp(),
                 this.subtitle.comp(),
                 of
@@ -80,8 +83,8 @@ public class Title implements ISendable<Title> {
         return this;
     }
 
-    public @NotNull Title send(@NotNull CommandSender player, @Nullable net.kyori.adventure.title.Title.Times times) {
-        player.showTitle(net.kyori.adventure.title.Title.title(
+    public @NotNull Title send(@NotNull CommandSender player, @Nullable Times times) {
+        player.showTitle(title(
                 this.title.comp(),
                 this.subtitle.comp(),
                 times

@@ -62,7 +62,7 @@ public final class MenuManager implements Listener {
     }
 
     public @NotNull Menu createMenu(int size, @Nullable String name) {
-        return this.createMenu(size, (name == null) ? null : new Text(name));
+        return this.createMenu(size, (name == null) ? null : Text.of(name));
     }
 
     public @NotNull Menu createMenu(int size, @Nullable Text text) {

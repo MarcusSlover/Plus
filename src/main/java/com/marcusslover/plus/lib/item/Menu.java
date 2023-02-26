@@ -36,7 +36,7 @@ public class Menu implements ISendable<Menu> {
     }
 
     Menu(int size, @Nullable String name) {
-        this(size, (name == null) ? null : new Text(name));
+        this(size, (name == null) ? null : Text.of(name));
     }
 
     Menu(int size, @Nullable Text text) {
