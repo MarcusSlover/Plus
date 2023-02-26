@@ -1,9 +1,6 @@
 package com.marcusslover.plus.lib;
 
 import com.marcusslover.plus.PlusPlugin;
-import com.marcusslover.plus.lib.sound.Note;
-import net.kyori.adventure.key.Key;
-import net.kyori.adventure.sound.Sound;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 

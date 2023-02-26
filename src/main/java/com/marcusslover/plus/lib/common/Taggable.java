@@ -24,7 +24,7 @@ public abstract class Taggable<V extends IMetaContainer<V, P>, P extends Persist
         return p.has(n, type);
     }
 
-    public @NotNull <K> V setTag(@NotNull String key, @NotNull PersistentDataType<K, K> type, @NotNull K value) {
+    public @NotNull <K> V setTag(@NotNull String key, @NotNull K value, @NotNull PersistentDataType<K, K> type) {
         this.holder().meta(itemMeta -> {
             PersistentDataContainer p = itemMeta.getPersistentDataContainer();
             NamespacedKey n = new NamespacedKey("plus", key);
