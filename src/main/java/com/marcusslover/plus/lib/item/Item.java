@@ -481,7 +481,7 @@ public class Item {
             if (component == null) {
                 return null;
             }
-            return new Text(component);
+            return Text.of(component);
         }
         return null;
     }
