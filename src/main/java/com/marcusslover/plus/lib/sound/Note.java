@@ -56,4 +56,16 @@ public class Note implements ISendable<Note> {
     public static Note of(@NotNull String sound, float volume, float pitch, Sound.Source source) {
         return new Note(Sound.sound(Key.key(sound), source, volume, pitch));
     }
+
+    public static Note of(@NotNull Key key) {
+        return new Note(Sound.sound(key, Sound.Source.MASTER, 1F, 1F));
+    }
+
+    public static Note of(@NotNull Key key, float volume, float pitch) {
+        return new Note(Sound.sound(key, Sound.Source.MASTER, volume, pitch));
+    }
+
+    public static Note of(@NotNull Key key, float volume, float pitch, Sound.Source source) {
+        return new Note(Sound.sound(key, source, volume, pitch));
+    }
 }
