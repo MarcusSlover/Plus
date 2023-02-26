@@ -7,10 +7,8 @@ on:
   push:
     branches: [ master ]
   pull_request:
-    branches:
-        - master
-        - 4.0
-    types: [ ready_for_review, opened ]
+    branches: [ 'master', 'main', '4.0', 'release/**' ]
+    types: [ opened, synchronize, reopened ]
 
 
 jobs:
