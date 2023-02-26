@@ -1,12 +1,13 @@
 package com.marcusslover.plus.lib.text;
 
 import com.marcusslover.plus.lib.common.ISendable;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
-import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -17,6 +18,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Text implements ISendable<Text> {
     private static final @NotNull LegacyComponentSerializer LEGACY = LegacyComponentSerializer.builder()
             .hexColors()
@@ -24,42 +26,15 @@ public class Text implements ISendable<Text> {
             .build();
 
     protected @NotNull String text;
-
     protected @NotNull Component component;
 
-    public Text() {
-        this("");
-    }
-
-    public Text(@NotNull String text) {
+    private Text(@NotNull String text) {
         // Colorize the raw text before deserialization
         this(ColorUtil.hex(text), LEGACY.deserialize(ColorUtil.hex(text)));
     }
 
-    public Text(@NotNull Component component) {
+    private Text(@NotNull Component component) {
         this(LEGACY.serialize(component), component);
-    }
-
-    public Text(@NotNull String text, @NotNull Component component) {
-        this.text = text;
-        this.component = component.decoration(TextDecoration.ITALIC, false);
-    }
-
-    @Deprecated
-    public static @NotNull List<@NotNull Text> list(@NotNull List<@NotNull Component> lore) {
-        return lore.stream().map(Text::new).collect(Collectors.toList());
-    }
-
-    public static @NotNull String legacy(@NotNull String text) {
-        return ColorUtil.color('&', text);
-    }
-
-    public static @NotNull Text empty() {
-        return new Text("");
-    }
-
-    public static @NotNull Text reset() {
-        return new Text("&f");
     }
 
     public @NotNull Text hover(@Nullable Text hover) {
@@ -126,13 +101,13 @@ public class Text implements ISendable<Text> {
         return this;
     }
 
-    public @NotNull <T extends CommandSender> Text sendActionBar(@NotNull T target) {
-        target.sendActionBar(this.comp());
+    public @NotNull Text sendActionBar(@NotNull Audience audience) {
+        audience.sendActionBar(this.comp());
         return this;
     }
 
-    public @NotNull Text sendActionBar(@NotNull Audience audience) {
-        audience.sendActionBar(this.comp());
+    public @NotNull <T extends CommandSender> Text sendActionBar(@NotNull T target) {
+        target.sendActionBar(this.comp());
         return this;
     }
 
@@ -165,5 +140,24 @@ public class Text implements ISendable<Text> {
 
     public static @NotNull Text of(@NotNull Component component) {
         return new Text(component);
+    }
+
+    /* Static Methods */
+
+    @Deprecated
+    public static @NotNull List<@NotNull Text> list(@NotNull List<@NotNull Component> lore) {
+        return lore.stream().map(Text::new).collect(Collectors.toList());
+    }
+
+    public static @NotNull String legacy(@NotNull String text) {
+        return ColorUtil.color('&', text);
+    }
+
+    public static @NotNull Text empty() {
+        return new Text("");
+    }
+
+    public static @NotNull Text reset() {
+        return new Text("&f");
     }
 }
