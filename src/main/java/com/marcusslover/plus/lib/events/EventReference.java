@@ -2,7 +2,6 @@ package com.marcusslover.plus.lib.events;
 
 import com.marcusslover.plus.lib.lifecycle.ILifeCycle;
 import lombok.AccessLevel;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -14,24 +13,21 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
-@Data()
 @Accessors(fluent = true, chain = true)
-@Getter(AccessLevel.PACKAGE)
-@Setter(AccessLevel.PACKAGE)
 public class EventReference<T extends Event> implements ILifeCycle<EventReference<T>> {
-    private final @NotNull Class<T> base;
 
     @Getter(AccessLevel.PUBLIC) @Setter(AccessLevel.NONE)
-    private EventListener listener = null;
+    private @Nullable EventListener listener = null;
+
     @Getter(AccessLevel.PUBLIC) @Setter(AccessLevel.PUBLIC)
     private @NotNull EventPriority priority = EventPriority.NORMAL;
-    @Setter(AccessLevel.PUBLIC)
+
+    @Getter(AccessLevel.PUBLIC) @Setter(AccessLevel.PUBLIC)
     private @Nullable Consumer<T> handler = null;
 
-    private Plugin plugin;
+    private @Nullable Plugin plugin;
 
-    public EventReference(@NotNull Class<T> base) {
-        this.base = base;
+    private EventReference(@NotNull Class<T> base) {
     }
 
     @Override
@@ -48,7 +44,7 @@ public class EventReference<T extends Event> implements ILifeCycle<EventReferenc
     /**
      * Register the event. This must be the final method called similarly to build() methods.
      *
-     * @return
+     * @return the event reference
      */
     public EventReference<T> bind(@NotNull Plugin plugin) {
         if (this.plugin != null || this.listener != null) {
