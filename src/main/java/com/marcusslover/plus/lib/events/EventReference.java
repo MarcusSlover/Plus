@@ -51,6 +51,10 @@ public class EventReference<T extends Event> implements ILifeCycle<EventReferenc
             throw new IllegalStateException("Event has already been bound.");
         }
 
+        if (this.handler == null) {
+            throw new IllegalStateException("Event handler is not set.");
+        }
+
         this.plugin = plugin;
 
         var handle = EventHandler.get(plugin);
