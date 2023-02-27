@@ -22,15 +22,16 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class EventHandler implements Listener {
     private static final String PREFIX = "EventHandler";
     private static final Map<Plugin, EventHandler> handlers = new ConcurrentHashMap<>();
 
-    private final Map<Class<? extends org.bukkit.event.Event>, EventList> subscribers = new ConcurrentHashMap<>();
+    private final Map<EventPriority, Map<Class<? extends org.bukkit.event.Event>, EventList>> subscribers = new ConcurrentHashMap<>();
     private final Map<EventListener, Set<EventList>> referenceMap = new ConcurrentHashMap<>();
 
-    private final Set<Class<? extends org.bukkit.event.Event>> injectedEvents = new HashSet<>();
+    private final Map<EventPriority, Set<Class<? extends org.bukkit.event.Event>>> injectedEvents = new ConcurrentHashMap<>();
     private final Plugin plugin;
     private final Logger logger;
     private Method notifyMethod;
@@ -38,7 +39,6 @@ public class EventHandler implements Listener {
     private EventHandler(Plugin plugin) {
         this.plugin = plugin;
         this.logger = Logger.getLogger(plugin.getName().concat("@" + PREFIX));
-        handlers.put(plugin, this);
     }
 
     /**
@@ -62,7 +62,7 @@ public class EventHandler implements Listener {
             methods.addAll(Arrays.asList(publicMethods));
             methods.addAll(Arrays.asList(privateMethods));
         } catch (NoClassDefFoundError e) {
-            this.logger.severe(PREFIX + "Failed to register events for " + observer.getClass() + " because " + e.getMessage() + " does not exist.");
+            this.logger.severe("Failed to register events for " + observer.getClass() + " because " + e.getMessage() + " does not exist.");
             return observer;
         }
 
@@ -76,7 +76,7 @@ public class EventHandler implements Listener {
             }
             final Class<?> checkClass;
             if (method.getParameterTypes().length != 1 || !org.bukkit.event.Event.class.isAssignableFrom(checkClass = method.getParameterTypes()[0])) {
-                this.logger.severe(PREFIX + "attempted to register an invalid CustomEvents method signature \"" + method.toGenericString() + "\" in " + observer.getClass());
+                this.logger.severe("Attempted to register an invalid CustomEvents method signature \"" + method.toGenericString() + "\" in " + observer.getClass());
                 continue;
             }
             final Class<? extends org.bukkit.event.Event> eventClass = checkClass.asSubclass(org.bukkit.event.Event.class);
@@ -92,8 +92,7 @@ public class EventHandler implements Listener {
                     this.logger.log(
                             Level.WARNING,
                             String.format(
-                                    "%s\"%s\" has registered a listener for %s on method \"%s\", but the event is Deprecated. \"%s\"; please notify the authors %s.",
-                                    PREFIX,
+                                    "\"%s\" has registered a listener for %s on method \"%s\", but the event is Deprecated. \"%s\"; please notify the authors %s.",
                                     this.plugin.getDescription().getFullName(),
                                     clazz.getName(),
                                     method.toGenericString(),
@@ -105,7 +104,7 @@ public class EventHandler implements Listener {
             }
 
             try {
-                var list = this.getSubscribers(eventClass, eh.async());
+                var list = this.getSubscribers(eventClass, eh.injectionPriority(), eh.async());
 
                 list.add(WrappedListener.of(observer, MethodHandles.lookup().unreflect(method), eh.priority(), eh.ignoreCancelled()));
                 /* Easy link for the event listener to access the EventList it is part of */
@@ -115,88 +114,66 @@ public class EventHandler implements Listener {
             }
 
             /* Check for event injection */
-            if (eh.inject() && !this.injectedEvents.contains(eventClass)) {
-                /* Inject event into this event bus allowing this class to notify observers */
-                try {
-                    if (this.notifyMethod == null) {
-                        this.notifyMethod = this.getClass().getMethod("notify", org.bukkit.event.Event.class);
-                    }
-
-                    Bukkit.getPluginManager().registerEvent(
-                            eventClass,
-                            this,
-                            eh.injectionPriority(),
-                            new MethodHandleEventExecutor(eventClass, MethodHandles.lookup().unreflect(this.notifyMethod)),
-                            this.plugin,
-                            eh.async());
-
-                    this.injectedEvents.add(eventClass);
-
-                    this.logger.warning(PREFIX + "Injecting Event: " + eventClass.getName());
-                } catch (Exception e) {
-                    SneakyThrow.sneaky(e);
-                }
+            if (eh.inject() && !(this.injectedEvents.computeIfAbsent(eh.injectionPriority(), k -> new HashSet<>()).contains(eventClass))) {
+                this.injectEvent(eventClass, eh.injectionPriority(), eh.async());
             }
         }
 
         return observer;
     }
 
-    public <T extends org.bukkit.event.Event> EventListener subscribe(EventReference<T> reference) {
-        EventListener registeredEvent = null;
+    private void injectEvent(Class<? extends org.bukkit.event.Event> eventClass, EventPriority priority, boolean async) {
+        var mapped = this.injectedEvents.computeIfAbsent(priority, k -> new HashSet<>());
 
-        switch (reference.priority()) {
-            case LOWEST -> registeredEvent = this.subscribe(new EventListener() {
-                @Event(injectionPriority = EventPriority.LOWEST)
-                public void onEvent(T event) {
-                    if (reference.handler() != null) {
-                        reference.handler().accept(event);
-                    }
-                }
-            });
-            case LOW -> registeredEvent = this.subscribe(new EventListener() {
-                @Event(injectionPriority = EventPriority.LOW)
-                public void onEvent(T event) {
-                    if (reference.handler() != null) {
-                        reference.handler().accept(event);
-                    }
-                }
-            });
-            case NORMAL -> registeredEvent = this.subscribe(new EventListener() {
-                @Event(injectionPriority = EventPriority.NORMAL)
-                public void onEvent(T event) {
-                    if (reference.handler() != null) {
-                        reference.handler().accept(event);
-                    }
-                }
-            });
-            case HIGH -> registeredEvent = this.subscribe(new EventListener() {
-                @Event(injectionPriority = EventPriority.HIGH)
-                public void onEvent(T event) {
-                    if (reference.handler() != null) {
-                        reference.handler().accept(event);
-                    }
-                }
-            });
-            case HIGHEST -> registeredEvent = this.subscribe(new EventListener() {
-                @Event(injectionPriority = EventPriority.HIGHEST)
-                public void onEvent(T event) {
-                    if (reference.handler() != null) {
-                        reference.handler().accept(event);
-                    }
-                }
-            });
-            case MONITOR -> registeredEvent = this.subscribe(new EventListener() {
-                @Event(injectionPriority = EventPriority.MONITOR)
-                public void onEvent(T event) {
-                    if (reference.handler() != null) {
-                        reference.handler().accept(event);
-                    }
-                }
-            });
+        for (var event : this.injectedEvents.values().stream().flatMap(Collection::stream).toList()) {
+            /* TODO Ask marcus what to do here since BUKKIT hates everyone */
+
+            if (event.isAssignableFrom(eventClass)) {
+                return;
+            }
         }
 
-        return registeredEvent;
+        if (mapped.contains(eventClass)) {
+            return;
+        }
+
+        /* Inject event into this event bus allowing this class to notify observers */
+        try {
+            if (this.notifyMethod == null) {
+                this.notifyMethod = this.getClass().getMethod("notify", org.bukkit.event.Event.class);
+            }
+
+            Bukkit.getPluginManager().registerEvent(
+                    eventClass,
+                    this,
+                    priority,
+                    new MethodHandleEventExecutor(eventClass, MethodHandles.lookup().unreflect(this.notifyMethod)),
+                    this.plugin,
+                    async);
+
+            mapped.add(eventClass);
+
+            this.logger.warning("Injecting Event: " + eventClass.getName() + " with priority: " + priority.name() + " and async: " + async);
+        } catch (Exception e) {
+            SneakyThrow.sneaky(e);
+        }
+    }
+
+    public <T extends org.bukkit.event.Event> EventListener subscribe(EventReference<T> reference, boolean async) {
+        var registeredEvent = WrappedListener.of(reference);
+        var subs = this.getSubscribers(reference.base(), reference.priority(), async);
+        subs.add(registeredEvent);
+
+        if (!this.injectedEvents.containsKey(reference.priority())) {
+            this.injectedEvents.put(reference.priority(), new HashSet<>());
+        }
+
+        if (!this.injectedEvents.get(reference.priority()).contains(reference.base())) {
+            /* Event is not injected yet */
+            this.injectEvent(reference.base(), reference.priority(), async);
+        }
+
+        return registeredEvent.getListener();
     }
 
     /**
@@ -206,25 +183,30 @@ public class EventHandler implements Listener {
      * @param <T>   The type of event.
      */
     public <T extends org.bukkit.event.Event> void notify(T event) {
-        this.getSubscribers(event)
-                .sort()
-                .forEach(wrapped -> {
-                    try {
-                        var handler = wrapped.getMethodHandle();
-                        var listener = wrapped.getListener();
-                        var ignoreCancelled = wrapped.isIgnoreCancelled();
+        for (var priority : EventPriority.values()) {
+            var subs = this.getSubscribers(event, priority);
 
-                        if (event instanceof Cancellable cancellable) {
-                            if (cancellable.isCancelled() && !ignoreCancelled) {
-                                return;
+//            this.logger.warning("Notifying " + subs.size() + " subscribers for " + event.getEventName() + " with priority " + priority);
+
+            subs.sort()
+                    .forEach(wrapped -> {
+                        try {
+                            var handler = wrapped.getMethodHandle();
+                            var listener = wrapped.getListener();
+                            var ignoreCancelled = wrapped.isIgnoreCancelled();
+
+                            if (event instanceof Cancellable cancellable) {
+                                if (cancellable.isCancelled() && !ignoreCancelled) {
+                                    return;
+                                }
                             }
-                        }
 
-                        handler.invoke(listener, event);
-                    } catch (Throwable t) {
-                        SneakyThrow.sneaky(t);
-                    }
-                });
+                            handler.invoke(listener, event);
+                        } catch (Throwable t) {
+                            SneakyThrow.sneaky(t);
+                        }
+                    });
+        }
     }
 
     /**
@@ -235,7 +217,7 @@ public class EventHandler implements Listener {
     public <T extends org.bukkit.event.Event> void unsubscribe(Class<T> event) {
         this.subscribers.remove(event);
 
-        this.logger.warning(PREFIX + "Unsubscribing Event: " + event.getCanonicalName());
+        this.logger.warning("Unsubscribing Event: " + event.getCanonicalName());
     }
 
     /**
@@ -255,7 +237,7 @@ public class EventHandler implements Listener {
      * @return The registered event classes.
      */
     public Collection<Class<? extends org.bukkit.event.Event>> getSubscribedEvents() {
-        return this.subscribers.keySet();
+        return this.subscribers.values().stream().map(Map::keySet).flatMap(Collection::stream).collect(Collectors.toSet());
     }
 
     /**
@@ -264,12 +246,14 @@ public class EventHandler implements Listener {
      * @param event The event to obtain observers for.
      * @return The observer list.
      */
-    public <T extends org.bukkit.event.Event> EventList getSubscribers(T event) {
-        return this.getSubscribers(event.getClass(), event.isAsynchronous());
+    public <T extends org.bukkit.event.Event> EventList getSubscribers(T event, EventPriority priority) {
+        return this.getSubscribers(event.getClass(), priority, event.isAsynchronous());
     }
 
-    <T extends org.bukkit.event.Event> EventList getSubscribers(Class<T> eventClass, boolean async) {
-        return this.subscribers.computeIfAbsent(eventClass, k -> new EventList(async));
+    <T extends org.bukkit.event.Event> EventList getSubscribers(Class<T> eventClass, EventPriority priority, boolean async) {
+        var map = this.subscribers.computeIfAbsent(priority, k -> new ConcurrentHashMap<>());
+
+        return map.computeIfAbsent(eventClass, k -> new EventList(async));
     }
 
     /**

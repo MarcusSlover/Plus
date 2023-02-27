@@ -54,4 +54,8 @@ public class EventList {
 
         return this;
     }
+
+    public int size() {
+        return this.observers.size();
+    }
 }

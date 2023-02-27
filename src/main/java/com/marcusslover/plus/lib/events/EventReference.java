@@ -15,6 +15,8 @@ import java.util.function.Consumer;
 
 @Accessors(fluent = true, chain = true)
 public class EventReference<T extends Event> implements ILifeCycle<EventReference<T>> {
+    @Getter(AccessLevel.PACKAGE) @Setter(AccessLevel.NONE)
+    private final @NotNull Class<T> base;
 
     @Getter(AccessLevel.PUBLIC) @Setter(AccessLevel.NONE)
     private @Nullable EventListener listener = null;
@@ -23,11 +25,16 @@ public class EventReference<T extends Event> implements ILifeCycle<EventReferenc
     private @NotNull EventPriority priority = EventPriority.NORMAL;
 
     @Getter(AccessLevel.PUBLIC) @Setter(AccessLevel.PUBLIC)
+    private boolean ignoreCancelled = false;
+
+    @Getter(AccessLevel.PUBLIC) @Setter(AccessLevel.PUBLIC)
     private @Nullable Consumer<T> handler = null;
 
     private @Nullable Plugin plugin;
+    private boolean async = false;
 
     private EventReference(@NotNull Class<T> base) {
+        this.base = base;
     }
 
     @Override
@@ -39,6 +46,11 @@ public class EventReference<T extends Event> implements ILifeCycle<EventReferenc
         var handle = EventHandler.get(this.plugin);
 
         handle.unsubscribe(this.listener);
+    }
+
+    public EventReference<T> async() {
+        this.async = true;
+        return this;
     }
 
     /**
@@ -59,7 +71,7 @@ public class EventReference<T extends Event> implements ILifeCycle<EventReferenc
 
         var handle = EventHandler.get(plugin);
 
-        this.listener = handle.subscribe(this);
+        this.listener = handle.subscribe(this, this.async);
 
         return this;
     }
