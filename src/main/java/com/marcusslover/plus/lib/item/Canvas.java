@@ -26,8 +26,8 @@ public class Canvas {
     private @NotNull Integer rows; // 1-6 (using non-primitive to allow @NotNull for the constructor)
     private @Nullable Component title;
     private @Nullable Inventory assosiatedInventory = null;
-    private @Nullable GenericClick genericClick = null;
-    private @Nullable SelfInventory selfInventory = null;
+    private @Nullable ClickContext genericClick = null;
+    private @Nullable ClickContext selfInventory = null;
     private @Nullable Canvas.PopulatorContext.ViewStrategy viewStrategy = null;
 
     // buttons of the canvas
@@ -87,6 +87,28 @@ public class Canvas {
     }
 
     /**
+     * Set the self inventory action.
+     * This action is called when the player clicks on the inventory.
+     * @param selfInventory the self inventory action
+     * @return the click context associated with the self inventory action
+     */
+    public @NotNull ClickContext selfInventory(@Nullable Canvas.SelfInventoryClick selfInventory) {
+        this.selfInventory = new ClickContext(this, selfInventory);
+        return this.selfInventory;
+    }
+
+    /**
+     * Set the generic click action.
+     * This action is called when the player clicks on the inventory.
+     * @param genericClick the generic click action
+     * @return the click context associated with the generic click action
+     */
+    public @NotNull ClickContext genericClick(@Nullable Canvas.GenericClick genericClick) {
+        this.genericClick = new ClickContext(this, genericClick);
+        return this.genericClick;
+    }
+
+    /**
      * Add a button to the canvas.
      *
      * @param button      the button
@@ -95,7 +117,7 @@ public class Canvas {
      */
     public @NotNull ClickContext button(@NotNull Button button, @Nullable Canvas.ButtonClick buttonClick) {
         this.buttons.add(button);
-        ClickContext context = new ClickContext(buttonClick);
+        ClickContext context = new ClickContext(this, buttonClick);
         button.clickContext(context);
         return context;
     }
@@ -124,6 +146,10 @@ public class Canvas {
         private final @NotNull List<T> elements;
         private @Nullable ViewStrategy viewStrategy = null;
 
+        /*Page manipulation*/
+        private @Nullable Button pageForwards = null;
+        private @Nullable Button pageBackwards = null;
+
         /**
          * Set the view strategy.
          * Works only with the default view strategies.
@@ -132,6 +158,10 @@ public class Canvas {
          * @return the populator context
          */
         public @NotNull PopulatorContext<T> viewStrategy(@Nullable DefaultViewStrategy defaultViewStrategy) {
+            if (defaultViewStrategy == null) {
+                this.viewStrategy = null;
+                return this;
+            }
             this.viewStrategy = defaultViewStrategy.viewStrategy();
             return this;
         }
@@ -268,18 +298,22 @@ public class Canvas {
         }
     }
 
-
     /**
      * A button click context.
      */
     @Data
     public static class ClickContext {
+        private final @NotNull Canvas canvas;
         private final @Nullable ButtonClick click;
         private @Nullable Consumer<Throwable> throwableConsumer;
 
         public @NotNull ClickContext handleException(@NotNull Consumer<Throwable> exception) {
             this.throwableConsumer = exception;
             return this;
+        }
+
+        public @NotNull Canvas end() {
+            return this.canvas;
         }
     }
 
@@ -294,7 +328,7 @@ public class Canvas {
          * @param target the target
          * @param event  the event
          */
-        void onClick(@NotNull Player target, @NotNull Item clicked, @NotNull InventoryClickEvent event);
+        void onClick(@NotNull Player target, @NotNull Item clicked, @NotNull InventoryClickEvent event, @NotNull Canvas it);
     }
 
     /**
@@ -302,29 +336,14 @@ public class Canvas {
      * This is called before the button click.
      */
     @FunctionalInterface
-    public interface GenericClick {
-        /**
-         * Called when a player clicks on the inventory.
-         *
-         * @param target the player
-         * @param event  the event
-         * @param canvas the canvas
-         */
-        void onClick(@NotNull Player target, @NotNull Item clicked, @NotNull InventoryClickEvent event, @NotNull Canvas canvas);
+    public interface GenericClick extends ButtonClick {
+
     }
 
     /**
      * A self inventory click. This is called when a player clicks on their inventory.
      */
     @FunctionalInterface
-    public interface SelfInventory {
-        /**
-         * Called when a player clicks on their inventory.
-         *
-         * @param target the player
-         * @param event  the event
-         * @param canvas the canvas
-         */
-        void onClick(@NotNull Player target, @NotNull Item clicked, @NotNull InventoryClickEvent event, @NotNull Canvas canvas);
+    public interface SelfInventoryClick extends ButtonClick {
     }
 }
