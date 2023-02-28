@@ -1,5 +1,6 @@
 package com.marcusslover.plus.lib.text;
 
+import com.marcusslover.plus.lib.color.ColorGradient;
 import com.marcusslover.plus.lib.common.ISendable;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -53,6 +54,10 @@ public class Text implements ISendable<Text> {
 
     public @NotNull Text append(@NotNull String text) {
         return this.append(new Text(text));
+    }
+
+    public @NotNull Text append(@NotNull Component component) {
+        return this.append(new Text(component));
     }
 
     public @NotNull Text append(@NotNull Text text) {
@@ -147,6 +152,19 @@ public class Text implements ISendable<Text> {
     @Deprecated
     public static @NotNull List<@NotNull Text> list(@NotNull List<@NotNull Component> lore) {
         return lore.stream().map(Text::new).collect(Collectors.toList());
+    }
+
+    /**
+     * Creates a gradient text.
+     * @param text the text to be colored.
+     * @param gradient the gradient to be used.
+     * @return the gradient text.
+     */
+    public static @NotNull String gradient(@NotNull String text, @NotNull ColorGradient gradient) {
+        int length = text.length();
+        StringBuilder builder = new StringBuilder();
+        gradient.forEach(length, color -> builder.append(color.plus()).append(text.charAt(0)));
+        return builder.toString();
     }
 
     public static @NotNull String legacy(@NotNull String text) {
