@@ -54,15 +54,21 @@ public final class MenuManager {
 
                     Item item = Item.of(event.getCurrentItem());
 
-                    Canvas.GenericClick genericClick = canvas.genericClick();
+                    Canvas.ClickContext genericClick = canvas.genericClick();
                     if (genericClick != null) {
-                        genericClick.onClick((Player) event.getWhoClicked(), item, event, canvas);
+                        Canvas.ButtonClick buttonClick = genericClick.click();
+                        if (buttonClick != null) {
+                            buttonClick.onClick((Player) event.getWhoClicked(), item, event, canvas);
+                        }
                     }
 
                     if (slot > size) {
-                        Canvas.SelfInventory selfInventory = canvas.selfInventory();
+                        Canvas.ClickContext selfInventory = canvas.selfInventory();
                         if (selfInventory != null) {
-                            selfInventory.onClick((Player) event.getWhoClicked(), item, event, canvas);
+                            Canvas.ButtonClick buttonClick = selfInventory.click();
+                            if (buttonClick != null) {
+                                buttonClick.onClick((Player) event.getWhoClicked(), item, event, canvas);
+                            }
                         }
                         return;
                     }
@@ -78,7 +84,7 @@ public final class MenuManager {
                                     return;
                                 }
                                 try {
-                                    click.onClick(player, item, event);
+                                    click.onClick(player, item, event, canvas);
                                 } catch (Throwable e) {
                                     if (context.throwableConsumer() != null) {
                                         context.throwableConsumer().accept(e);

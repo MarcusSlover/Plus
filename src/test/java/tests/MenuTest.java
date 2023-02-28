@@ -1,5 +1,6 @@
 package tests;
 
+import com.marcusslover.plus.lib.item.Button;
 import com.marcusslover.plus.lib.item.Canvas;
 import com.marcusslover.plus.lib.item.Canvas.PopulatorContext.DefaultViewStrategy;
 import com.marcusslover.plus.lib.item.Item;
@@ -25,12 +26,15 @@ public class MenuTest extends Menu {
                 .populate(List.of(1, 2, 3))
                 // View strategy
                 .viewStrategy(DefaultViewStrategy.MIDDLE)
+                // Pages
+                .pageForwards(Button.create(0, 0).item(Item.of(Material.ARROW, 1, "Next page")))
+                .pageBackwards(Button.create(0, 1).item(Item.of(Material.ARROW, 1, "Previous page")))
                 // Content of the menu
                 .content((element, canvas, button) -> {
                     Item item = Item.of(Material.SHIELD, 1, "Shield #%s".formatted(element));
                     button.item(item); // Item of the button
                     // Click event
-                    canvas.button(button, (target, clicked, event) -> {
+                    canvas.button(button, (target, clicked, event, canvas1) -> {
                         Text name = clicked.name();
                         if (name == null) {
                             name = Text.of("null");
@@ -41,7 +45,11 @@ public class MenuTest extends Menu {
                     }).handleException(throwable -> {
                        // Handle exception
                     });
-                });
-        ;
+                }).end()
+                .genericClick((target, clicked, event, a) -> {
+                    // Generic click event
+                }).handleException(throwable -> {
+                    // Handle exception
+                }).end();
     }
 }
