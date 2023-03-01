@@ -10,7 +10,6 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -28,7 +27,7 @@ import java.util.function.Predicate;
 public class EventReference<T extends Event> implements Filter<T, EventReference<T>> {
     private final @NotNull Class<T> eventClass;
 
-    private final @NotNull EventPriority eventPriority = EventPriority.NORMAL;
+    private @NotNull EventPriority eventPriority = EventPriority.NORMAL;
 
     private @Nullable Consumer<T> handler = null;
 
@@ -50,7 +49,7 @@ public class EventReference<T extends Event> implements Filter<T, EventReference
     private @Nullable Plugin plugin;
 
     public EventReference(@NotNull Class<T> eventClass) {
-        this(eventClass, new Class[] { eventClass });
+        this(eventClass, new Class[]{eventClass});
     }
 
     public EventReference(@NotNull Class<T> eventClass, Class<? extends T>[] classes) {
@@ -106,9 +105,9 @@ public class EventReference<T extends Event> implements Filter<T, EventReference
                     }
 
                     if (this.handler != null) {
-                        this.callCount.incrementAndGet();
+                        this.handler.accept(eventInstance);
 
-                        this.handler.accept(this.eventClass.cast(event));
+                        this.callCount.incrementAndGet();
                     }
                 } catch (Exception e) {
                     DEFAULT_EXCEPTION_CONSUMER.accept(this, e);
@@ -189,7 +188,7 @@ public class EventReference<T extends Event> implements Filter<T, EventReference
 
     /* Getters & Setters */
 
-    public @Nonnull Class<T> getEventClass() {
+    public @NotNull Class<T> getEventClass() {
         return this.eventClass;
     }
 
@@ -201,8 +200,16 @@ public class EventReference<T extends Event> implements Filter<T, EventReference
         return !this.active.get();
     }
 
-    public long getCallCounter() {
+    public long getCallsCounted() {
         return this.callCount.get();
+    }
+
+    public EventPriority getPriority() {
+        return this.eventPriority;
+    }
+
+    public @Nullable Plugin getPlugin() {
+        return this.plugin;
     }
 
     public EventReference<T> handler(@NotNull Consumer<T> handler) {
@@ -212,6 +219,11 @@ public class EventReference<T extends Event> implements Filter<T, EventReference
 
     public EventReference<T> handler(@NotNull BiConsumer<EventReference<T>, T> handler) {
         this.handler = t -> handler.accept(EventReference.this, t);
+        return this;
+    }
+
+    public EventReference<T> priority(@NotNull EventPriority eventPriority) {
+        this.eventPriority = eventPriority;
         return this;
     }
 
