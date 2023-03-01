@@ -50,7 +50,7 @@ public class EventReference<T extends Event> implements Filter<T, EventReference
     private @Nullable Plugin plugin;
 
     public EventReference(@NotNull Class<T> eventClass) {
-        this(eventClass, new Class[0]);
+        this(eventClass, new Class[] { eventClass });
     }
 
     public EventReference(@NotNull Class<T> eventClass, Class<? extends T>[] classes) {
@@ -79,7 +79,12 @@ public class EventReference<T extends Event> implements Filter<T, EventReference
      * Register the event.
      */
     public @NotNull EventReference<T> bind(@NotNull Plugin plugin) {
+        Preconditions.checkNotNull(this.handler, "No handler was set for the event");
+
+        this.plugin = plugin;
+
         this.listeners = new Listener[this.merged.length];
+
         for (int i = 0; i < this.merged.length; i++) {
             final Class<? extends T> type = this.merged[i];
             Bukkit.getPluginManager().registerEvent(type, this.listeners[i] = new Listener() {
