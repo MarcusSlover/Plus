@@ -1,6 +1,5 @@
 package com.marcusslover.plus;
 
-import com.marcusslover.plus.lib.events.EventHandler;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
@@ -23,7 +22,5 @@ public final class PlusPlugin extends JavaPlugin {
         if (!dataFolder.exists()) {
             dataFolder.mkdirs();
         }
-
-        EventHandler.get().register(this);
     }
 }

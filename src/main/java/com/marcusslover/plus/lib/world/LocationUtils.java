@@ -1,6 +1,7 @@
 package com.marcusslover.plus.lib.world;
 
-import com.marcusslover.plus.lib.events.BundledListener;
+import com.marcusslover.plus.lib.events.Events;
+import com.marcusslover.plus.lib.server.ServerUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -49,13 +50,16 @@ public class LocationUtils {
             callback.accept(new Location(world, x, y, z));
             return;
         }
-        new BundledListener<>(WorldLoadEvent.class, (l, e) -> {
-            if (e.getWorld().getName().equals(split[0])) {
-                World w = Bukkit.getWorld(split[0]);
-                callback.accept(new Location(w, x, y, z));
-                l.unregister();
-            }
-        });
+
+        Events.listen(WorldLoadEvent.class)
+                .handler((l, e) -> {
+                    if (e.getWorld().getName().equals(split[0])) {
+                        World w = Bukkit.getWorld(split[0]);
+                        callback.accept(new Location(w, x, y, z));
+                        l.unregister();
+                    }
+                })
+                .bind(ServerUtils.getCallingPlugin());
     }
 
     /**
@@ -129,11 +133,11 @@ public class LocationUtils {
      */
     public static String toAccurateString(Location loc, String separator) {
         return loc.getWorld().getName() + separator +
-                loc.getX() + separator +
-                loc.getY() + separator +
-                loc.getZ() + separator +
-                loc.getYaw() + separator +
-                loc.getPitch();
+               loc.getX() + separator +
+               loc.getY() + separator +
+               loc.getZ() + separator +
+               loc.getYaw() + separator +
+               loc.getPitch();
     }
 
     /**
@@ -144,11 +148,11 @@ public class LocationUtils {
      */
     public static String toAccurateString(String world, double x, double y, double z, float yaw, float pitch, String separator) {
         return world + separator +
-                x + separator +
-                y + separator +
-                z + separator +
-                yaw + separator +
-                pitch;
+               x + separator +
+               y + separator +
+               z + separator +
+               yaw + separator +
+               pitch;
     }
 
     /**
@@ -160,9 +164,9 @@ public class LocationUtils {
      */
     public static String toString(Location loc, String separator) {
         return loc.getWorld().getName() + separator +
-                loc.getX() + separator +
-                loc.getY() + separator +
-                loc.getZ();
+               loc.getX() + separator +
+               loc.getY() + separator +
+               loc.getZ();
     }
 
     /**
@@ -174,9 +178,9 @@ public class LocationUtils {
      */
     public static String toString(Block block, String separator) {
         return block.getWorld().getName() + separator +
-                block.getX() + separator +
-                block.getY() + separator +
-                block.getZ();
+               block.getX() + separator +
+               block.getY() + separator +
+               block.getZ();
     }
 
     /**
@@ -215,13 +219,16 @@ public class LocationUtils {
             return;
         }
         initialized = true;
-        new BundledListener<>(WorldLoadEvent.class, e -> {
-            List<Consumer<World>> list = waiting.remove(e.getWorld().getName());
-            if (list == null) {
-                return;
-            }
-            list.forEach(c -> c.accept(e.getWorld()));
-        });
+
+        Events.listen(WorldLoadEvent.class)
+                .handler(e -> {
+                    List<Consumer<World>> list = waiting.remove(e.getWorld().getName());
+                    if (list == null) {
+                        return;
+                    }
+                    list.forEach(c -> c.accept(e.getWorld()));
+                })
+                .bind(ServerUtils.getCallingPlugin());
     }
 
     /**

@@ -35,7 +35,7 @@ public final class MenuManager {
                     gameMenu.canvasMap().remove(uuid);
                 });
             }
-        }).asRegistered(plugin);
+        }).bind(plugin);
 
         Events.listen(InventoryClickEvent.class).handler(event -> {
             InventoryView view = event.getView();
@@ -95,7 +95,7 @@ public final class MenuManager {
                             });
                 });
             }
-        }).asRegistered(plugin);
+        }).bind(plugin);
     }
 
     @Deprecated
