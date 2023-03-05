@@ -166,7 +166,7 @@ public final class MenuManager {
         Canvas canvas = menu.canvasMap().get(player.getUniqueId());
 
         if (canvas == null) {
-            canvas = new Canvas(6);
+            canvas = new Canvas(6, menu);
             menu.canvasMap().put(player.getUniqueId(), canvas);
             try {
                 menu.open(canvas, player);

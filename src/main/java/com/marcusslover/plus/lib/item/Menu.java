@@ -25,7 +25,7 @@ public abstract class Menu implements IMenu {
     private final @NotNull Map<UUID, Canvas> canvasMap = new HashMap<>(); // player -> canvas
     private @Nullable String id; // menu id, not required
 
-    @Getter(AccessLevel.NONE)
+    @Getter(AccessLevel.PUBLIC)
     @Setter(AccessLevel.NONE)
     private @Nullable MenuManager manager;
 

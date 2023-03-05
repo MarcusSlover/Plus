@@ -30,7 +30,7 @@ public class MenuTest extends Menu {
                 .pageForwards(Button.create(0, 0).item(Item.of(Material.ARROW, 1, "Next page")))
                 .pageBackwards(Button.create(0, 1).item(Item.of(Material.ARROW, 1, "Previous page")))
                 // Content of the menu
-                .content((element, canvas, button) -> {
+                .content(player, (element, canvas, button) -> {
                     Item item = Item.of(Material.SHIELD, 1, "Shield #%s".formatted(element));
                     button.item(item); // Item of the button
                     // Click event

@@ -13,7 +13,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 /**
@@ -24,14 +27,21 @@ import java.util.function.Consumer;
 @Accessors(fluent = true, chain = true)
 public class Canvas {
     private @NotNull Integer rows; // 1-6 (using non-primitive to allow @NotNull for the constructor)
+    private @NotNull Menu assosiatedMenu;
+
     private @Nullable Component title;
     private @Nullable Inventory assosiatedInventory = null;
-    private @Nullable ClickContext genericClick = null;
-    private @Nullable ClickContext selfInventory = null;
+
+    private @Nullable ClickContext genericClick = null, selfInventory = null;
     private @Nullable Canvas.PopulatorContext.ViewStrategy viewStrategy = null;
 
     // buttons of the canvas
     private final @NotNull List<Button> buttons = new ArrayList<>();
+
+    // means literally nothing but used for some hacky stuff
+    private final @NotNull Button hackyButton = Button.create(-1);
+    // pages of the canvas
+    private final @NotNull Map<UUID, Integer> pages = new HashMap<>();
 
     /**
      * Set the title of the canvas.
@@ -170,18 +180,69 @@ public class Canvas {
 
         /**
          * Modify how the elements are populated on the canvas.
+         * The populator is called for each element.
+         * Additionally, adds the page manipulation buttons.
          *
+         * @param player    the player
          * @param populator the populator
          * @return the populator context
          */
-        public @NotNull PopulatorContext<T> content(@NotNull Populator<T> populator) {
+        public @NotNull PopulatorContext<T> content(@NotNull Player player, @NotNull Populator<T> populator) {
+            // page manipulation
+            if (this.pageForwards != null) {
+                this.canvas.button(this.pageForwards, (target, clicked, event, canvas) -> {
+                    UUID uniqueId = target.getUniqueId();
+                    int page = this.canvas.pages.getOrDefault(uniqueId, 0);
+                    this.canvas.pages.put(uniqueId, page + 1);
+                    Menu menu = this.canvas.assosiatedMenu();
+                    MenuManager manager = menu.manager();
+                    if (manager != null) { // should never be null
+                        manager.internallyOpen(target, menu);
+                    }
+                });
+            }
+            if (this.pageBackwards != null) {
+                this.canvas.button(this.pageBackwards, (target, clicked, event, canvas) -> {
+                    UUID uniqueId = target.getUniqueId();
+                    int page = this.canvas.pages.getOrDefault(uniqueId, 0);
+                    if (page > 0) {
+                        this.canvas.pages.put(uniqueId, page - 1);
+                    }
+                    Menu menu = this.canvas.assosiatedMenu();
+                    MenuManager manager = menu.manager();
+                    if (manager != null) { // should never be null
+                        manager.internallyOpen(target, menu);
+                    }
+                });
+            }
+
             int counter = 0;
-            for (T element : this.elements) {
-                Button button = Button.create(counter);
+            int page = this.canvas.pages.getOrDefault(player.getUniqueId(), 0);
+            int elementsPerPage = this.canvas.rows * 9;
+
+            // ig one way of getting the elements per page
+            if (this.viewStrategy != null) {
+                // it's kinda hacky, but it works
+                elementsPerPage = this.viewStrategy.handle(0, this.canvas, this.canvas.hackyButton());
+            }
+
+            // populating elements
+            for (int i = 0; i < elementsPerPage; i++) {
+                int index = i + (page * elementsPerPage); // the index of the element
+                if (index >= this.elements.size()) {
+                    break; // no more elements
+                }
+
+                // getting the element
+                T element = this.elements.get(index);
+                Button button = Button.create(counter); // creating the button
 
                 if (this.viewStrategy != null) {
+                    // modifying the button based on the view strategy
                     this.viewStrategy.handle(counter, this.canvas, button);
                 }
+
+                // populating the element
                 populator.populate(element, this.canvas, button);
                 counter++;
             }
@@ -229,8 +290,9 @@ public class Canvas {
              * @param counter the counter
              * @param canvas  the canvas
              * @param button  the button to modify if needed
+             * @return elements per page
              */
-            void handle(int counter, @NotNull Canvas canvas, @NotNull Button button);
+            int handle(int counter, @NotNull Canvas canvas, @NotNull Button button);
         }
 
         /**
@@ -241,7 +303,10 @@ public class Canvas {
             /**
              * Fills all first possible slots on the canvas.
              */
-            FULL((counter, canvas, button) -> button.slot(counter)),
+            FULL((counter, canvas, button) -> {
+                button.slot(counter);
+                return canvas.rows * 9;
+            }),
 
             /**
              * Fills all first possible middle slots on the canvas.
@@ -251,6 +316,7 @@ public class Canvas {
                 if (middleSlots.size() > counter) {
                     button.slot(middleSlots.get(counter));
                 }
+                return middleSlots.size();
             });
 
             @Getter
