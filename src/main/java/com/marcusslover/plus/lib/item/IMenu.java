@@ -12,7 +12,7 @@ public interface IMenu extends ISendable<IMenu> {
      * Opens the menu to the player.
      *
      * @param menuCanvas the canvas
-     * @param player the player
+     * @param player     the player
      */
     void open(@NotNull Canvas menuCanvas, @NotNull Player player);
 }

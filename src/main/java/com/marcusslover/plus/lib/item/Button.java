@@ -169,6 +169,7 @@ public class Button {
 
         /**
          * Creates a new detectable area with the given vectors.
+         *
          * @param min The minimum vector
          * @param max The maximum vector
          */
