@@ -39,57 +39,6 @@ public class Title implements ISendable<Title> {
         this.subtitle = subtitle;
     }
 
-    public static @NotNull Title of(@NotNull String title) {
-        return new Title(title);
-    }
-
-    public static @NotNull Title of(@NotNull Text text) {
-        return new Title(text);
-    }
-
-    public static @NotNull Title of(@NotNull String title, @NotNull String subtitle) {
-        return new Title(title, subtitle);
-    }
-
-    public static @NotNull Title of(@NotNull Text title, @NotNull Text subtitle) {
-        return new Title(title, subtitle);
-    }
-
-    public net.kyori.adventure.title.Title adventure() {
-        return title(
-                this.title.comp(),
-                this.subtitle.comp(),
-                this.times
-        );
-    }
-
-    public Title times(@NotNull Times times) {
-        this.times = times;
-        return this;
-    }
-
-    public Title times(int fadeIn, int stay, int fadeOut) {
-        this.times = Times.times(
-                Ticks.duration(fadeIn),
-                Ticks.duration(stay),
-                Ticks.duration(fadeOut)
-        );
-
-        return this;
-    }
-
-    public @NotNull Title times(long fadeIn, long stay, long fadeOut) {
-        this.times = Times.times(
-                Ticks.duration(fadeIn),
-                Ticks.duration(stay),
-                Ticks.duration(fadeOut)
-        );
-
-        return this;
-    }
-
-    /* Static Constructors */
-
     public @NotNull Title send(@NotNull CommandSender player, long fadeIn, long fadeStay, long fadeOut) {
         Times of = Times.times(Ticks.duration(fadeIn), Ticks.duration(fadeStay), Ticks.duration(fadeOut));
         player.showTitle(title(
@@ -123,5 +72,56 @@ public class Title implements ISendable<Title> {
         audience.showTitle(this.adventure());
 
         return this;
+    }
+
+    public @NotNull net.kyori.adventure.title.Title adventure() {
+        return title(
+                this.title.comp(),
+                this.subtitle.comp(),
+                this.times
+        );
+    }
+
+    public @NotNull Title times(@NotNull Times times) {
+        this.times = times;
+        return this;
+    }
+
+    public @NotNull Title times(int fadeIn, int stay, int fadeOut) {
+        this.times = Times.times(
+                Ticks.duration(fadeIn),
+                Ticks.duration(stay),
+                Ticks.duration(fadeOut)
+        );
+
+        return this;
+    }
+
+    public @NotNull Title times(long fadeIn, long stay, long fadeOut) {
+        this.times = Times.times(
+                Ticks.duration(fadeIn),
+                Ticks.duration(stay),
+                Ticks.duration(fadeOut)
+        );
+
+        return this;
+    }
+
+    /* Static Constructors */
+
+    public static @NotNull Title of(@NotNull String title) {
+        return new Title(title);
+    }
+
+    public static @NotNull Title of(@NotNull Text text) {
+        return new Title(text);
+    }
+
+    public static @NotNull Title of(@NotNull String title, @NotNull String subtitle) {
+        return new Title(title, subtitle);
+    }
+
+    public static @NotNull Title of(@NotNull Text title, @NotNull Text subtitle) {
+        return new Title(title, subtitle);
     }
 }
