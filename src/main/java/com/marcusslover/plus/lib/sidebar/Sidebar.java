@@ -43,17 +43,17 @@ public class Sidebar implements ISendable<Sidebar> {
 
     private Sidebar(@NotNull Text title, @NotNull Scoreboard scoreboard) {
         this.scoreboard = scoreboard;
-        this.objective = this.scoreboard.registerNewObjective(customID + "DS", "dummy", title.comp());
+        this.objective = this.scoreboard.registerNewObjective(Sidebar.customID + "DS", "dummy", title.comp());
         this.objective.setDisplaySlot(DisplaySlot.SIDEBAR);
 
         this.fields = new LinkedList<>();
 
         // Add to the id value
-        customID += 1;
+        Sidebar.customID += 1;
     }
 
     private @NotNull String getEntry(int currentSize) {
-        return COLOR[currentSize].toString() + COLOR[currentSize / 4].toString() + COLOR[COLOR.length - 1];
+        return Sidebar.COLOR[currentSize].toString() + Sidebar.COLOR[currentSize / 4].toString() + Sidebar.COLOR[COLOR.length - 1];
     }
 
     public @NotNull Sidebar addField(@NotNull String prefix, @NotNull String suffix) {
@@ -183,7 +183,7 @@ public class Sidebar implements ISendable<Sidebar> {
         }
 
         player.setScoreboard(this.scoreboard);
-        SIDEBAR_MAP.put(player.getUniqueId(), this);
+        Sidebar.SIDEBAR_MAP.put(player.getUniqueId(), this);
         return this;
     }
 
@@ -220,8 +220,8 @@ public class Sidebar implements ISendable<Sidebar> {
     }
 
     public static @NotNull Optional<Sidebar> get(@NotNull UUID uuid) {
-        if (SIDEBAR_MAP.containsKey(uuid)) {
-            return Optional.of(SIDEBAR_MAP.get(uuid));
+        if (Sidebar.SIDEBAR_MAP.containsKey(uuid)) {
+            return Optional.of(Sidebar.SIDEBAR_MAP.get(uuid));
         }
         return Optional.empty();
     }
@@ -231,14 +231,14 @@ public class Sidebar implements ISendable<Sidebar> {
     }
 
     public static void destroy(@NotNull UUID uuid) {
-        get(uuid).ifPresent(sidebar -> SIDEBAR_MAP.remove(uuid));
+        get(uuid).ifPresent(sidebar -> Sidebar.SIDEBAR_MAP.remove(uuid));
     }
 
     public static int getCustomID() {
-        return customID;
+        return Sidebar.customID;
     }
 
     public static @NotNull Map<UUID, Sidebar> getSidebarMap() {
-        return SIDEBAR_MAP;
+        return Sidebar.SIDEBAR_MAP;
     }
 }
