@@ -131,7 +131,7 @@ public class Color {
 
     /**
      * A hacky way of pre-converting the color into a bukkit translatable color.
-     * <font color="FF4843"><b>Note that this pretty much only works with {@link Player#sendMessage(String)}</b></font>
+     * <b>Note that this pretty much only works with {@link Player#sendMessage(String)}</b>
      *
      * @return the converted color as a String
      */

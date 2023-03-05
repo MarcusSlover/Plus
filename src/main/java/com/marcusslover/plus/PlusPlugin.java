@@ -21,7 +21,10 @@ public final class PlusPlugin extends JavaPlugin {
         File dataFolder = this.getDataFolder();
 
         if (!dataFolder.exists()) {
-            dataFolder.mkdirs();
+            boolean mkdirs = dataFolder.mkdirs();
+            if (!mkdirs) {
+                throw new IllegalStateException("Could not create data folder.");
+            }
         }
 
         EventHandler.get().register(this);

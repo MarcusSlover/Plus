@@ -12,43 +12,43 @@ public class Tiny {
     private static final Map<Character, Character> LETTERS = new HashMap<>();
 
     static {
-        LETTERS.put('a', '\u1D00');
-        LETTERS.put('b', '\u0299');
-        LETTERS.put('c', '\u1D04');
-        LETTERS.put('d', '\u1D05');
-        LETTERS.put('e', '\u1D07');
-        LETTERS.put('f', '\uA730');
-        LETTERS.put('g', '\u0262');
-        LETTERS.put('h', '\u029C');
-        LETTERS.put('i', '\u026A');
-        LETTERS.put('j', '\u1D0A');
-        LETTERS.put('k', '\u1D0B');
-        LETTERS.put('l', '\u029F');
-        LETTERS.put('m', '\u1D0D');
-        LETTERS.put('n', '\u0274');
-        LETTERS.put('o', '\u1D0F');
-        LETTERS.put('p', '\u1D18');
-        LETTERS.put('q', '\uA7AF');
-        LETTERS.put('r', '\u0280');
+        LETTERS.put('a', 'ᴀ');
+        LETTERS.put('b', 'ʙ');
+        LETTERS.put('c', 'ᴄ');
+        LETTERS.put('d', 'ᴅ');
+        LETTERS.put('e', 'ᴇ');
+        LETTERS.put('f', 'ꜰ');
+        LETTERS.put('g', 'ɢ');
+        LETTERS.put('h', 'ʜ');
+        LETTERS.put('i', 'ɪ');
+        LETTERS.put('j', 'ᴊ');
+        LETTERS.put('k', 'ᴋ');
+        LETTERS.put('l', 'ʟ');
+        LETTERS.put('m', 'ᴍ');
+        LETTERS.put('n', 'ɴ');
+        LETTERS.put('o', 'ᴏ');
+        LETTERS.put('p', 'ᴘ');
+        LETTERS.put('q', 'ꞯ');
+        LETTERS.put('r', 'ʀ');
         LETTERS.put('s', 's');
-        LETTERS.put('t', '\u1D1B');
-        LETTERS.put('u', '\u1D1C');
-        LETTERS.put('v', '\u1D20');
-        LETTERS.put('w', '\u1D21');
+        LETTERS.put('t', 'ᴛ');
+        LETTERS.put('u', 'ᴜ');
+        LETTERS.put('v', 'ᴠ');
+        LETTERS.put('w', 'ᴡ');
         LETTERS.put('x', 'x');
-        LETTERS.put('y', '\u028F');
-        LETTERS.put('z', '\u1D22');
+        LETTERS.put('y', 'ʏ');
+        LETTERS.put('z', 'ᴢ');
 
-        LETTERS.put('0', '\u2080');
-        LETTERS.put('1', '\u2081');
-        LETTERS.put('2', '\u2082');
-        LETTERS.put('3', '\u2083');
-        LETTERS.put('4', '\u2084');
-        LETTERS.put('5', '\u2085');
-        LETTERS.put('6', '\u2086');
-        LETTERS.put('7', '\u2087');
-        LETTERS.put('8', '\u2088');
-        LETTERS.put('9', '\u2089');
+        LETTERS.put('0', '₀');
+        LETTERS.put('1', '₁');
+        LETTERS.put('2', '₂');
+        LETTERS.put('3', '₃');
+        LETTERS.put('4', '₄');
+        LETTERS.put('5', '₅');
+        LETTERS.put('6', '₆');
+        LETTERS.put('7', '₇');
+        LETTERS.put('8', '₈');
+        LETTERS.put('9', '₉');
     }
 
     private Tiny() {

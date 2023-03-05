@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 import java.util.function.Predicate;
 
+@SuppressWarnings("unchecked")
 public interface IApplicable<T extends LivingEntity, V> {
     @NotNull V apply(@NotNull T target);
 

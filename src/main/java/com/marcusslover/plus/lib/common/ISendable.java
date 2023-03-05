@@ -9,6 +9,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 import java.util.function.Predicate;
 
+@SuppressWarnings("unchecked")
 public interface ISendable<V extends ISendable<V>> {
     @NotNull <T extends CommandSender> V send(@NotNull T target);
 

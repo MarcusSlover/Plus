@@ -17,9 +17,10 @@ import java.util.stream.Collectors;
 public class ColorUtil {
     public static final Pattern HEX_TO_BUKKIT = Pattern.compile("&#([a-fA-F0-9]{6})");
     public static final Pattern HEX_FROM_BUKKIT = Pattern.compile("&x(&[a-fA-F0-9]){6}");
-    public static final char COLOR_CHAR = '\u00A7';
+    public static final char COLOR_CHAR = '§';
     private static final Pattern HEX_PATTERN = Pattern.compile("^#([a-fA-F0-9]{6})$");
-    private static final EnumMap<DyeColor, ChatColor> dyeChatMap = new EnumMap<DyeColor, ChatColor>(DyeColor.class) {{
+    @SuppressWarnings("deprecation")
+    private static final EnumMap<DyeColor, ChatColor> dyeChatMap = new EnumMap<>(DyeColor.class) {{
         this.put(DyeColor.BLACK, ChatColor.BLACK);
         this.put(DyeColor.BLUE, ChatColor.DARK_BLUE);
         this.put(DyeColor.BROWN, ChatColor.GOLD);
@@ -38,7 +39,7 @@ public class ColorUtil {
         this.put(DyeColor.YELLOW, ChatColor.YELLOW);
     }};
 
-    private static final EnumMap<Material, DyeColor> matDyeMap = new EnumMap<Material, DyeColor>(Material.class) {{
+    private static final EnumMap<Material, DyeColor> matDyeMap = new EnumMap<>(Material.class) {{
         Arrays.stream(Material.values()).forEach(material -> {
             if (material.name().startsWith("WHITE")) {
                 this.put(material, DyeColor.WHITE);
@@ -124,7 +125,7 @@ public class ColorUtil {
     }
 
     public static @NotNull String hexTranslation(@NotNull String text) {
-        text = text.replaceAll("\u00A7", "&"); // legacy fix
+        text = text.replaceAll("§", "&"); // legacy fix
         var matcher = HEX_FROM_BUKKIT.matcher(text);
         while (matcher.find()) {
             String group = matcher.group();
@@ -143,7 +144,7 @@ public class ColorUtil {
      * @param value Must match one of these formats "#FFFFFF" or "ampersand-c"
      * @return org.bukkit.Color
      */
-    public static Color getRGBFromCode(String value) {
+    public static @NotNull Color getRGBFromCode(@NotNull String value) {
         value = value.replaceAll("[{}]", "").replaceAll("&", "");
         return HEX_PATTERN.matcher(value).matches() ? hex2Rgb(value) : minecraft2Rgb(value);
     }
@@ -154,7 +155,7 @@ public class ColorUtil {
      * @param value Must be in format "#FFFFFF"
      * @return org.bukkit.Color
      */
-    public static Color hex2Rgb(String value) {
+    public static @NotNull Color hex2Rgb(@NotNull String value) {
         try {
             Color color;
             if (value.startsWith("#")) {
@@ -180,7 +181,7 @@ public class ColorUtil {
      * @param value Must be in format "ampersand-0"
      * @return org.bukkit.Color
      */
-    public static Color minecraft2Rgb(String value) {
+    public static @NotNull Color minecraft2Rgb(@NotNull String value) {
         try {
             return switch (value) {
                 case "&0" -> Color.fromRGB(0, 0, 0);
@@ -205,15 +206,17 @@ public class ColorUtil {
         }
     }
 
-    public static ChatColor dyeToChat(DyeColor dye) {
+    @SuppressWarnings("deprecation")
+    public static @NotNull ChatColor dyeToChat(@NotNull DyeColor dye) {
         return dyeChatMap.getOrDefault(dye, ChatColor.RESET);
     }
 
-    public static DyeColor materialToDye(Material material) {
+    public static @NotNull DyeColor materialToDye(@NotNull Material material) {
         return matDyeMap.getOrDefault(material, DyeColor.WHITE);
     }
 
-    public static ChatColor materialToChat(Material material) {
+    @SuppressWarnings("deprecation")
+    public static @NotNull ChatColor materialToChat(@NotNull Material material) {
         return dyeToChat(materialToDye(material));
     }
 
