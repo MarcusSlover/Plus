@@ -34,7 +34,8 @@ public class ColorGradient {
 
     /**
      * Iterates over the gradient.
-     * @param amount the amount of times to iterate
+     *
+     * @param amount   the amount of times to iterate
      * @param consumer the consumer
      * @return the gradient
      */
@@ -48,6 +49,7 @@ public class ColorGradient {
 
     /**
      * Reverses the gradient.
+     *
      * @return the reversed gradient
      */
     public @NotNull ColorGradient reverse() {

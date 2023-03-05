@@ -158,7 +158,8 @@ public class Text implements ISendable<Text> {
 
     /**
      * Creates a gradient text.
-     * @param text the text to be colored.
+     *
+     * @param text     the text to be colored.
      * @param gradient the gradient to be used.
      * @return the gradient text.
      */

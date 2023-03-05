@@ -89,6 +89,7 @@ public class Canvas {
     /**
      * Set the self inventory action.
      * This action is called when the player clicks on the inventory.
+     *
      * @param selfInventory the self inventory action
      * @return the click context associated with the self inventory action
      */
@@ -100,6 +101,7 @@ public class Canvas {
     /**
      * Set the generic click action.
      * This action is called when the player clicks on the inventory.
+     *
      * @param genericClick the generic click action
      * @return the click context associated with the generic click action
      */
@@ -207,7 +209,7 @@ public class Canvas {
              * Populates the element.
              *
              * @param element the element to populate
-             * @param canvas the canvas
+             * @param canvas  the canvas
              * @param button  the button associated with the element on the canvas
              */
             void populate(@NotNull T element, @NotNull Canvas canvas, @NotNull Button button);

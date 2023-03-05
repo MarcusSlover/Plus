@@ -43,7 +43,7 @@ public class MenuTest extends Menu {
                         Note.of("something", 1, 1).send(target);
                         target.closeInventory();
                     }).handleException(throwable -> {
-                       // Handle exception
+                        // Handle exception
                     });
                 }).end()
                 .genericClick((target, clicked, event, a) -> {
