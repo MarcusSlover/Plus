@@ -138,6 +138,7 @@ public class JsonWrapper {
         AtomicReference<Character> atom = new AtomicReference<>(defaultValue);
         this.jsonObject(json -> {
             if (this.hasKey(key)) {
+                //noinspection deprecation
                 atom.set(json.get(key).getAsCharacter());
             } else {
                 atom.set(defaultValue);

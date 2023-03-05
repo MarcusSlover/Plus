@@ -148,7 +148,10 @@ public abstract class SingleContainer<V> extends AbstractContainer<V> {
         Gson gson = this.getGson();
         File file = new File(this.getParentFolder(), this.fileName + ".json");
         if (value == null) {
-            file.delete();
+            boolean delete = file.delete();
+            if (!delete) {
+                throw new RuntimeException("Could not delete file: " + file.getAbsolutePath());
+            }
             return;
         }
         try (FileWriter fileWriter = new FileWriter(file)) {

@@ -45,7 +45,10 @@ public class ContainerManager {
 
         File dataFolder = plugin.getDataFolder();
         if (!dataFolder.exists()) {
-            dataFolder.mkdirs();
+            boolean mkdirs = dataFolder.mkdirs();
+            if (!mkdirs) {
+                throw new IllegalStateException("Could not create data folder.");
+            }
         }
 
         /*Creates directories for all containers*/
@@ -53,7 +56,10 @@ public class ContainerManager {
             File containerFolder = new File(dataFolder, parent);
 
             if (!containerFolder.exists()) {
-                containerFolder.mkdirs();
+                boolean mkdirs = containerFolder.mkdirs();
+                if (!mkdirs) {
+                    throw new IllegalStateException("Could not create container folder.");
+                }
             }
 
             AbstractContainer<?> container = this.containerMap.get(parent);

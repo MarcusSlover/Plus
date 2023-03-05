@@ -30,6 +30,7 @@ public class Potion implements IApplicable<LivingEntity, Potion> {
                 .withAmbient(this.transparent)
                 .withIcon(this.icon);
 
+        //noinspection deprecation
         entity.addPotionEffect(potionEffect, this.force);
 
         return this;
