@@ -8,22 +8,20 @@
 
 # 💻 For Developers
 
-This library is currently meant to be working with PaperMC 1.19.2.<br/>
+This library is currently meant to be working with PaperMC 1.19.3.<br/>
+However, it should be compatible with any version of Minecraft 1.18 and above.<br/>
 
 ## 🐘 Gradle
-
 ```gradle
 repositories {
     maven { url = 'https://s01.oss.sonatype.org/content/repositories/snapshots/' }
 }
 
 dependencies {
-    compileOnly 'com.marcusslover:plus:3.5-SNAPSHOT'
+    compileOnly 'com.marcusslover:plus:4.0-SNAPSHOT'
 }
 ```
-
 ## 🦢 Maven
-
 ```xml
 <repository>
     <id>ossrh</id>
@@ -33,6 +31,6 @@ dependencies {
 <dependency>
     <groupId>com.marcusslover</groupId>
     <artifactId>plus</artifactId>
-    <version>3.5-SNAPSHOT</version>
+    <version>4.0-SNAPSHOT</version>
 </dependency>
 ```
