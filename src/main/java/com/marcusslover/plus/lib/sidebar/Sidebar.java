@@ -3,6 +3,7 @@ package com.marcusslover.plus.lib.sidebar;
 import com.marcusslover.plus.lib.common.ISendable;
 import com.marcusslover.plus.lib.text.Text;
 import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -202,6 +203,10 @@ public class Sidebar implements ISendable<Sidebar> {
 
     public static @NotNull Sidebar of(@NotNull String title) {
         return new Sidebar(title);
+    }
+
+    public static @NotNull Sidebar of(@NotNull Component title) {
+        return new Sidebar(Text.of(title));
     }
 
     public static @NotNull Sidebar of(@NotNull Text title) {
