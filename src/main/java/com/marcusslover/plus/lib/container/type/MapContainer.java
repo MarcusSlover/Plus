@@ -261,7 +261,10 @@ public abstract class MapContainer<K, V> extends AbstractContainer<K> {
         Gson gson = this.getGson();
         File file = new File(this.getParentFolder(), fileName + ".json");
         if (value == null) {
-            file.delete();
+            boolean delete = file.delete();
+            if (!delete) {
+                throw new RuntimeException("Failed to delete file: " + file.getAbsolutePath());
+            }
             return;
         }
         try (FileWriter fileWriter = new FileWriter(file)) {

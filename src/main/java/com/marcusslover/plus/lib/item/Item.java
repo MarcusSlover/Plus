@@ -33,6 +33,7 @@ import java.util.Base64;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -293,7 +294,7 @@ public class Item extends Taggable<Item, ItemMeta> {
     }
 
     public @NotNull PersistentDataContainer getPersistentDataContainer() {
-        return this.meta().getPersistentDataContainer();
+        return Objects.requireNonNull(this.meta()).getPersistentDataContainer();
     }
 
 
@@ -369,7 +370,7 @@ public class Item extends Taggable<Item, ItemMeta> {
     }
 
     public @NotNull List<@NotNull String> lore() {
-        //noinspection ConstantConditions
+        //noinspection ConstantConditions,deprecation
         return this.hasLore() ? ColorUtil.translateList(this.meta().getLore()) : new ArrayList<>();
     }
 
@@ -449,6 +450,7 @@ public class Item extends Taggable<Item, ItemMeta> {
         return this;
     }
 
+    @SuppressWarnings("MethodDoesntCallSuperMethod")
     public @NotNull Item clone() {
         return new Item(this.itemStack.clone());
     }

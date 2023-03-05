@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 
+@SuppressWarnings("DataFlowIssue")
 public abstract class Taggable<V extends IMetaContainer<V, P>, P extends PersistentDataHolder> implements IMetaContainer<Item, ItemMeta> {
     protected abstract @NotNull V holder();
 
