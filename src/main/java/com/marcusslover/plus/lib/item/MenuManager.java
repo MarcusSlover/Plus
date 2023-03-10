@@ -228,15 +228,12 @@ public final class MenuManager {
         for (Button button : canvas.buttons()) {
             Item item = button.item();
             if (item == null) {
-                Bukkit.getLogger().warning("Item is null");
                 continue;
             }
             Button.DetectableArea matrix = button.detectableArea();
             Set<Integer> slots = matrix.slots();
-            Bukkit.getLogger().warning("Slots: " + slots.size());
 
             for (Integer slot : slots) {
-                Bukkit.getLogger().warning("Slot: " + slot);
                 inventory.setItem(slot, item.get());
             }
         }
