@@ -13,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -52,7 +53,10 @@ public final class MenuManager {
         this.clickEvent = Events.listen(InventoryClickEvent.class).handler(event -> {
             InventoryView view = event.getView();
             for (Menu menu : MenuManager.this.menus) {
-                menu.canvasMap().forEach((uuid, canvas) -> {
+                Map<UUID, Canvas> map = menu.canvasMap();
+                // copy map to avoid concurrent modification
+                Map<UUID, Canvas> copy = new HashMap<>(map);
+                copy.forEach((uuid, canvas) -> {
                     Inventory inventory = canvas.assosiatedInventory();
                     if (inventory == null) {
                         return;
@@ -70,7 +74,15 @@ public final class MenuManager {
                     if (genericClick != null) {
                         Canvas.ButtonClick buttonClick = genericClick.click();
                         if (buttonClick != null) {
-                            buttonClick.onClick((Player) event.getWhoClicked(), item, event, canvas);
+                            try {
+                                buttonClick.onClick((Player) event.getWhoClicked(), item, event, canvas);
+                            } catch (Throwable e) {
+                                if (genericClick.throwableConsumer() != null) {
+                                    genericClick.throwableConsumer().accept(e);
+                                } else {
+                                    Bukkit.getLogger().warning(e.getMessage());
+                                }
+                            }
                         }
                     }
 
@@ -79,7 +91,15 @@ public final class MenuManager {
                         if (selfInventory != null) {
                             Canvas.ButtonClick buttonClick = selfInventory.click();
                             if (buttonClick != null) {
-                                buttonClick.onClick((Player) event.getWhoClicked(), item, event, canvas);
+                                try {
+                                    buttonClick.onClick((Player) event.getWhoClicked(), item, event, canvas);
+                                } catch (Throwable e) {
+                                    if (selfInventory.throwableConsumer() != null) {
+                                        selfInventory.throwableConsumer().accept(e);
+                                    } else {
+                                        Bukkit.getLogger().warning(e.getMessage());
+                                    }
+                                }
                             }
                         }
                         return;
@@ -188,6 +208,7 @@ public final class MenuManager {
             // craft inventory
             Inventory inventory = canvas.craftInventory();
             canvas.assosiatedInventory(inventory);
+            this.updateInventory(inventory, canvas);
             player.openInventory(inventory);
         } else {
             Inventory topInventory = openInventory.getTopInventory();
@@ -207,12 +228,15 @@ public final class MenuManager {
         for (Button button : canvas.buttons()) {
             Item item = button.item();
             if (item == null) {
+                Bukkit.getLogger().warning("Item is null");
                 continue;
             }
             Button.DetectableArea matrix = button.detectableArea();
             Set<Integer> slots = matrix.slots();
+            Bukkit.getLogger().warning("Slots: " + slots.size());
 
             for (Integer slot : slots) {
+                Bukkit.getLogger().warning("Slot: " + slot);
                 inventory.setItem(slot, item.get());
             }
         }
