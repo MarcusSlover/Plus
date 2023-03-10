@@ -1,5 +1,6 @@
 package com.marcusslover.plus.lib.item;
 
+import com.marcusslover.plus.lib.events.EventReference;
 import com.marcusslover.plus.lib.events.Events;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -9,6 +10,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -17,9 +19,12 @@ public final class MenuManager {
     private final @NotNull Plugin plugin;
     private final @NotNull Set<@NotNull Menu> menus = new HashSet<>();
 
+    private final @NotNull EventReference<InventoryCloseEvent> closeEvent;
+    private final @NotNull EventReference<InventoryClickEvent> clickEvent;
+
     public MenuManager(@NotNull Plugin plugin) {
         this.plugin = plugin;
-        Events.listen(InventoryCloseEvent.class).handler(event -> {
+        this.closeEvent = Events.listen(InventoryCloseEvent.class).handler(event -> {
             InventoryView view = event.getView();
             for (Menu gameMenu : MenuManager.this.menus) {
 
@@ -37,7 +42,7 @@ public final class MenuManager {
             }
         }).asRegistered(plugin);
 
-        Events.listen(InventoryClickEvent.class).handler(event -> {
+        this.clickEvent = Events.listen(InventoryClickEvent.class).handler(event -> {
             InventoryView view = event.getView();
             for (Menu menu : MenuManager.this.menus) {
                 menu.canvasMap().forEach((uuid, canvas) -> {
@@ -213,5 +218,15 @@ public final class MenuManager {
      */
     public @NotNull Set<@NotNull Menu> getMenus() {
         return this.menus;
+    }
+
+    /**
+     * Clears the menus.
+     * Shutdown the manager.
+     */
+    public void clearMenus() {
+        this.menus.clear();
+        this.clickEvent.unregister();
+        this.closeEvent.unregister();
     }
 }
