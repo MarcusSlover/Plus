@@ -12,8 +12,12 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 public final class MenuManager {
     private final @NotNull Plugin plugin;
@@ -27,18 +31,21 @@ public final class MenuManager {
         this.closeEvent = Events.listen(InventoryCloseEvent.class).handler(event -> {
             InventoryView view = event.getView();
             for (Menu gameMenu : MenuManager.this.menus) {
-
-                gameMenu.canvasMap().forEach((uuid, canvas) -> {
+                List<UUID> toRemove = new ArrayList<>();
+                for (Map.Entry<UUID, Canvas> entry : gameMenu.canvasMap().entrySet()) {
+                    UUID uuid = entry.getKey();
+                    Canvas canvas = entry.getValue();
                     Inventory inventory = canvas.assosiatedInventory();
                     if (inventory == null) {
-                        return;
+                        continue;
                     }
                     if (!inventory.equals(view.getTopInventory())) {
-                        return;
+                        continue;
                     }
                     canvas.assosiatedInventory(null);
-                    gameMenu.canvasMap().remove(uuid);
-                });
+                    toRemove.add(uuid);
+                }
+                toRemove.forEach(gameMenu.canvasMap()::remove);
             }
         }).asRegistered(plugin);
 
