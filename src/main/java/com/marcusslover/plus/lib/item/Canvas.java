@@ -188,37 +188,37 @@ public class Canvas {
          * @return the populator context
          */
         public @NotNull PopulatorContext<T> content(@NotNull Player player, @NotNull Populator<T> populator) {
-            // page manipulation
-            if (this.pageForwards != null) {
-                this.canvas.button(this.pageForwards, (target, clicked, event, canvas) -> {
-                    UUID uniqueId = target.getUniqueId();
-                    int page = this.canvas.pages.getOrDefault(uniqueId, 0);
-                    this.canvas.pages.put(uniqueId, page + 1);
-                    Menu menu = this.canvas.assosiatedMenu();
-                    MenuManager manager = menu.manager();
-                    if (manager != null) { // should never be null
-                        manager.internallyOpen(target, menu);
-                    }
-                });
-            }
-            if (this.pageBackwards != null) {
-                this.canvas.button(this.pageBackwards, (target, clicked, event, canvas) -> {
-                    UUID uniqueId = target.getUniqueId();
-                    int page = this.canvas.pages.getOrDefault(uniqueId, 0);
-                    if (page > 0) {
-                        this.canvas.pages.put(uniqueId, page - 1);
-                    }
-                    Menu menu = this.canvas.assosiatedMenu();
-                    MenuManager manager = menu.manager();
-                    if (manager != null) { // should never be null
-                        manager.internallyOpen(target, menu);
-                    }
-                });
-            }
-
             int counter = 0;
             int page = this.canvas.pages.getOrDefault(player.getUniqueId(), 0);
             int elementsPerPage = this.canvas.rows * 9;
+
+            // page manipulation
+            if (this.pageForwards != null && this.elements.size() > elementsPerPage) {
+                this.canvas.button(this.pageForwards, (target, clicked, event, canvas) -> {
+                    UUID uniqueId = target.getUniqueId();
+                    int _page = this.canvas.pages.getOrDefault(uniqueId, 0);
+                    this.canvas.pages.put(uniqueId, _page + 1);
+                    Menu menu = this.canvas.assosiatedMenu();
+                    MenuManager manager = menu.manager();
+                    if (manager != null) { // should never be null
+                        manager.internallyOpen(target, menu);
+                    }
+                });
+            }
+            if (this.pageBackwards != null && page > 0) {
+                this.canvas.button(this.pageBackwards, (target, clicked, event, canvas) -> {
+                    UUID uniqueId = target.getUniqueId();
+                    int _page = this.canvas.pages.getOrDefault(uniqueId, 0);
+                    if (_page > 0) {
+                        this.canvas.pages.put(uniqueId, _page - 1);
+                    }
+                    Menu menu = this.canvas.assosiatedMenu();
+                    MenuManager manager = menu.manager();
+                    if (manager != null) { // should never be null
+                        manager.internallyOpen(target, menu);
+                    }
+                });
+            }
 
             // ig one way of getting the elements per page
             if (this.viewStrategy != null) {
