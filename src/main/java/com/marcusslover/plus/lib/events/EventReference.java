@@ -52,18 +52,35 @@ public class EventReference<T extends Event> implements ILifeCycle<EventReferenc
      * Register the event.
      */
     public @NotNull EventReference<T> asRegistered(@NotNull Plugin plugin) {
-        this.listeners = new Listener[this.merged.length];
-        for (int i = 0; i < this.merged.length; i++) {
-            final Class<? extends T> type = this.merged[i];
-            Bukkit.getPluginManager().registerEvent(type, this.listeners[i] = new Listener() {
-            }, this.eventPriority, (listener, event) -> {
-                if (this.handler != null) {
-                    this.handler.accept(this.base.cast(event));
-                }
-            }, plugin);
+        this.registerListener(this.base, plugin); // register the base event
 
+        // register the merged events
+        for (Class<? extends T> type : this.merged) {
+            this.registerListener(type, plugin);
         }
         return this;
+    }
+
+    /**
+     * Register a listener.
+     *
+     * @param type   the event type
+     * @param plugin the plugin
+     */
+    private void registerListener(@NotNull Class<? extends T> type, @NotNull Plugin plugin) {
+        Listener listener = new Listener() {
+        };
+        Bukkit.getPluginManager().registerEvent(type, listener, this.eventPriority, (__, event) -> {
+            if (this.handler != null) {
+                this.handler.accept(this.base.cast(event));
+            }
+        }, plugin);
+
+        // add listener to the listeners array
+        Listener[] listeners = new Listener[this.listeners.length + 1];
+        System.arraycopy(this.listeners, 0, listeners, 0, this.listeners.length);
+        listeners[this.listeners.length] = listener;
+        this.listeners = listeners;
     }
 
     @Override
