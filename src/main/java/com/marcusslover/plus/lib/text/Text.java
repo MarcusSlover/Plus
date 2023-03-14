@@ -5,6 +5,7 @@ import com.marcusslover.plus.lib.common.ISendable;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -63,6 +64,11 @@ public class Text implements ISendable<Text> {
     public @NotNull Text append(@NotNull Text text) {
         this.text += text.text;
         this.component = this.component.append(text.component);
+        return this;
+    }
+
+    public @NotNull Text font(@NotNull Key font) {
+        this.component = this.component.font(font);
         return this;
     }
 
