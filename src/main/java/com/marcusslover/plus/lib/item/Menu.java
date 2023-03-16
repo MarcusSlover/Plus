@@ -2,6 +2,7 @@ package com.marcusslover.plus.lib.item;
 
 import lombok.AccessLevel;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -21,8 +22,11 @@ import java.util.UUID;
  */
 @Data
 @Accessors(fluent = true, chain = true)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public abstract class Menu implements IMenu {
+    @EqualsAndHashCode.Include
     private final @NotNull Map<UUID, Canvas> canvasMap = new HashMap<>(); // player -> canvas
+    @EqualsAndHashCode.Include
     private @Nullable String id; // menu id, not required
 
     @Getter(AccessLevel.PUBLIC)

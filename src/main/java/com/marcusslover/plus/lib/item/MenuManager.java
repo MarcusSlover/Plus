@@ -15,6 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,7 +23,7 @@ import java.util.UUID;
 
 public final class MenuManager {
     private final @NotNull Plugin plugin;
-    private final @NotNull Set<@NotNull Menu> menus = new HashSet<>();
+    private final @NotNull List<@NotNull Menu> menus = new LinkedList<>();
 
     private final @NotNull EventReference<InventoryCloseEvent> closeEvent;
     private final @NotNull EventReference<InventoryClickEvent> clickEvent;
@@ -179,7 +180,7 @@ public final class MenuManager {
      * @param player the player
      * @param clazz  the class
      */
-    public void open(@NotNull Player player, @NotNull Class<? extends Menu> clazz) {
+    public <T extends Menu> void open(@NotNull Player player, @NotNull Class<T> clazz) {
         this.menus.stream()
                 .filter(menu -> menu.getClass().equals(clazz))
                 .findFirst()
@@ -244,7 +245,7 @@ public final class MenuManager {
      *
      * @return the menus
      */
-    public @NotNull Set<@NotNull Menu> getMenus() {
+    public @NotNull List<@NotNull Menu> getMenus() {
         return this.menus;
     }
 
