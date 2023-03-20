@@ -31,24 +31,41 @@ public final class CommandManager {
         return new CommandManager(plugin);
     }
 
+    /**
+     * Registers a command.
+     *
+     * @param command The command.
+     * @return The command manager.
+     */
     public @NotNull CommandManager register(@NotNull ICommand command) {
+        // Validate the command.
         Command commandAnnotation = this.getCommandAnnotation(command);
         if (commandAnnotation == null) {
+            Bukkit.getLogger().warning("The command " + command.getClass().getName() + " does not have the @Command annotation.");
             return this;
         }
+        // Get the command information.
         String name = commandAnnotation.name();
         String description = commandAnnotation.description();
         String permission = commandAnnotation.permission();
         String pMessage = commandAnnotation.permissionMessage().isEmpty() ? Bukkit.getServer().getPermissionMessage() : commandAnnotation.permissionMessage();
         List<String> aliases = Arrays.stream(commandAnnotation.aliases()).toList();
 
+        // Register the command.
         CommandMap commandMap = Bukkit.getCommandMap();
         org.bukkit.command.Command cmd = new org.bukkit.command.Command(name, description, "", aliases) {
             @Override
             public boolean execute(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] args) {
-                CommandContext commandContext = new CommandContext(commandAnnotation, sender, commandLabel, args);
+                CommandContext commandContext = new CommandContext(commandAnnotation, sender, commandLabel, args, null);
 
+                // Checks if the sender does not have the permission.
                 if (!permission.isEmpty() && !sender.hasPermission(permission)) {
+
+                    // Checks if the permission message is empty.
+                    if (pMessage.isEmpty()) {
+                        return false;
+                    }
+                    // Sends the permission message.
                     Text.of(pMessage).send(sender);
                     return false;
                 }
@@ -60,13 +77,16 @@ public final class CommandManager {
             public @NotNull List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args) throws IllegalArgumentException {
                 TabCompleteContext tabCompleteContext = new TabCompleteContext(commandAnnotation, sender, name, alias, args);
 
+                // Checks if the sender does not have the permission.
                 if (!permission.isEmpty() && !sender.hasPermission(permission)) {
-                    return Collections.emptyList();
+                    return Collections.emptyList(); // Returns an empty list.
                 }
 
                 return command.tab(tabCompleteContext);
             }
         };
+
+        // Track the command.
         this.commandSet.add(cmd);
         commandMap.register(name, this.plugin.getName().toLowerCase(Locale.ROOT), cmd);
         return this;

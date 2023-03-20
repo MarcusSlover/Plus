@@ -1,5 +1,7 @@
 package com.marcusslover.plus.lib.command;
 
+import lombok.Data;
+import lombok.experimental.Accessors;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
@@ -14,28 +16,22 @@ import java.util.function.Consumer;
  * The context of a command.
  * Mainly used by developers in the {@link ICommand#execute(CommandContext)} method.
  * Provides you with a context of a specific command execution.
- *
- * @param sender The sender of the command.
- * @param label  The label of the command.
- * @param args   The arguments of the command.
- * @param parent The parent context.
  */
-public record CommandContext(@NotNull Command commandData,
-                             @NotNull CommandSender sender,
-                             @NotNull String label,
-                             @NotNull String[] args,
-                             @Nullable CommandContext parent) implements ICommandContextHelper<CommandContext> {
+@Data
+@Accessors(fluent = true)
+public final class CommandContext implements ICommandContextHelper<CommandContext> {
+    private final @NotNull Command commandData;
+    private final @NotNull CommandSender sender;
+    private final @NotNull String label;
+    private final String @NotNull [] args;
+    private final @Nullable CommandContext parent;
 
     /**
-     * Creates a new command context.
-     *
-     * @param sender The sender of the command.
-     * @param label  The label of the command.
-     * @param args   The arguments of the command.
+     * Additional argument context.
+     * This is used by the command framework to store parsed arguments.
+     * Your command must implement {@link ICommand#onRegister(CommandBuilder)} to use this.
      */
-    public CommandContext(@NotNull Command commandData, @NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
-        this(commandData, sender, label, args, null);
-    }
+    private @Nullable ArgContext argContext;
 
     /**
      * Gets the sender of the command.
@@ -113,4 +109,23 @@ public record CommandContext(@NotNull Command commandData,
         // 03.25.2023 - MarcusSlover: Added this.commandData to the constructor.
         return new CommandContext(this.commandData, sender, label, remainingArgs.toArray(new String[0]), this);
     }
+
+
+    /**
+     * Gets the argument context.
+     * Your command must implement {@link ICommand#onRegister(CommandBuilder)} to use this.
+     *
+     * @param name The name of the argument.
+     * @return The argument context.
+     */
+    public @NotNull ArgResult arg(@NotNull String name) {
+        // This is a safety check to make sure that the command developer has registered their arguments.
+        if (this.argContext == null) {
+            throw new IllegalStateException("Argument context is null, did you forget to register your arguments? See ICommand#onRegister");
+        }
+        // Try obtaining the value from the context.
+        @Nullable Object provided = this.argContext.provide(name);
+        return new ArgResult(name, this.argContext, provided);
+    }
+
 }

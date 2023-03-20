@@ -14,6 +14,7 @@ public interface ICommand extends ITabCompleterHelper {
     /**
      * Called when the command is registered.
      * Allows you to build a specific structure for the command.
+     *
      * @param builder An empty command builder.
      */
     default void onRegister(@NotNull CommandBuilder builder) {
