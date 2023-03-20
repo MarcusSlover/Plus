@@ -39,6 +39,22 @@ public class Title implements ISendable<Title> {
         this.subtitle = subtitle;
     }
 
+    public static @NotNull Title of(@NotNull String title) {
+        return new Title(title);
+    }
+
+    public static @NotNull Title of(@NotNull Text text) {
+        return new Title(text);
+    }
+
+    public static @NotNull Title of(@NotNull String title, @NotNull String subtitle) {
+        return new Title(title, subtitle);
+    }
+
+    public static @NotNull Title of(@NotNull Text title, @NotNull Text subtitle) {
+        return new Title(title, subtitle);
+    }
+
     public @NotNull Title send(@NotNull CommandSender player, long fadeIn, long fadeStay, long fadeOut) {
         Times of = Times.times(Ticks.duration(fadeIn), Ticks.duration(fadeStay), Ticks.duration(fadeOut));
         player.showTitle(title(
@@ -105,23 +121,5 @@ public class Title implements ISendable<Title> {
         );
 
         return this;
-    }
-
-    /* Static Constructors */
-
-    public static @NotNull Title of(@NotNull String title) {
-        return new Title(title);
-    }
-
-    public static @NotNull Title of(@NotNull Text text) {
-        return new Title(text);
-    }
-
-    public static @NotNull Title of(@NotNull String title, @NotNull String subtitle) {
-        return new Title(title, subtitle);
-    }
-
-    public static @NotNull Title of(@NotNull Text title, @NotNull Text subtitle) {
-        return new Title(title, subtitle);
     }
 }

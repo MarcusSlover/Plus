@@ -39,6 +39,45 @@ public class Text implements ISendable<Text> {
         this(LEGACY.serialize(component), component);
     }
 
+    public static @NotNull Text of(@NotNull String text) {
+        return new Text(text);
+    }
+
+    public static @NotNull Text of(@NotNull Component component) {
+        return new Text(component);
+    }
+
+    @Deprecated
+    public static @NotNull List<@NotNull Text> list(@NotNull List<@NotNull Component> lore) {
+        return lore.stream().map(Text::new).collect(Collectors.toList());
+    }
+
+    /**
+     * Creates a gradient text.
+     *
+     * @param text     the text to be colored.
+     * @param gradient the gradient to be used.
+     * @return the gradient text.
+     */
+    public static @NotNull String gradient(@NotNull String text, @NotNull ColorGradient gradient) {
+        int length = text.length();
+        StringBuilder builder = new StringBuilder();
+        gradient.forEach(length, color -> builder.append(color.plus()).append(text.charAt(0)));
+        return builder.toString();
+    }
+
+    public static @NotNull String legacy(@NotNull String text) {
+        return ColorUtil.color('&', text);
+    }
+
+    public static @NotNull Text empty() {
+        return new Text("");
+    }
+
+    public static @NotNull Text reset() {
+        return new Text("&f");
+    }
+
     public @NotNull Text hover(@Nullable Text hover) {
         if (hover == null) {
             this.component = this.component.hoverEvent(null);
@@ -130,8 +169,6 @@ public class Text implements ISendable<Text> {
         return this;
     }
 
-    /* Static Constructors */
-
     public @NotNull <T extends CommandSender> Text sendActionBar(@NotNull T... targets) {
         for (T sender : targets) {
             this.sendActionBar(sender);
@@ -143,48 +180,5 @@ public class Text implements ISendable<Text> {
     @Override
     public String toString() {
         return LEGACY.serialize(this.component);
-    }
-
-    /* Static Constructors */
-
-    public static @NotNull Text of(@NotNull String text) {
-        return new Text(text);
-    }
-
-    public static @NotNull Text of(@NotNull Component component) {
-        return new Text(component);
-    }
-
-    /* Static Methods */
-
-    @Deprecated
-    public static @NotNull List<@NotNull Text> list(@NotNull List<@NotNull Component> lore) {
-        return lore.stream().map(Text::new).collect(Collectors.toList());
-    }
-
-    /**
-     * Creates a gradient text.
-     *
-     * @param text     the text to be colored.
-     * @param gradient the gradient to be used.
-     * @return the gradient text.
-     */
-    public static @NotNull String gradient(@NotNull String text, @NotNull ColorGradient gradient) {
-        int length = text.length();
-        StringBuilder builder = new StringBuilder();
-        gradient.forEach(length, color -> builder.append(color.plus()).append(text.charAt(0)));
-        return builder.toString();
-    }
-
-    public static @NotNull String legacy(@NotNull String text) {
-        return ColorUtil.color('&', text);
-    }
-
-    public static @NotNull Text empty() {
-        return new Text("");
-    }
-
-    public static @NotNull Text reset() {
-        return new Text("&f");
     }
 }

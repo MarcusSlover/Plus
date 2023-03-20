@@ -23,21 +23,6 @@ public class Potion implements IApplicable<LivingEntity, Potion> {
     protected boolean icon;
     protected boolean force;
 
-    @Override
-    public @NotNull Potion apply(@NotNull LivingEntity entity) {
-        PotionEffect potionEffect = new PotionEffect(this.type, this.duration, this.amplifier)
-                .withParticles(this.particles)
-                .withAmbient(this.transparent)
-                .withIcon(this.icon);
-
-        //noinspection deprecation
-        entity.addPotionEffect(potionEffect, this.force);
-
-        return this;
-    }
-
-    /* Static Constructors */
-
     public static @NotNull Potion of(@NotNull PotionEffectType type) {
         return new Potion(type, Ticks.TICKS_PER_SECOND * 30, 0, true, false, true, false);
     }
@@ -60,5 +45,18 @@ public class Potion implements IApplicable<LivingEntity, Potion> {
 
     public static @NotNull Potion of(@NotNull PotionEffectType type, int durationTicks, int amplifier, boolean particles, boolean transparent, boolean icon, boolean force) {
         return new Potion(type, durationTicks, amplifier, particles, transparent, icon, force);
+    }
+
+    @Override
+    public @NotNull Potion apply(@NotNull LivingEntity entity) {
+        PotionEffect potionEffect = new PotionEffect(this.type, this.duration, this.amplifier)
+                .withParticles(this.particles)
+                .withAmbient(this.transparent)
+                .withIcon(this.icon);
+
+        //noinspection deprecation
+        entity.addPotionEffect(potionEffect, this.force);
+
+        return this;
     }
 }

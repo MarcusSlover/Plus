@@ -21,38 +21,6 @@ public class Button {
     private @Nullable Item item = null; // The item that represents the button
     private Canvas.ClickContext clickContext; // The click event of the button
 
-    public @NotNull Button slot(int slot) {
-        int x = transformX(slot);
-        int y = transformY(slot);
-        return this.slot(x, y);
-    }
-
-    public @NotNull Button slot(int x, int y) {
-        return this.slot(x, y, false);
-    }
-
-    public @NotNull Button slot(int min_or_x, int max_or_y, boolean rawSlot) {
-        if (rawSlot) {
-            int x1 = transformX(min_or_x);
-            int y1 = transformY(min_or_x);
-            int x2 = transformX(max_or_y);
-            int y2 = transformY(max_or_y);
-            return this.slot(x1, y1, x2, y2);
-        } else {
-            this.detectableArea = DetectableArea.of(min_or_x, max_or_y);
-            return this;
-        }
-    }
-
-    public @NotNull Button slot(int x1, int y1, int x2, int y2) {
-        int minX = Math.min(x1, x2);
-        int minY = Math.min(y1, y2);
-        int maxX = Math.max(x1, x2);
-        int maxY = Math.max(y1, y2);
-        this.detectableArea = DetectableArea.of(new Vector(minX, 0, minY), new Vector(maxX, 0, maxY));
-        return this;
-    }
-
     /**
      * Creates a button with the given coordinates.
      *
@@ -141,6 +109,38 @@ public class Button {
      */
     public static int transformSlot(int y, int x) {
         return (y * 9) + x;
+    }
+
+    public @NotNull Button slot(int slot) {
+        int x = transformX(slot);
+        int y = transformY(slot);
+        return this.slot(x, y);
+    }
+
+    public @NotNull Button slot(int x, int y) {
+        return this.slot(x, y, false);
+    }
+
+    public @NotNull Button slot(int min_or_x, int max_or_y, boolean rawSlot) {
+        if (rawSlot) {
+            int x1 = transformX(min_or_x);
+            int y1 = transformY(min_or_x);
+            int x2 = transformX(max_or_y);
+            int y2 = transformY(max_or_y);
+            return this.slot(x1, y1, x2, y2);
+        } else {
+            this.detectableArea = DetectableArea.of(min_or_x, max_or_y);
+            return this;
+        }
+    }
+
+    public @NotNull Button slot(int x1, int y1, int x2, int y2) {
+        int minX = Math.min(x1, x2);
+        int minY = Math.min(y1, y2);
+        int maxX = Math.max(x1, x2);
+        int maxY = Math.max(y1, y2);
+        this.detectableArea = DetectableArea.of(new Vector(minX, 0, minY), new Vector(maxX, 0, maxY));
+        return this;
     }
 
     /**

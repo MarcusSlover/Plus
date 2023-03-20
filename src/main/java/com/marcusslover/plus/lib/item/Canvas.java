@@ -26,22 +26,18 @@ import java.util.function.Consumer;
 @Data
 @Accessors(fluent = true, chain = true)
 public class Canvas {
-    private @NotNull Integer rows; // 1-6 (using non-primitive to allow @NotNull for the constructor)
-    private @NotNull Menu assosiatedMenu;
-
-    private @Nullable Component title;
-    private @Nullable Inventory assosiatedInventory = null;
-
-    private @Nullable ClickContext genericClick = null, selfInventory = null;
-    private @Nullable Canvas.PopulatorContext.ViewStrategy viewStrategy = null;
-
     // buttons of the canvas
     private final @NotNull List<Button> buttons = new ArrayList<>();
-
     // means literally nothing but used for some hacky stuff
     private final @NotNull Button hackyButton = Button.create(-1);
     // pages of the canvas
     private final @NotNull Map<UUID, Integer> pages = new HashMap<>();
+    private @NotNull Integer rows; // 1-6 (using non-primitive to allow @NotNull for the constructor)
+    private @NotNull Menu assosiatedMenu;
+    private @Nullable Component title;
+    private @Nullable Inventory assosiatedInventory = null;
+    private @Nullable ClickContext genericClick = null, selfInventory = null;
+    private @Nullable Canvas.PopulatorContext.ViewStrategy viewStrategy = null;
 
     /**
      * Set the title of the canvas.
@@ -143,6 +139,36 @@ public class Canvas {
      */
     public <T> @NotNull PopulatorContext<T> populate(@NotNull List<T> elements) {
         return new PopulatorContext<>(this, elements);
+    }
+
+    /**
+     * A button click. This is called when a player clicks on the button.
+     */
+    @FunctionalInterface
+    public interface ButtonClick {
+        /**
+         * Called when a target clicks on the button.
+         *
+         * @param target the target
+         * @param event  the event
+         */
+        void onClick(@NotNull Player target, @NotNull Item clicked, @NotNull InventoryClickEvent event, @NotNull Canvas it);
+    }
+
+    /**
+     * A generic click. This is called when a player clicks on the inventory.
+     * This is called before the button click.
+     */
+    @FunctionalInterface
+    public interface GenericClick extends ButtonClick {
+
+    }
+
+    /**
+     * A self inventory click. This is called when a player clicks on their inventory.
+     */
+    @FunctionalInterface
+    public interface SelfInventoryClick extends ButtonClick {
     }
 
     /**
@@ -259,43 +285,6 @@ public class Canvas {
         }
 
         /**
-         * Populates one element and provides the player with the button.
-         *
-         * @param <T> the type of the element
-         */
-        @FunctionalInterface
-        public interface Populator<T> {
-
-            /**
-             * Populates the element.
-             *
-             * @param element the element to populate
-             * @param canvas  the canvas
-             * @param button  the button associated with the element on the canvas
-             */
-            void populate(@NotNull T element, @NotNull Canvas canvas, @NotNull Button button);
-        }
-
-        /**
-         * Holds the strategy on how to populate the elements on the canvas.
-         * If a menu requires multiple pages, this is the strategy to use.
-         * The strategy allows the modification of the area in which the elements are populated.
-         */
-        @FunctionalInterface
-        public interface ViewStrategy {
-
-            /**
-             * Allows you to modify the button depending on the given context.
-             *
-             * @param counter the counter
-             * @param canvas  the canvas
-             * @param button  the button to modify if needed
-             * @return elements per page
-             */
-            int handle(int counter, @NotNull Canvas canvas, @NotNull Button button);
-        }
-
-        /**
          * Default view strategies.
          */
         @Accessors(fluent = true, chain = true)
@@ -364,6 +353,43 @@ public class Canvas {
 
             }
         }
+
+        /**
+         * Populates one element and provides the player with the button.
+         *
+         * @param <T> the type of the element
+         */
+        @FunctionalInterface
+        public interface Populator<T> {
+
+            /**
+             * Populates the element.
+             *
+             * @param element the element to populate
+             * @param canvas  the canvas
+             * @param button  the button associated with the element on the canvas
+             */
+            void populate(@NotNull T element, @NotNull Canvas canvas, @NotNull Button button);
+        }
+
+        /**
+         * Holds the strategy on how to populate the elements on the canvas.
+         * If a menu requires multiple pages, this is the strategy to use.
+         * The strategy allows the modification of the area in which the elements are populated.
+         */
+        @FunctionalInterface
+        public interface ViewStrategy {
+
+            /**
+             * Allows you to modify the button depending on the given context.
+             *
+             * @param counter the counter
+             * @param canvas  the canvas
+             * @param button  the button to modify if needed
+             * @return elements per page
+             */
+            int handle(int counter, @NotNull Canvas canvas, @NotNull Button button);
+        }
     }
 
     /**
@@ -383,35 +409,5 @@ public class Canvas {
         public @NotNull Canvas end() {
             return this.canvas;
         }
-    }
-
-    /**
-     * A button click. This is called when a player clicks on the button.
-     */
-    @FunctionalInterface
-    public interface ButtonClick {
-        /**
-         * Called when a target clicks on the button.
-         *
-         * @param target the target
-         * @param event  the event
-         */
-        void onClick(@NotNull Player target, @NotNull Item clicked, @NotNull InventoryClickEvent event, @NotNull Canvas it);
-    }
-
-    /**
-     * A generic click. This is called when a player clicks on the inventory.
-     * This is called before the button click.
-     */
-    @FunctionalInterface
-    public interface GenericClick extends ButtonClick {
-
-    }
-
-    /**
-     * A self inventory click. This is called when a player clicks on their inventory.
-     */
-    @FunctionalInterface
-    public interface SelfInventoryClick extends ButtonClick {
     }
 }

@@ -72,6 +72,42 @@ public class Item extends Taggable<Item, ItemMeta> {
         this.lore(lore);
     }
 
+    public static @NotNull Item of() {
+        return new Item(Material.STONE, 1);
+    }
+
+    public static @NotNull Item of(@NotNull Material material) {
+        return new Item(material, 1);
+    }
+
+    public static @NotNull Item of(@NotNull Material material, int amount) {
+        return new Item(material, amount);
+    }
+
+    public static @NotNull Item of(@NotNull Material material, int amount, @Nullable Text name) {
+        return new Item(material, amount, name);
+    }
+
+    public static @NotNull Item of(@NotNull Material material, int amount, @Nullable Text name, @Nullable List<@NotNull Text> lore) {
+        return new Item(material, amount, name, lore);
+    }
+
+    public static @NotNull Item of(@NotNull Material material, int amount, @Nullable String name) {
+        return new Item(material, amount, name);
+    }
+
+    public static @NotNull Item of(@NotNull Material material, int amount, @Nullable String name, @Nullable List<@NotNull String> lore) {
+        return new Item(material, amount, name, lore);
+    }
+
+    public static @NotNull Item of(@Nullable ItemStack itemStack) {
+        if (itemStack == null) {
+            return Item.of();
+        } else {
+            return new Item(itemStack);
+        }
+    }
+
     public boolean isValid() {
         return !this.type().isAir();
     }
@@ -297,7 +333,6 @@ public class Item extends Taggable<Item, ItemMeta> {
         return Objects.requireNonNull(this.meta()).getPersistentDataContainer();
     }
 
-
     public boolean hasCustomModelData() {
         ItemMeta itemMeta = this.itemStack.getItemMeta();
         if (itemMeta == null) {
@@ -466,43 +501,6 @@ public class Item extends Taggable<Item, ItemMeta> {
         }
 
         return super.equals(obj);
-    }
-
-    /* Static Constructors */
-    public static @NotNull Item of() {
-        return new Item(Material.STONE, 1);
-    }
-
-    public static @NotNull Item of(@NotNull Material material) {
-        return new Item(material, 1);
-    }
-
-    public static @NotNull Item of(@NotNull Material material, int amount) {
-        return new Item(material, amount);
-    }
-
-    public static @NotNull Item of(@NotNull Material material, int amount, @Nullable Text name) {
-        return new Item(material, amount, name);
-    }
-
-    public static @NotNull Item of(@NotNull Material material, int amount, @Nullable Text name, @Nullable List<@NotNull Text> lore) {
-        return new Item(material, amount, name, lore);
-    }
-
-    public static @NotNull Item of(@NotNull Material material, int amount, @Nullable String name) {
-        return new Item(material, amount, name);
-    }
-
-    public static @NotNull Item of(@NotNull Material material, int amount, @Nullable String name, @Nullable List<@NotNull String> lore) {
-        return new Item(material, amount, name, lore);
-    }
-
-    public static @NotNull Item of(@Nullable ItemStack itemStack) {
-        if (itemStack == null) {
-            return Item.of();
-        } else {
-            return new Item(itemStack);
-        }
     }
 
     @Override

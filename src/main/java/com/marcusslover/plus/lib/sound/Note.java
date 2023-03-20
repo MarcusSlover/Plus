@@ -18,28 +18,6 @@ import org.jetbrains.annotations.NotNull;
 public class Note implements ISendable<Note> {
     protected final Sound sound;
 
-    public @NotNull Note send(@NotNull Location location) {
-        location.getWorld().playSound(this.sound, location.getX(), location.getY(), location.getZ());
-
-        return this;
-    }
-
-    @Override
-    public @NotNull <T extends CommandSender> Note send(@NotNull T target) {
-        target.playSound(this.sound);
-
-        return this;
-    }
-
-    @Override
-    public @NotNull Note send(Audience audience) {
-        audience.playSound(this.sound);
-
-        return this;
-    }
-
-    /* Static Constructors */
-
     public static @NotNull Note of(@NotNull org.bukkit.Sound sound) {
         return new Note(Sound.sound(sound.key(), Sound.Source.MASTER, 1F, 1F));
     }
@@ -78,5 +56,25 @@ public class Note implements ISendable<Note> {
 
     public static @NotNull Note of(@NotNull Key key, float volume, float pitch, @NotNull Sound.Source source) {
         return new Note(Sound.sound(key, source, volume, pitch));
+    }
+
+    public @NotNull Note send(@NotNull Location location) {
+        location.getWorld().playSound(this.sound, location.getX(), location.getY(), location.getZ());
+
+        return this;
+    }
+
+    @Override
+    public @NotNull <T extends CommandSender> Note send(@NotNull T target) {
+        target.playSound(this.sound);
+
+        return this;
+    }
+
+    @Override
+    public @NotNull Note send(Audience audience) {
+        audience.playSound(this.sound);
+
+        return this;
     }
 }

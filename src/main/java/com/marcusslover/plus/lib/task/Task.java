@@ -31,6 +31,7 @@ public class Task {
      * @param run The task to run
      * @return The Task that has been scheduled
      */
+    @Deprecated
     public static Task syncDelayed(Runnable run) {
         return syncDelayed(ServerUtils.getCallingPlugin(), run);
     }
@@ -52,6 +53,7 @@ public class Task {
      * @param run The task to run
      * @return The Task that has been scheduled
      */
+    @Deprecated
     public static Task syncDelayed(Consumer<Task> run) {
         return syncDelayed(ServerUtils.getCallingPlugin(), run);
     }
@@ -74,6 +76,7 @@ public class Task {
      * @param delay The delay in ticks to wait before running the task
      * @return The Task that has been scheduled
      */
+    @Deprecated
     public static Task syncDelayed(Runnable run, long delay) {
         return syncDelayed(ServerUtils.getCallingPlugin(), run, delay);
     }
@@ -99,6 +102,7 @@ public class Task {
      * @param delay The delay in ticks to wait before running the task
      * @return The Task that has been scheduled
      */
+    @Deprecated
     public static Task syncDelayed(Consumer<Task> run, long delay) {
         return syncDelayed(ServerUtils.getCallingPlugin(), run, delay);
     }
@@ -125,6 +129,7 @@ public class Task {
      * @param period The number of ticks between executions of the task
      * @return The Task that has been scheduled
      */
+    @Deprecated
     public static Task syncRepeating(Runnable run, long delay, long period) {
         return syncRepeating(ServerUtils.getCallingPlugin(), run, delay, period);
     }
@@ -152,6 +157,7 @@ public class Task {
      * @param period The number of ticks between executions of the task
      * @return The Task that has been scheduled
      */
+    @Deprecated
     public static Task syncRepeating(Consumer<Task> run, long delay, long period) {
         return syncRepeating(ServerUtils.getCallingPlugin(), run, delay, period);
     }
@@ -177,6 +183,7 @@ public class Task {
      * @param run The task to run
      * @return The Task that has been scheduled
      */
+    @Deprecated
     public static Task asyncDelayed(Runnable run) {
         return asyncDelayed(ServerUtils.getCallingPlugin(), run);
     }
@@ -200,6 +207,7 @@ public class Task {
      * @param run The task to run
      * @return The Task that has been scheduled
      */
+    @Deprecated
     public static Task asyncDelayed(Consumer<Task> run) {
         return asyncDelayed(ServerUtils.getCallingPlugin(), run);
     }
@@ -222,6 +230,7 @@ public class Task {
      * @param delay The delay in ticks to wait before running the task
      * @return The Task that has been scheduled
      */
+    @Deprecated
     public static Task asyncDelayed(Runnable run, long delay) {
         return asyncDelayed(ServerUtils.getCallingPlugin(), run, delay);
     }
@@ -247,6 +256,7 @@ public class Task {
      * @param delay The delay in ticks to wait before running the task
      * @return The Task that has been scheduled
      */
+    @Deprecated
     public static Task asyncDelayed(Consumer<Task> run, long delay) {
         return asyncDelayed(ServerUtils.getCallingPlugin(), run, delay);
     }
@@ -259,6 +269,7 @@ public class Task {
      * @param delay  The delay in ticks to wait before running the task
      * @return The Task that has been scheduled
      */
+    @Deprecated
     public static Task asyncDelayed(Plugin plugin, Consumer<Task> run, long delay) {
         Task[] task = {null};
         task[0] = new Task(Bukkit.getScheduler().scheduleAsyncDelayedTask(plugin, () -> run.accept(task[0]), delay), TaskType.ASYNC_DELAYED, plugin);
@@ -273,6 +284,7 @@ public class Task {
      * @param period The number of ticks between executions of the task
      * @return The Task that has been scheduled
      */
+    @Deprecated
     public static Task asyncRepeating(Consumer<Task> run, long delay, long period) {
         return asyncRepeating(ServerUtils.getCallingPlugin(), run, delay, period);
     }
@@ -286,6 +298,7 @@ public class Task {
      * @param period The number of ticks between executions of the task
      * @return The Task that has been scheduled
      */
+    @Deprecated
     public static Task asyncRepeating(Plugin plugin, Consumer<Task> run, long delay, long period) {
         Task[] task = {null};
         task[0] = new Task(Bukkit.getScheduler().scheduleAsyncRepeatingTask(plugin, () -> run.accept(task[0]), delay, period), TaskType.ASYNC_REPEATING, plugin);
@@ -300,6 +313,7 @@ public class Task {
      * @param period The number of ticks between executions of the task
      * @return The Task that has been scheduled
      */
+    @Deprecated
     public static Task asyncRepeating(Runnable run, long delay, long period) {
         return asyncRepeating(ServerUtils.getCallingPlugin(), run, delay, period);
     }
