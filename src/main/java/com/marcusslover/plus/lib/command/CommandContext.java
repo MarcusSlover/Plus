@@ -10,15 +10,66 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
+/**
+ * The context of a command.
+ * Mainly used by developers in the {@link ICommand#execute(CommandContext)} method.
+ * Provides you with a context of a specific command execution.
+ *
+ * @param sender The sender of the command.
+ * @param label  The label of the command.
+ * @param args   The arguments of the command.
+ * @param parent The parent context.
+ */
 public record CommandContext(@NotNull Command commandData,
                              @NotNull CommandSender sender,
                              @NotNull String label,
                              @NotNull String[] args,
                              @Nullable CommandContext parent) implements ICommandContextHelper<CommandContext> {
+
+    /**
+     * Creates a new command context.
+     *
+     * @param sender The sender of the command.
+     * @param label  The label of the command.
+     * @param args   The arguments of the command.
+     */
     public CommandContext(@NotNull Command commandData, @NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
         this(commandData, sender, label, args, null);
     }
 
+    /**
+     * Gets the sender of the command.
+     * Throws an exception if the sender is not a player.
+     *
+     * @return The sender of the command.
+     */
+    public @NotNull Player player() {
+        if (this.sender instanceof Player p) {
+            return p;
+        }
+        throw new IllegalStateException("Sender is not a player");
+    }
+
+    /**
+     * Gets the sender of the command.
+     * Throws an exception if the sender is not a console.
+     *
+     * @return The sender of the command.
+     */
+    public @NotNull ConsoleCommandSender console() {
+        if (this.sender instanceof ConsoleCommandSender c) {
+            return c;
+        }
+        throw new IllegalStateException("Sender is not a console");
+    }
+
+    /**
+     * Gets the sender of the command.
+     * Passes the sender to the consumer if it is a player.
+     *
+     * @param player The consumer to pass the player to.
+     * @return The context.
+     */
     public @NotNull CommandContext asPlayer(@NotNull Consumer<@NotNull Player> player) {
         if (this.sender instanceof Player p) {
             player.accept(p);
@@ -26,6 +77,13 @@ public record CommandContext(@NotNull Command commandData,
         return this;
     }
 
+    /**
+     * Gets the sender of the command.
+     * Passes the sender to the consumer if it is a console.
+     *
+     * @param console The consumer to pass the console to.
+     * @return The context.
+     */
     public @NotNull CommandContext asConsole(@NotNull Consumer<ConsoleCommandSender> console) {
         if (this.sender instanceof ConsoleCommandSender c) {
             console.accept(c);
