@@ -224,7 +224,7 @@ public class Button {
          * @return True if the vector is within the region
          */
         @Override
-        public boolean within(@NotNull Vector vector, @NotNull VectorStrategy strategy) {
+        public boolean within(@NotNull Vector vector, @NotNull IRegion.DefaultVectorStrategy strategy) {
             if (this.singular()) {
                 return IRegion.super.within(vector, this.min(), this.max().clone().add(new Vector(this.size, 0, this.size)), strategy);
             }
