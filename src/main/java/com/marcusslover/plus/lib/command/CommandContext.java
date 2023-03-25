@@ -10,11 +10,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
-public record CommandContext(@NotNull CommandSender sender, @NotNull String label,
+public record CommandContext(@NotNull Command commandData,
+                             @NotNull CommandSender sender,
+                             @NotNull String label,
                              @NotNull String[] args,
                              @Nullable CommandContext parent) implements ICommandContextHelper<CommandContext> {
-    public CommandContext(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
-        this(sender, label, args, null);
+    public CommandContext(@NotNull Command commandData, @NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
+        this(commandData, sender, label, args, null);
     }
 
     public @NotNull CommandContext asPlayer(@NotNull Consumer<@NotNull Player> player) {
@@ -50,6 +52,7 @@ public record CommandContext(@NotNull CommandSender sender, @NotNull String labe
         int remainingArgsLength = originalArgs.size() - consumedArguments;
         List<String> remainingArgs = remainingArgsLength > 0 ? originalArgs.subList(consumedArguments, originalArgs.size()) : Collections.emptyList();
 
-        return new CommandContext(sender, label, remainingArgs.toArray(new String[0]), this);
+        // 03.25.2023 - MarcusSlover: Added this.commandData to the constructor.
+        return new CommandContext(this.commandData, sender, label, remainingArgs.toArray(new String[0]), this);
     }
 }

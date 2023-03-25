@@ -10,7 +10,7 @@ public class CommandContextTest {
     @Test
     public void childContextTest() {
         String[] parentArgs = new String[]{"world", "plus"};
-        CommandContext context = new CommandContext(null, "hello", parentArgs);
+        CommandContext context = new CommandContext(null, null, "hello", parentArgs);
         assertNull(context.parent());
         assertEquals(context.label(), "hello");
         assertArrayEquals(context.args(), parentArgs);
