@@ -46,7 +46,7 @@ public final class CommandManager {
         org.bukkit.command.Command cmd = new org.bukkit.command.Command(name, description, "", aliases) {
             @Override
             public boolean execute(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] args) {
-                CommandContext commandContext = new CommandContext(sender, commandLabel, args);
+                CommandContext commandContext = new CommandContext(commandAnnotation, sender, commandLabel, args);
 
                 if (!permission.isEmpty() && !sender.hasPermission(permission)) {
                     Text.of(pMessage).send(sender);
@@ -58,7 +58,7 @@ public final class CommandManager {
 
             @Override
             public @NotNull List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args) throws IllegalArgumentException {
-                TabCompleteContext tabCompleteContext = new TabCompleteContext(sender, args);
+                TabCompleteContext tabCompleteContext = new TabCompleteContext(commandAnnotation, sender, name, alias, args);
 
                 if (!permission.isEmpty() && !sender.hasPermission(permission)) {
                     return Collections.emptyList();
