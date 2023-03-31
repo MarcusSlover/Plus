@@ -248,6 +248,15 @@ public class Item extends Taggable<Item, ItemMeta> {
         return this.enchant(enchantment) > 0;
     }
 
+    public @NotNull Item glow() {
+        if (this.itemStack.getType().equals(Material.BOW)) {
+            enchant(Enchantment.DIG_SPEED, 1);
+        } else {
+            enchant(Enchantment.ARROW_INFINITE, 1);
+        }
+        return addItemFlag(ItemFlag.HIDE_ENCHANTS);
+    }
+
     public @NotNull Item color(@Nullable com.marcusslover.plus.lib.color.Color plusColor) {
         return this.color(plusColor != null ? Color.fromRGB(plusColor.rgb()) : null);
     }
