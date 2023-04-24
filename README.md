@@ -8,7 +8,7 @@
 
 # 💻 For Developers
 
-This library is currently meant to be working with PaperMC 1.19.3.<br/>
+This library is currently meant to be working with PaperMC 1.19.4.<br/>
 However, it should be compatible with any version of Minecraft 1.18 and above.<br/>
 
 ## 🐘 Gradle
@@ -18,7 +18,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'com.marcusslover:plus:4.0.2-SNAPSHOT'
+    compileOnly 'com.marcusslover:plus:4.0.3-SNAPSHOT'
 }
 ```
 ## 🦢 Maven
@@ -31,6 +31,6 @@ dependencies {
 <dependency>
     <groupId>com.marcusslover</groupId>
     <artifactId>plus</artifactId>
-    <version>4.0.2-SNAPSHOT</version>
+    <version>4.0.3-SNAPSHOT</version>
 </dependency>
 ```
