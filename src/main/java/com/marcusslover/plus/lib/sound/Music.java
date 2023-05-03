@@ -4,13 +4,18 @@ import com.marcusslover.plus.lib.common.ISendable;
 import com.marcusslover.plus.lib.server.ServerUtils;
 import com.marcusslover.plus.lib.task.Task;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.Accessors;
 import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.pointer.Pointer;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 /**
  * Music can be used to loop notes for an audience or command sender.
@@ -27,16 +32,20 @@ import java.util.Map;
 @Data
 @Accessors(fluent = true)
 public class Music implements ISendable<Music> {
-    public static Map<Audience, Music> playerMusic = new HashMap<>();
-    public long ticks = 0;
-    public int loops = 0;
+    /** Pointer which checks if the player has music playing. */
+    @Getter public static final Pointer<Boolean> MUSIC_PLAYING = Pointer.pointer(Boolean.class, Key.key("music_playing"));
+    protected final Map<Audience, Session> sessions = new HashMap<>();
+    /** The intro note to play before the loop. */
     protected Note intro;
+    /** The length of the intro in ticks. */
     protected long introLength;
+    /** The note to play on loop. */
     protected Note loop;
+    /** The length of the loop in ticks. */
     protected long loopLength;
+    /** The note to play when stopped. */
     protected Note tail;
-    protected Task loopTask;
-    protected Task tickTask;
+
 
     private Music(Note intro, long introLength, Note loop, long loopLength, Note tail) {
         this.intro = intro;
@@ -44,10 +53,6 @@ public class Music implements ISendable<Music> {
         this.loop = loop;
         this.loopLength = loopLength;
         this.tail = tail;
-        this.loopTask = null;
-        this.tickTask = Task.asyncRepeating(ServerUtils.getCallingPlugin(), () -> {
-            ticks++;
-        }, 1, 1);
     }
 
     /**
@@ -57,8 +62,33 @@ public class Music implements ISendable<Music> {
      * @param noteLength The length of the note in ticks.
      * @return The music object.
      */
-    public static @NotNull Music of(@NotNull Note note, long noteLength) {
-        return new Music(null, 0, note, noteLength, null);
+    public static @NotNull Music of(@NotNull Note note, long noteLength, @NotNull Audience audience) {
+        Music music = new Music(null, 0, note, noteLength, null);;
+        music.sessions.put(audience, music.createSession(audience));
+        return music;
+    }
+
+    private Session createSession(Audience audience) {
+        return new Session(System.currentTimeMillis(), (audience1) -> (session) -> {
+                session.audience(audience1);
+                if (session.stopped) {
+                    return null;
+                }
+                if (this.introLength != 0 && this.intro != null) {
+                    this.intro.send(audience1);
+                    return Task.syncRepeating(ServerUtils.getCallingPlugin(), () -> {
+                            this.loop.send(audience1);
+                            audience1.getOrDefault(MUSIC_PLAYING, true);
+                            session.incrementLoops();
+                    }, this.introLength, loopLength);
+                } else {
+                    return Task.syncRepeating(ServerUtils.getCallingPlugin(), () -> {
+                        this.loop.send(audience1);
+                        audience1.getOrDefault(MUSIC_PLAYING, true);
+                        session.incrementLoops();
+                    }, 1, loopLength);
+                }
+        }, audience);
     }
 
     /**
@@ -71,43 +101,30 @@ public class Music implements ISendable<Music> {
      * @param tail        Note to play when stopped.
      * @return The music object.
      */
-    public static @NotNull Music of(@NotNull Note intro, long introLength, @NotNull Note loop, long loopLength, @NotNull Note tail) {
-        return new Music(intro, introLength, loop, loopLength, tail);
-    }
-
-    /**
-     * Stop music from playing to all audiences.
-     */
-    public static void stopAll() {
-        for (Audience audience : Music.playerMusic.keySet()) {
-            Music.playerMusic.get(audience).forceStop(audience);
-        }
+    public static @NotNull Music of(@NotNull Note intro, long introLength, @NotNull Note loop, long loopLength, @NotNull Note tail, @NotNull Audience audience) {
+        Music music = new Music(intro, introLength, loop, loopLength, tail);
+        music.sessions.put(audience, music.createSession(audience));
+        return music;
     }
 
     /**
      * Stop the music for an audience and play the tail if it exists.
-     *
-     * @param audience The audience.
      */
-    public void stop(Audience audience) {
-        if (!Music.playerMusic.containsKey(audience)) {
-            return;
-        }
-        stopTasks();
-        if (this.loops > 0) {
+    public void stop(Session session) {
+        if (session.loops() > 0) {
             Task.syncDelayed(ServerUtils.getCallingPlugin(), () -> {
-                audience.stopSound(this.loop.sound);
+                session.stopSound(this.loop);
+                session.audience().getOrDefault(MUSIC_PLAYING, false);
                 if (this.tail != null) {
-                    this.tail.send(audience);
+                    this.tail.send(session.audience);
                 }
-            }, this.loopLength - (this.ticks % this.loopLength));
+            }, this.loopLength - (session.ticks() % this.loopLength));
         } else {
-            audience.stopSound(this.loop.sound);
+            session.stopSound(this.loop);
             if (this.tail != null) {
-                this.tail.send(audience);
+                this.tail.send(session.audience);
             }
         }
-        Music.playerMusic.remove(audience);
     }
 
     /**
@@ -116,71 +133,27 @@ public class Music implements ISendable<Music> {
      * @param audience The audience.
      */
     public void forceStop(Audience audience) {
-        if (!Music.playerMusic.containsKey(audience)) {
-            return;
-        }
-        stopTasks();
-        if (this.intro != null) {
+        this.sessions().get(audience).stop();
+        if (this.intro() != null) {
             audience.stopSound(this.intro().sound);
         }
-        if (this.loop != null) {
+        if (this.loop() != null) {
             audience.stopSound(this.loop().sound);
         }
-        if (this.tail != null) {
+        if (this.tail() != null) {
             audience.stopSound(this.tail().sound);
         }
-        Music.playerMusic.remove(audience);
-    }
-
-    /**
-     * Stops the music from looping again, but it will finish the current note.
-     */
-    public void stopTasks() {
-        this.tickTask.cancel();
-        this.loopTask.cancel();
     }
 
     @Override
-    public @NotNull <T extends CommandSender> Music send(@NotNull T target) throws IllegalStateException {
-        if (Music.playerMusic.containsKey(target)) {
-            throw new IllegalStateException("Music is already playing for this target.");
-        } else {
-            Music.playerMusic.put(target, this);
-        }
-        if (this.introLength != 0 && this.intro != null) {
-            this.intro.send(target);
-            loopTask = Task.syncRepeating(ServerUtils.getCallingPlugin(), () -> {
-                this.loop.send(target);
-                this.loops++;
-            }, this.introLength + 20, loopLength);
-        } else {
-            loopTask = Task.syncRepeating(ServerUtils.getCallingPlugin(), () -> {
-                this.loop.send(target);
-                this.loops++;
-            }, 1, loopLength);
-        }
+    public @NotNull <T extends CommandSender> Music send(@NotNull T target) {
+        this.sessions().get(target).start();
         return this;
     }
 
     @Override
-    public @NotNull Music send(Audience audience) throws IllegalStateException {
-        if (Music.playerMusic.containsKey(audience)) {
-            throw new IllegalStateException("Music is already playing for this audience.");
-        } else {
-            Music.playerMusic.put(audience, this);
-        }
-        if (this.introLength != 0 && this.intro != null) {
-            this.intro.send(audience);
-            loopTask = Task.syncRepeating(ServerUtils.getCallingPlugin(), () -> {
-                this.loop.send(audience);
-                this.loops++;
-            }, this.introLength + 20, loopLength);
-        } else {
-            loopTask = Task.syncRepeating(ServerUtils.getCallingPlugin(), () -> {
-                this.loop.send(audience);
-                this.loops++;
-            }, 1, loopLength);
-        }
+    public @NotNull Music send(Audience audience) {
+        this.sessions().get(audience).start();
         return this;
     }
 
@@ -219,5 +192,56 @@ public class Music implements ISendable<Music> {
     public @NotNull Music tail(@NotNull Note tail) {
         this.tail = tail;
         return this;
+    }
+
+    public Music play() {
+        this.sessions().forEach((audience, session) -> session.start());
+        return this;
+    }
+
+
+    private static class Session {
+        @Getter private final long startTime;
+        @Getter @Setter private long ticks = 0;
+        @Getter private final Task tickTask;
+        @Getter private final Task loopTask;
+        @Getter @Setter private int loops = 0;
+        @Getter @Setter private boolean stopped = true;
+        @Getter @Setter private Audience audience;
+
+        public Session(long startTime, Function<Audience, Function<Session, Task>> loopTask, Audience audience) {
+            this.startTime = startTime;
+            this.tickTask = Task.syncRepeating(ServerUtils.getCallingPlugin(), this::tick, 1, 1);
+            this.loopTask = loopTask.apply(audience).apply(this);
+            this.audience = audience;
+        }
+
+        public void tick() {
+            if (!this.stopped) {
+                this.ticks++;
+            }
+        }
+
+        public void incrementLoops() {
+            if (!this.stopped) {
+                this.loops++;
+            }
+        }
+
+        public void stop() {
+            this.stopped(true);
+            this.tickTask.cancel();
+            if (this.loopTask != null) {
+                this.loopTask.cancel();
+            }
+        }
+
+        public void stopSound(Note note) {
+            this.audience.stopSound(note.sound);
+        }
+
+        public void start() {
+            this.stopped(false);
+        }
     }
 }
