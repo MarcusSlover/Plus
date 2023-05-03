@@ -9,6 +9,9 @@ import net.kyori.adventure.audience.Audience;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Music can be used to loop notes for an audience or command sender.
  *
@@ -24,6 +27,7 @@ import org.jetbrains.annotations.NotNull;
 @Data
 @Accessors(fluent = true)
 public class Music implements ISendable<Music> {
+    public static Map<Audience, Music> playerMusic = new HashMap<>();
     public long ticks = 0;
     public int loops = 0;
     protected Note intro;
@@ -72,14 +76,24 @@ public class Music implements ISendable<Music> {
     }
 
     /**
+     * Stop music from playing to all audiences.
+     */
+    public static void stopAll() {
+        for (Audience audience : Music.playerMusic.keySet()) {
+            Music.playerMusic.get(audience).forceStop(audience);
+        }
+    }
+
+    /**
      * Stop the music for an audience and play the tail if it exists.
      *
      * @param audience The audience.
      */
     public void stop(Audience audience) {
-        this.tickTask.cancel();
-        this.loopTask.cancel();
-        // If we are playing the loop sound, then wait until its finished before then playing the tail.
+        if (!Music.playerMusic.containsKey(audience)) {
+            return;
+        }
+        stopTasks();
         if (this.loops > 0) {
             Task.syncDelayed(ServerUtils.getCallingPlugin(), () -> {
                 audience.stopSound(this.loop.sound);
@@ -93,29 +107,7 @@ public class Music implements ISendable<Music> {
                 this.tail.send(audience);
             }
         }
-    }
-
-    /**
-     * Stop the music for a command sender and play the tail if it exists.
-     *
-     * @param target The command sender.
-     */
-    public void stop(CommandSender target) {
-        this.tickTask.cancel();
-        this.loopTask.cancel();
-        if (this.loops > 0) {
-            Task.syncDelayed(ServerUtils.getCallingPlugin(), () -> {
-                target.stopSound(this.loop.sound);
-                if (this.tail != null) {
-                    this.tail.send(target);
-                }
-            }, this.loopLength - (this.ticks % this.loopLength) - 1);
-        } else {
-            target.stopSound(this.loop.sound);
-            if (this.tail != null) {
-                this.tail.send(target);
-            }
-        }
+        Music.playerMusic.remove(audience);
     }
 
     /**
@@ -123,9 +115,11 @@ public class Music implements ISendable<Music> {
      *
      * @param audience The audience.
      */
-    public void stopAll(Audience audience) {
-        this.tickTask.cancel();
-        this.loopTask.cancel();
+    public void forceStop(Audience audience) {
+        if (!Music.playerMusic.containsKey(audience)) {
+            return;
+        }
+        stopTasks();
         if (this.intro != null) {
             audience.stopSound(this.intro().sound);
         }
@@ -135,29 +129,24 @@ public class Music implements ISendable<Music> {
         if (this.tail != null) {
             audience.stopSound(this.tail().sound);
         }
+        Music.playerMusic.remove(audience);
     }
 
     /**
-     * Stop the music from the command sender without playing the tail.
-     *
-     * @param target The command sender.
+     * Stops the music from looping again, but it will finish the current note.
      */
-    public void stopAll(CommandSender target) {
+    public void stopTasks() {
         this.tickTask.cancel();
         this.loopTask.cancel();
-        if (this.intro != null) {
-            target.stopSound(this.intro().sound);
-        }
-        if (this.loop != null) {
-            target.stopSound(this.loop().sound);
-        }
-        if (this.tail != null) {
-            target.stopSound(this.tail().sound);
-        }
     }
 
     @Override
-    public @NotNull <T extends CommandSender> Music send(@NotNull T target) {
+    public @NotNull <T extends CommandSender> Music send(@NotNull T target) throws IllegalStateException {
+        if (Music.playerMusic.containsKey(target)) {
+            throw new IllegalStateException("Music is already playing for this target.");
+        } else {
+            Music.playerMusic.put(target, this);
+        }
         if (this.introLength != 0 && this.intro != null) {
             this.intro.send(target);
             loopTask = Task.syncRepeating(ServerUtils.getCallingPlugin(), () -> {
@@ -174,7 +163,12 @@ public class Music implements ISendable<Music> {
     }
 
     @Override
-    public @NotNull Music send(Audience audience) {
+    public @NotNull Music send(Audience audience) throws IllegalStateException {
+        if (Music.playerMusic.containsKey(audience)) {
+            throw new IllegalStateException("Music is already playing for this audience.");
+        } else {
+            Music.playerMusic.put(audience, this);
+        }
         if (this.introLength != 0 && this.intro != null) {
             this.intro.send(audience);
             loopTask = Task.syncRepeating(ServerUtils.getCallingPlugin(), () -> {
