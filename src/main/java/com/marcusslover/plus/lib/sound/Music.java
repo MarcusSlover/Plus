@@ -23,9 +23,6 @@ import org.jetbrains.annotations.NotNull;
  * This will play the note "music.loop" for 2400 ticks (2 minutes) for the audience.
  * <p>
  */
-@Data
-@Accessors(fluent = true)
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class Music implements ISendable<Music> {
 	protected final Note intro;
 	protected final long introLength;
@@ -35,10 +32,19 @@ public class Music implements ISendable<Music> {
 
 	protected Task loopTask = null;
 	public long ticks = 0;
-	protected Task tickTask = Task.asyncRepeating(ServerUtils.getCallingPlugin(), () -> {
-		ticks++;
-	}, 0, 1);
+	protected Task tickTask = null;
 	public int loops = 0;
+
+ private Music(Note intro, long introLength, Note length, long loopLength, Note tail) {
+  this.intro = intro;
+  this.introLength = introLength;
+  this.loop = loop;
+  this.loopLength = loopLength;
+  this.tail = tail;
+  this.tickTask = Task.asyncRepeating(ServerUtils.getCallingPlugin(), () -> {
+		  ticks++;
+	 }, 1, 1);
+ }
 
 
 	/**
@@ -96,12 +102,14 @@ public class Music implements ISendable<Music> {
 	public void stopAll(Audience audience) {
 		this.tickTask.cancel();
 		this.loopTask.cancel();
-		if (this.intro != null)
-			audience.stopSound(this.intro().sound);
-		if (this.loop != null)
+		if (this.intro != null) {
+			audience.stopSound(this.intro().sound);}
+		if (this.loop != null){
 			audience.stopSound(this.loop().sound);
-		if (this.tail != null)
+		}
+		if (this.tail != null){
 			audience.stopSound(this.tail().sound);
+		}
 	}
 
 	/**
@@ -132,7 +140,7 @@ public class Music implements ISendable<Music> {
 			loopTask = Task.syncRepeating(ServerUtils.getCallingPlugin(), () -> {
 				this.loop.send(target);
 				this.loops++;
-			}, 0, loopLength);
+			}, 1, loopLength);
 		}
 		return this;
 	}
@@ -149,7 +157,7 @@ public class Music implements ISendable<Music> {
 			loopTask = Task.syncRepeating(ServerUtils.getCallingPlugin(), () -> {
 				this.loop.send(audience);
 				this.loops++;
-			}, 0, loopLength);
+			}, 1, loopLength);
 		}
 		return this;
 	}
