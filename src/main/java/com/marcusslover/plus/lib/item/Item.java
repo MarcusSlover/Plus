@@ -8,6 +8,7 @@ import com.marcusslover.plus.lib.text.Text;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -373,7 +374,7 @@ public class Item extends Taggable<Item, ItemMeta> {
     public @NotNull Item name(@Nullable Text name) {
         return this.meta(itemMeta -> {
             if (name != null) {
-                itemMeta.displayName(name.comp());
+                itemMeta.displayName(name.comp().decoration(TextDecoration.ITALIC, TextDecoration.State.FALSE));
             } else {
                 itemMeta.displayName(null);
             }
@@ -401,7 +402,7 @@ public class Item extends Taggable<Item, ItemMeta> {
                 if (name.isEmpty()) {
                     itemMeta.displayName(null);
                 } else {
-                    itemMeta.displayName(Text.of(name).comp());
+                    itemMeta.displayName(Text.of(name).comp().decoration(TextDecoration.ITALIC, TextDecoration.State.FALSE));
                 }
             } else {
                 itemMeta.displayName(null);
@@ -424,7 +425,7 @@ public class Item extends Taggable<Item, ItemMeta> {
                 if (lore.isEmpty()) {
                     itemMeta.lore(null);
                 } else {
-                    itemMeta.lore(lore.stream().map(line -> Text.of(line).comp()).toList());
+                    itemMeta.lore(lore.stream().map(line -> Text.of(line).comp().decoration(TextDecoration.ITALIC, TextDecoration.State.FALSE)).toList());
                 }
             } else {
                 itemMeta.lore(null);
