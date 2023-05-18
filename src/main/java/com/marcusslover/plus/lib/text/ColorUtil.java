@@ -2,7 +2,7 @@ package com.marcusslover.plus.lib.text;
 
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.md_5.bungee.api.ChatColor;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
