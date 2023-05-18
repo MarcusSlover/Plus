@@ -17,6 +17,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
+// not sure if this is a good idea
 @Data(staticConstructor = "of")
 @Accessors(fluent = true, chain = true)
 @Getter(AccessLevel.PACKAGE)
@@ -38,6 +39,7 @@ public class EventReference<T extends Event> implements ILifeCycle<EventReferenc
      * @param otherEvent the other event
      * @return the event reference
      */
+    @Deprecated // messy
     public @NotNull EventReference<T> merge(@NotNull Class<? extends T> otherEvent) {
         // add the otherEvent to the merged array
         @SuppressWarnings("unchecked") Class<? extends T>[] merged = new Class[this.merged.length + 1];
