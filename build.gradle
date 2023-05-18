@@ -23,7 +23,7 @@ dependencies {
 }
 
 group 'com.marcusslover'
-version '4.0.3-SNAPSHOT'
+version '4.0.4-SNAPSHOT'
 ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 
 // All the building settings
