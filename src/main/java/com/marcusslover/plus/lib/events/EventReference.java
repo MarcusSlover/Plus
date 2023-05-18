@@ -52,7 +52,7 @@ public class EventReference<T extends Event> implements ILifeCycle<EventReferenc
      * Register the event.
      */
     public @NotNull EventReference<T> asRegistered(@NotNull Plugin plugin) {
-        //this.registerListener(this.base, plugin); // register the base event
+        this.registerListener(this.base, plugin); // register the base event
 
         // register the merged events
         for (Class<? extends T> type : this.merged) {
