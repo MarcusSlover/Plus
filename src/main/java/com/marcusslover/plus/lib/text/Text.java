@@ -10,6 +10,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -32,7 +33,7 @@ public class Text implements ISendable<Text> {
 
     private Text(@NotNull String text) {
         // Colorize the raw text before deserialization
-        this(ColorUtil.hex(text), LEGACY.deserialize(ColorUtil.hex(text)));
+        this(ColorUtil.hex(text), LEGACY.deserialize(ColorUtil.hex(text)).decoration(TextDecoration.ITALIC, false)); // Fix for italic? idk
     }
 
     private Text(@NotNull Component component) {
