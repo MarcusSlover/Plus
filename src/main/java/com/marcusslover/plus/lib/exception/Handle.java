@@ -16,6 +16,7 @@ public class Handle {
     public static <T extends Exception, V> Optional<V> throwable(ThrowableSupplier<T, V> supplier) {
         Objects.requireNonNull(supplier, "supplier");
 
+
         try {
             return Optional.ofNullable(supplier.get());
         } catch (Exception t) {
@@ -58,12 +59,79 @@ public class Handle {
         Handle.throwable(Delegates.runnableToThrowableSupplier(handler));
     }
 
-    public static <T extends Exception> void throwable(ThrowableRunnable<T> handler, Consumer<Exception> error) {
-        Handle.throwable(Delegates.runnableToThrowableSupplier(handler), error);
+    public static <T extends Exception> void throwable(ThrowableRunnable<T> handler, Consumer<EscapedException> error) {
+        Objects.requireNonNull(handler, "supplier");
+        Objects.requireNonNull(error, "error");
+
+        try {
+            ThrowableSupplier<Exception, Void> supplier = Delegates.runnableToThrowableSupplier(handler);
+
+            supplier.get();
+        } catch (Exception t) {
+            if (t instanceof EscapedException) {
+                error.accept((EscapedException) t);
+            } else {
+                error.accept(new EscapedException(t));
+            }
+        }
     }
 
-    public static <T extends Exception> void throwable(ThrowableRunnable<T> handler, Consumer<Exception> error, Runnable finallyHandler) {
-        Handle.throwable(Delegates.runnableToThrowableSupplier(handler), error, finallyHandler);
+    public static <T extends Exception> void throwable(ThrowableRunnable<T> handler, Consumer<EscapedException> error, ThrowableRunnable<T> finallyHandler) {
+        Objects.requireNonNull(handler, "supplier");
+        Objects.requireNonNull(error, "error");
+        Objects.requireNonNull(finallyHandler, "finally-handler");
+
+        try {
+            ThrowableSupplier<Exception, Void> supplier = Delegates.runnableToThrowableSupplier(handler);
+
+            supplier.get();
+        } catch (Exception t) {
+            if (t instanceof EscapedException) {
+                error.accept((EscapedException) t);
+            } else {
+                error.accept(new EscapedException(t));
+            }
+        } finally {
+            Handle.throwable(finallyHandler);
+        }
+    }
+
+    public static <T extends Exception, A extends AutoCloseable> void withResource(ThrowableSupplier<T, A> supplier, ThrowableConsumer<T, A> consumer) {
+        Objects.requireNonNull(supplier, "supplier");
+        Objects.requireNonNull(consumer, "consumer");
+
+        try (A resource = supplier.get()) {
+            consumer.accept(resource);
+        } catch (Exception t) {
+            t.printStackTrace();
+        }
+    }
+
+    public static <T extends Exception, A extends AutoCloseable> void withResource(ThrowableSupplier<T, A> supplier, ThrowableConsumer<T, A> consumer, Consumer<Exception> error) {
+        Objects.requireNonNull(supplier, "supplier");
+        Objects.requireNonNull(consumer, "consumer");
+        Objects.requireNonNull(error, "error");
+
+        try (A resource = supplier.get()) {
+            consumer.accept(resource);
+        } catch (Exception t) {
+            error.accept(t);
+        }
+    }
+
+    public static <T extends Exception, A extends AutoCloseable> void withResource(ThrowableSupplier<T, A> supplier, ThrowableConsumer<T, A> consumer, Consumer<Exception> error, ThrowableRunnable<T> finallyHandle) {
+        Objects.requireNonNull(supplier, "supplier");
+        Objects.requireNonNull(consumer, "consumer");
+        Objects.requireNonNull(error, "error");
+        Objects.requireNonNull(finallyHandle, "finally-handle");
+
+        try (A resource = supplier.get()) {
+            consumer.accept(resource);
+        } catch (Exception t) {
+            error.accept(t);
+        } finally {
+            Handle.throwable(finallyHandle);
+        }
     }
 
     public static void sanitizeStackTrace(Throwable throwable, int linesToRemove) {
