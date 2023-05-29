@@ -14,14 +14,22 @@ public class HandlerTest {
     public void testSuppliers() {
         try {
             Handle.throwable(() -> {
-                throw new TestException("Test");
+                if (true) {
+                    throw new TestException("Test");
+                }
+
+                return null;
             });
         } catch (Throwable t) {
             fail();
         }
 
         Handle.throwable(() -> {
-            throw new TestException("Test");
+            if (true) {
+                throw new TestException("Test");
+            }
+
+            return null;
         }, (t) -> {
             assertSame(TestException.class, t.getClass());
         });
@@ -30,7 +38,11 @@ public class HandlerTest {
         AtomicBoolean bool = new AtomicBoolean(false);
 
         Handle.throwable(() -> {
-            throw new TestException("Test");
+            if (true) {
+                throw new TestException("Test");
+            }
+
+            return null;
         }, (t) -> {
             assertSame(TestException.class, t.getClass());
         }, () -> {
@@ -56,7 +68,8 @@ public class HandlerTest {
             if (true) {
                 throw new TestException("Test");
             }
-        }, t -> {
+        }, (t) -> {
+            assertSame(TestException.class, t.escapedClass());
             assertSame(EscapedException.class, t.getClass());
         });
 
@@ -67,6 +80,7 @@ public class HandlerTest {
                 throw new TestException("Test");
             }
         }, (t) -> {
+            assertSame(TestException.class, t.escapedClass());
             assertSame(EscapedException.class, t.getClass());
         }, () -> {
             bool.set(true);
