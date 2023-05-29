@@ -1,4 +1,4 @@
-package com.marcusslover.plus.lib.server;
+package com.marcusslover.plus.lib.common.interfaces;
 
 /**
  * Represents a class which delegates calls to a different object.

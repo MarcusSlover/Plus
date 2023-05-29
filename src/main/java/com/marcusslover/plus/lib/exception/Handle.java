@@ -1,6 +1,9 @@
 package com.marcusslover.plus.lib.exception;
 
-import com.marcusslover.plus.lib.server.Delegates;
+import com.marcusslover.plus.lib.common.interfaces.ThrowableConsumer;
+import com.marcusslover.plus.lib.common.interfaces.ThrowableRunnable;
+import com.marcusslover.plus.lib.common.interfaces.ThrowableSupplier;
+import com.marcusslover.plus.lib.common.Delegates;
 
 import java.util.Objects;
 import java.util.Optional;
