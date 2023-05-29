@@ -1,4 +1,4 @@
-package com.marcusslover.plus.lib.exception;
+package com.marcusslover.plus.lib.common.interfaces;
 
 @FunctionalInterface
 public interface ThrowableConsumer<T extends Throwable, V> {

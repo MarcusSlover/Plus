@@ -1,9 +1,10 @@
-package com.marcusslover.plus.lib.server;
+package com.marcusslover.plus.lib.common;
 
+import com.marcusslover.plus.lib.common.interfaces.Delegate;
 import com.marcusslover.plus.lib.exception.EscapedException;
 import com.marcusslover.plus.lib.exception.Handle;
-import com.marcusslover.plus.lib.exception.ThrowableRunnable;
-import com.marcusslover.plus.lib.exception.ThrowableSupplier;
+import com.marcusslover.plus.lib.common.interfaces.ThrowableRunnable;
+import com.marcusslover.plus.lib.common.interfaces.ThrowableSupplier;
 
 import java.util.concurrent.Callable;
 import java.util.function.BiConsumer;
