@@ -1,8 +1,10 @@
 package com.marcusslover.plus.lib.item;
 
 import com.marcusslover.plus.lib.text.Text;
+import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.Accessors;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -27,17 +29,27 @@ import java.util.function.Consumer;
 @Accessors(fluent = true, chain = true)
 public class Canvas {
     // buttons of the canvas
+    @Getter(AccessLevel.PACKAGE)
     private final @NotNull List<Button> buttons = new ArrayList<>();
+
     // means literally nothing but used for some hacky stuff
+    @Getter(AccessLevel.PRIVATE)
     private final @NotNull Button hackyButton = Button.create(-1);
+
     // pages of the canvas
+    @Getter(AccessLevel.PRIVATE)
     private final @NotNull Map<UUID, Integer> pages = new HashMap<>();
     private @NotNull Integer rows; // 1-6 (using non-primitive to allow @NotNull for the constructor)
+
+    @Getter(AccessLevel.PRIVATE)
+    @Setter(AccessLevel.PRIVATE)
     private @NotNull Menu assosiatedMenu;
     private @Nullable Component title;
+
+    @Getter(AccessLevel.PACKAGE)
+    @Setter(AccessLevel.PACKAGE)
     private @Nullable Inventory assosiatedInventory = null;
     private @Nullable ClickContext genericClick = null, selfInventory = null;
-    private @Nullable Canvas.PopulatorContext.ViewStrategy viewStrategy = null;
 
     /**
      * Set the title of the canvas.
@@ -85,7 +97,7 @@ public class Canvas {
      *
      * @return the inventory
      */
-    public @NotNull Inventory craftInventory() {
+    @NotNull Inventory craftInventory() {
         if (this.title == null) {
             return Bukkit.createInventory(null, this.rows * 9);
         }
@@ -323,34 +335,17 @@ public class Canvas {
              * @return the middle slots
              */
             public static List<Integer> middleSlots(int rows) {
-                /* Check if the rows is at least > 2
-                 * [] = Not needed
-                 * {} = Middle parts
-                 *
-                 * Rows:
-                 *    [] [] [] [] [] [] [] [] [] - Row 1
-                 *    [] {} {} {} {} {} {} {} [] - Row 2
-                 *    [] [] [] [] [] [] [] [] [] - Row 3
-                 */
+                List<Integer> middleSlots = new ArrayList<>();
                 if (rows > 2) {
-                    // calculate all the middle rows
-                    int middleRows = (rows / 9) - 2;
-                    List<Integer> integers = new ArrayList<>();
-
-                    // loop through all middle rows
+                    int middleRows = rows - 2;
                     for (int i = 0; i < middleRows; i++) {
-                        int slot = 10 + (9 * i); // fill with all rest iteration
-
+                        int startSlot = 10 + 9 * i;
                         for (int j = 0; j < 7; j++) {
-                            integers.add((slot + j));
+                            middleSlots.add(startSlot + j);
                         }
                     }
-
-                    return integers;
                 }
-
-                return new ArrayList<>();
-
+                return middleSlots;
             }
         }
 
