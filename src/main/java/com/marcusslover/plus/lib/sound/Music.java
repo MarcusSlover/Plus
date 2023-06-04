@@ -119,6 +119,7 @@ public class Music implements ISendable<Music> {
 	 * @param session The session that you would like to stop.
 	 */
 	public void stop(Session session) {
+		this.sessions.get(session.audience()).stop();
 		if (session.loops() > 0) {
 			Task.syncDelayed(ServerUtils.getCallingPlugin(), () -> {
 				session.stopSound(this.loop);
