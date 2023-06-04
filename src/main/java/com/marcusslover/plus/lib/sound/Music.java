@@ -194,7 +194,7 @@ public class Music implements ISendable<Music> {
         return this;
     }
 
-    public Music play() {
+    public Music playAllSessions() {
         this.sessions().forEach((audience, session) -> session.start());
         return this;
     }
@@ -209,26 +209,26 @@ public class Music implements ISendable<Music> {
         @Getter @Setter private boolean stopped = true;
         @Getter @Setter private Audience audience;
 
-        public Session(long startTime, Function<Audience, Function<Session, Task>> loopTask, Audience audience) {
+        protected Session(long startTime, BiFunction<Audience, Session, Task> loopTask, Audience audience) {
             this.startTime = startTime;
             this.tickTask = Task.syncRepeating(ServerUtils.getCallingPlugin(), this::tick, 1, 1);
             this.loopTask = loopTask.apply(audience).apply(this);
             this.audience = audience;
         }
 
-        public void tick() {
+        protected void tick() {
             if (!this.stopped) {
                 this.ticks++;
             }
         }
 
-        public void incrementLoops() {
+        protected void incrementLoops() {
             if (!this.stopped) {
                 this.loops++;
             }
         }
 
-        public void stop() {
+        protected void stop() {
             this.stopped(true);
             this.tickTask.cancel();
             if (this.loopTask != null) {
@@ -236,11 +236,11 @@ public class Music implements ISendable<Music> {
             }
         }
 
-        public void stopSound(Note note) {
+        protected void stopSound(Note note) {
             this.audience.stopSound(note.sound);
         }
 
-        public void start() {
+        protected void start() {
             this.stopped(false);
         }
     }
