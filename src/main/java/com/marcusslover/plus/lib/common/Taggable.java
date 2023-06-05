@@ -14,6 +14,21 @@ import java.util.Optional;
 public abstract class Taggable<V extends IMetaContainer<V, P>, P extends PersistentDataHolder> implements IMetaContainer<Item, ItemMeta> {
     protected abstract @NotNull V holder();
 
+    // Alias for holder()
+    public @NotNull V tagHolder() {
+        return this.holder();
+    }
+
+    /**
+     * Check if the item has a tag with the given key.
+     *
+     * @param key  The key of the tag.
+     * @param type The type of the tag.
+     * @return True if the item has the tag, false otherwise.
+     * @deprecated The method is deprecated because you can achieve the same result with {@link #tag(String, PersistentDataType)},
+     * where you can check if the returned {@link Optional} is empty or not.
+     */
+    @Deprecated
     public boolean hasTag(@NotNull String key, @NotNull PersistentDataType<?, ?> type) {
         if (this.holder().meta() == null) {
             return false;
@@ -25,6 +40,20 @@ public abstract class Taggable<V extends IMetaContainer<V, P>, P extends Persist
         return p.has(n, type);
     }
 
+    // Alias for setTag()
+    public @NotNull <K> V tag(@NotNull String key, @NotNull K value, @NotNull PersistentDataType<K, K> type) {
+        return this.setTag(key, value, type);
+    }
+
+    /**
+     * Set a tag to the item.
+     *
+     * @param key   The key of the tag.
+     * @param value The value of the tag.
+     * @param type  The type of the value. You can use {@link DataType} for all the default types.
+     * @param <K>   The type of the value.
+     * @return The holder.
+     */
     public @NotNull <K> V setTag(@NotNull String key, @NotNull K value, @NotNull PersistentDataType<K, K> type) {
         this.holder().meta(itemMeta -> {
             PersistentDataContainer p = itemMeta.getPersistentDataContainer();
@@ -35,6 +64,19 @@ public abstract class Taggable<V extends IMetaContainer<V, P>, P extends Persist
         return this.holder();
     }
 
+    // Alias for getTag()
+    public @NotNull <K> Optional<K> tag(@NotNull String key, @NotNull PersistentDataType<K, K> type) {
+        return this.getTag(key, type);
+    }
+
+    /**
+     * Get the value of the tag with the given key.
+     *
+     * @param key  The key of the tag.
+     * @param type The type of the value. You can use {@link DataType} for all the default types.
+     * @param <K>  The type of the value.
+     * @return The optional value of the tag. If the item doesn't have the tag, the optional will be empty.
+     */
     public @NotNull <K> Optional<K> getTag(@NotNull String key, @NotNull PersistentDataType<K, K> type) {
         if (this.holder().meta() == null) {
             return Optional.empty();
