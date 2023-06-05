@@ -257,6 +257,15 @@ public class Item extends Taggable<Item, ItemMeta> {
         return addItemFlag(ItemFlag.HIDE_ENCHANTS);
     }
 
+    /**
+     * Change the color of this item.
+     * @param hex The hex color code e.g. #FF0000.
+     * @return This item.
+     */
+    public @NotNull Item color(@Nullable String hex) {
+        return this.color(hex != null ? com.marcusslover.plus.lib.color.Color.of(hex) : null);
+    }
+
     public @NotNull Item color(@Nullable com.marcusslover.plus.lib.color.Color plusColor) {
         return this.color(plusColor != null ? Color.fromRGB(plusColor.rgb()) : null);
     }
