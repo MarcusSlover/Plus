@@ -259,17 +259,36 @@ public class Item extends Taggable<Item, ItemMeta> {
 
     /**
      * Change the color of this item.
+     *
      * @param hex The hex color code e.g. #FF0000.
      * @return This item.
+     * @see #color(Color)
      */
     public @NotNull Item color(@Nullable String hex) {
         return this.color(hex != null ? com.marcusslover.plus.lib.color.Color.of(hex) : null);
     }
 
+    /**
+     * Change the color of this item.
+     *
+     * @param plusColor The color.
+     * @return This item.
+     * @see #color(Color)
+     */
     public @NotNull Item color(@Nullable com.marcusslover.plus.lib.color.Color plusColor) {
         return this.color(plusColor != null ? Color.fromRGB(plusColor.rgb()) : null);
     }
 
+    /**
+     * Change the color of this item.
+     * Works with {@link Material#POTION}, {@link Material#SPLASH_POTION}, {@link Material#LINGERING_POTION},
+     * {@link Material#TIPPED_ARROW}, {@link Material#LEATHER_HELMET}, {@link Material#LEATHER_CHESTPLATE},
+     * {@link Material#LEATHER_LEGGINGS}, {@link Material#LEATHER_BOOTS}, {@link Material#LEATHER_HORSE_ARMOR},
+     * and colored maps.
+     *
+     * @param color The color.
+     * @return This item.
+     */
     public @NotNull Item color(@Nullable Color color) {
         return this.meta(itemMeta -> {
             if (itemMeta instanceof PotionMeta meta) {
