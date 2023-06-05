@@ -133,6 +133,16 @@ public abstract class MapContainer<K, V> extends AbstractContainer<K> {
     }
 
     /**
+     * Saves all the objects from the cache to the file.
+     * Should be called when the plugin is disabled.
+     */
+    public void saveData() {
+        for (K key : this.cache.keySet()) { // use keys to prevent concurrent modification
+            this.saveData(key); // save data individually
+        }
+    }
+
+    /**
      * Checks if object with the given key is loaded in the cache.
      *
      * @param key Key to the object.
@@ -282,6 +292,14 @@ public abstract class MapContainer<K, V> extends AbstractContainer<K> {
      */
     public @NotNull Collection<V> getValues() {
         return this.cache.values();
+    }
+
+    /**
+     * Gets all the loaded keys from the cache.
+     * @return All the loaded keys and their objects.
+     */
+    public @NotNull Map<K, V> getCache() {
+        return this.cache;
     }
 }
 

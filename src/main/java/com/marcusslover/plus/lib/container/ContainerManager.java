@@ -30,14 +30,12 @@ public class ContainerManager {
         this.containerMap.put(parent, container);
     }
 
-
     /**
      * Initializes all containers.
      *
      * @param plugin Plugin instance.
      */
     public void init(@NotNull Plugin plugin) {
-
         // check if the plugin is enabled
         if (!plugin.isEnabled()) {
             throw new IllegalStateException("Could not initialize containers because Plugin is not enabled.");
@@ -73,10 +71,15 @@ public class ContainerManager {
             if (!initialLoading.value()) {
                 continue;
             }
-            if (container instanceof MapContainer<?, ?> mapContainer) {
-                mapContainer.loadAllData();
-            } else if (container instanceof SingleContainer<?> singleContainer) {
-                singleContainer.loadAllData();
+
+            try { // Safe loading.
+                if (container instanceof MapContainer<?, ?> mapContainer) {
+                    mapContainer.loadAllData();
+                } else if (container instanceof SingleContainer<?> singleContainer) {
+                    singleContainer.loadAllData();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }
@@ -88,6 +91,30 @@ public class ContainerManager {
             return annotationsByType[0];
         }
         return null;
+    }
+
+    /**
+     * You may want to save all containers before the plugin is disabled.
+     * It's not a mandatory method, but it's recommended.
+     * Additionally, it clears the container map after saving.
+     */
+    public void shutdown() {
+        for (AbstractContainer<?> container : this.containerMap.values()) {
+            if (container instanceof SingleContainer<?> singleContainer) {
+                try { // Safe saving.
+                    singleContainer.saveData();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else if (container instanceof MapContainer<?, ?> mapContainer) {
+                try { // Safe saving.
+                    mapContainer.saveData(); // Saves all the data.
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        this.containerMap.clear(); // Clears the map.
     }
 
     /**
