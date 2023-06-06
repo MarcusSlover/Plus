@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -137,7 +138,7 @@ public abstract class MapContainer<K, V> extends AbstractContainer<K> {
      * Should be called when the plugin is disabled.
      */
     public void saveData() {
-        for (K key : this.cache.keySet()) { // use keys to prevent concurrent modification
+        for (K key : new ArrayList<>(this.cache.keySet())) { // use keys to prevent concurrent modification
             this.saveData(key); // save data individually
         }
     }
