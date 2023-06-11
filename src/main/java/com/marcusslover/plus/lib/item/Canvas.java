@@ -229,6 +229,11 @@ public class Canvas {
             int counter = 0;
             int page = this.canvas.pages.getOrDefault(player.getUniqueId(), 0);
             int elementsPerPage = this.canvas.rows * 9;
+            // ig one way of getting the elements per page
+            if (this.viewStrategy != null) {
+                // it's kinda hacky, but it works
+                elementsPerPage = this.viewStrategy.handle(0, this.canvas, this.canvas.hackyButton());
+            }
 
             // page manipulation
             if (this.pageForwards != null && this.elements.size() > elementsPerPage) {
@@ -256,12 +261,6 @@ public class Canvas {
                         manager.internallyOpen(target, menu);
                     }
                 });
-            }
-
-            // ig one way of getting the elements per page
-            if (this.viewStrategy != null) {
-                // it's kinda hacky, but it works
-                elementsPerPage = this.viewStrategy.handle(0, this.canvas, this.canvas.hackyButton());
             }
 
             // populating elements
