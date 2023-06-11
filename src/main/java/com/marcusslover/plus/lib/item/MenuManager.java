@@ -199,8 +199,9 @@ public final class MenuManager {
         if (canvas == null) {
             canvas = new Canvas(6, menu);
             menu.canvasMap().put(player.getUniqueId(), canvas);
+            canvas.assosiatedMenu(menu);
             try {
-                menu.open(canvas, player);
+                menu.open(canvas, player); // fill the canvas
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -210,7 +211,21 @@ public final class MenuManager {
             this.updateInventory(inventory, canvas);
             player.openInventory(inventory);
         } else {
+
+            // update inventory
             Inventory topInventory = openInventory.getTopInventory();
+            Canvas.PopulatorContext<?> populatorContext = canvas.poplatorContext();
+            if (populatorContext != null) {
+                Canvas.PopulatorContext.Populator<?> populator = populatorContext.populator();
+                if (populator != null) {
+                    try {
+                        canvas.buttons().clear();
+                        populatorContext.updateContent(player, populator);
+                    } catch (Throwable e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
             this.updateInventory(topInventory, canvas);
         }
     }

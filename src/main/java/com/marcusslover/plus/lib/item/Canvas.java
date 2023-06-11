@@ -42,7 +42,7 @@ public class Canvas {
     private @NotNull Integer rows; // 1-6 (using non-primitive to allow @NotNull for the constructor)
 
     @Getter(AccessLevel.PRIVATE)
-    @Setter(AccessLevel.PRIVATE)
+    @Setter(AccessLevel.PACKAGE)
     private @NotNull Menu assosiatedMenu;
     private @Nullable Component title;
 
@@ -50,6 +50,10 @@ public class Canvas {
     @Setter(AccessLevel.PACKAGE)
     private @Nullable Inventory assosiatedInventory = null;
     private @Nullable ClickContext genericClick = null, selfInventory = null;
+
+    @Getter(AccessLevel.PACKAGE)
+    @Setter(AccessLevel.PRIVATE)
+    private PopulatorContext<?> poplatorContext = null;
 
     /**
      * Set the title of the canvas.
@@ -149,8 +153,10 @@ public class Canvas {
      * @param <T>      the type of the elements
      * @return the canvas
      */
+    @SuppressWarnings("unchecked")
     public <T> @NotNull PopulatorContext<T> populate(@NotNull List<T> elements) {
-        return new PopulatorContext<>(this, elements);
+        this.poplatorContext = new PopulatorContext<>(this, elements);
+        return (PopulatorContext<T>) poplatorContext;
     }
 
     /**
@@ -199,6 +205,7 @@ public class Canvas {
         /*Page manipulation*/
         private @Nullable Button pageForwards = null;
         private @Nullable Button pageBackwards = null;
+        private @Nullable Populator<T> populator = null; // internal
 
         /**
          * Set the view strategy.
@@ -216,6 +223,11 @@ public class Canvas {
             return this;
         }
 
+        @SuppressWarnings("unchecked")
+        public void updateContent(@NotNull Player player, Populator<?> populator) {
+            this.content(player, (Populator<T>) populator);
+        }
+
         /**
          * Modify how the elements are populated on the canvas.
          * The populator is called for each element.
@@ -226,6 +238,8 @@ public class Canvas {
          * @return the populator context
          */
         public @NotNull PopulatorContext<T> content(@NotNull Player player, @NotNull Populator<T> populator) {
+            this.populator = populator;
+
             int counter = 0;
             int page = this.canvas.pages.getOrDefault(player.getUniqueId(), 0);
             int elementsPerPage = this.canvas.rows * 9;
@@ -234,19 +248,22 @@ public class Canvas {
                 // it's kinda hacky, but it works
                 elementsPerPage = this.viewStrategy.handle(0, this.canvas, this.canvas.hackyButton());
             }
+            // max possible page
+            int maxPage = (int) Math.ceil((double) this.elements.size() / elementsPerPage) - 1;
 
             // page manipulation
-            if (this.pageForwards != null && this.elements.size() > elementsPerPage) {
+            if (this.pageForwards != null && this.elements.size() > elementsPerPage && page < maxPage) {
                 this.canvas.button(this.pageForwards, (target, clicked, event, canvas) -> {
                     UUID uniqueId = target.getUniqueId();
                     int _page = this.canvas.pages.getOrDefault(uniqueId, 0);
                     this.canvas.pages.put(uniqueId, _page + 1);
                     Menu menu = this.canvas.assosiatedMenu();
+                    menu.debug("Page: " + _page);
                     MenuManager manager = menu.manager();
                     if (manager != null) { // should never be null
                         manager.internallyOpen(target, menu);
                     }
-                });
+                }).handleException(Throwable::printStackTrace);
             }
             if (this.pageBackwards != null && page > 0) {
                 this.canvas.button(this.pageBackwards, (target, clicked, event, canvas) -> {
@@ -256,11 +273,12 @@ public class Canvas {
                         this.canvas.pages.put(uniqueId, _page - 1);
                     }
                     Menu menu = this.canvas.assosiatedMenu();
+                    menu.debug("Page: " + _page);
                     MenuManager manager = menu.manager();
                     if (manager != null) { // should never be null
                         manager.internallyOpen(target, menu);
                     }
-                });
+                }).handleException(Throwable::printStackTrace);
             }
 
             // populating elements
