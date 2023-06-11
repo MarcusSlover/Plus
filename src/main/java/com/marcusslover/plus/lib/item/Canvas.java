@@ -11,6 +11,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -27,7 +29,7 @@ import java.util.function.Consumer;
  */
 @Data
 @Accessors(fluent = true, chain = true)
-public class Canvas {
+public class Canvas implements InventoryHolder { // Inventory holder to keep track of the inventory.
     // buttons of the canvas
     @Getter(AccessLevel.PACKAGE)
     private final @NotNull List<Button> buttons = new ArrayList<>();
@@ -41,7 +43,7 @@ public class Canvas {
     private final @NotNull Map<UUID, Integer> pages = new HashMap<>();
     private @NotNull Integer rows; // 1-6 (using non-primitive to allow @NotNull for the constructor)
 
-    @Getter(AccessLevel.PRIVATE)
+    @Getter(AccessLevel.PACKAGE)
     @Setter(AccessLevel.PACKAGE)
     private @NotNull Menu assosiatedMenu;
     private @Nullable Component title;
@@ -103,9 +105,9 @@ public class Canvas {
      */
     @NotNull Inventory craftInventory() {
         if (this.title == null) {
-            return Bukkit.createInventory(null, this.rows * 9);
+            return Bukkit.createInventory(this, this.rows * 9);
         }
-        return Bukkit.createInventory(null, this.rows * 9, this.title);
+        return Bukkit.createInventory(this, this.rows * 9, this.title);
     }
 
     /**
@@ -157,6 +159,11 @@ public class Canvas {
     public <T> @NotNull PopulatorContext<T> populate(@NotNull List<T> elements) {
         this.poplatorContext = new PopulatorContext<>(this, elements);
         return (PopulatorContext<T>) poplatorContext;
+    }
+
+    @Override
+    public @NotNull Inventory getInventory() {
+        return Objects.requireNonNull(this.assosiatedInventory);
     }
 
     /**
