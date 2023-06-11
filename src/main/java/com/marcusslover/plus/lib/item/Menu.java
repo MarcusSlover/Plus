@@ -37,6 +37,23 @@ public abstract class Menu implements IMenu {
         this.manager = manager;
     }
 
+    /**
+     * Debugs the message if the menu is in development mode.
+     *
+     * @param message The message to debug.
+     */
+    void debug(String message) {
+        DevelopmentMenu[] annotationsByType = this.getClass().getAnnotationsByType(DevelopmentMenu.class);
+        for (DevelopmentMenu developmentMenu : annotationsByType) {
+            if (!developmentMenu.value()) {
+                continue;
+            }
+            if (this.manager != null) {
+                this.manager.getPlugin().getLogger().info(message);
+            }
+        }
+    }
+
     @Override
     public @NotNull <T extends CommandSender> IMenu send(@NotNull T target) {
         if (target instanceof Player player) {
