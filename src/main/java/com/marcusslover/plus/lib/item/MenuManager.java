@@ -12,7 +12,6 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -30,102 +29,85 @@ public final class MenuManager {
         this.plugin = plugin;
         this.closeEvent = Events.listen(InventoryCloseEvent.class).handler(event -> {
             InventoryView view = event.getView();
-            for (Menu gameMenu : MenuManager.this.menus) {
-                List<UUID> toRemove = new ArrayList<>();
-                for (Map.Entry<UUID, Canvas> entry : gameMenu.canvasMap().entrySet()) {
-                    UUID uuid = entry.getKey();
-                    Canvas canvas = entry.getValue();
-                    Inventory inventory = canvas.assosiatedInventory();
-                    if (inventory == null) {
-                        continue;
-                    }
-                    if (!inventory.equals(view.getTopInventory())) {
-                        continue;
-                    }
-                    canvas.assosiatedInventory(null);
-                    toRemove.add(uuid);
-                }
-                toRemove.forEach(gameMenu.canvasMap()::remove);
+            Inventory inventory = view.getTopInventory();
+
+            if (!(inventory.getHolder() instanceof Canvas canvas)) {
+                return;
             }
+
+            Menu menu = canvas.assosiatedMenu();
+            menu.canvasMap().remove(event.getPlayer().getUniqueId());
         }).asRegistered(plugin);
 
         this.clickEvent = Events.listen(InventoryClickEvent.class).handler(event -> {
             InventoryView view = event.getView();
-            for (Menu menu : MenuManager.this.menus) {
-                Map<UUID, Canvas> map = menu.canvasMap();
-                // copy map to avoid concurrent modification
-                Map<UUID, Canvas> copy = new HashMap<>(map);
-                copy.forEach((uuid, canvas) -> {
-                    Inventory inventory = canvas.assosiatedInventory();
-                    if (inventory == null) {
-                        return;
-                    }
-                    if (!inventory.equals(view.getTopInventory())) {
-                        return;
-                    }
-                    event.setCancelled(true);
-                    int slot = event.getRawSlot();
-                    int size = inventory.getSize();
+            Inventory inventory = view.getTopInventory();
 
-                    Item item = Item.of(event.getCurrentItem());
-
-                    Canvas.ClickContext genericClick = canvas.genericClick();
-                    if (genericClick != null) {
-                        Canvas.ButtonClick buttonClick = genericClick.click();
-                        if (buttonClick != null) {
-                            try {
-                                buttonClick.onClick((Player) event.getWhoClicked(), item, event, canvas);
-                            } catch (Throwable e) {
-                                if (genericClick.throwableConsumer() != null) {
-                                    genericClick.throwableConsumer().accept(e);
-                                } else {
-                                    Bukkit.getLogger().warning(e.getMessage());
-                                }
-                            }
-                        }
-                    }
-
-                    if (slot > size) {
-                        Canvas.ClickContext selfInventory = canvas.selfInventory();
-                        if (selfInventory != null) {
-                            Canvas.ButtonClick buttonClick = selfInventory.click();
-                            if (buttonClick != null) {
-                                try {
-                                    buttonClick.onClick((Player) event.getWhoClicked(), item, event, canvas);
-                                } catch (Throwable e) {
-                                    if (selfInventory.throwableConsumer() != null) {
-                                        selfInventory.throwableConsumer().accept(e);
-                                    } else {
-                                        Bukkit.getLogger().warning(e.getMessage());
-                                    }
-                                }
-                            }
-                        }
-                        return;
-                    }
-
-                    canvas.buttons().stream()
-                            .filter(button -> button.within(slot))
-                            .findFirst()
-                            .ifPresent(button -> {
-                                Player player = (Player) event.getWhoClicked();
-                                Canvas.ClickContext context = button.clickContext();
-                                Canvas.ButtonClick click = context.click();
-                                if (click == null) {
-                                    return;
-                                }
-                                try {
-                                    click.onClick(player, item, event, canvas);
-                                } catch (Throwable e) {
-                                    if (context.throwableConsumer() != null) {
-                                        context.throwableConsumer().accept(e);
-                                    } else {
-                                        Bukkit.getLogger().warning(e.getMessage());
-                                    }
-                                }
-                            });
-                });
+            if (!(inventory.getHolder() instanceof Canvas canvas)) {
+                return;
             }
+
+            event.setCancelled(true);
+            int slot = event.getRawSlot();
+            int size = inventory.getSize();
+
+            Item item = Item.of(event.getCurrentItem());
+
+            Canvas.ClickContext genericClick = canvas.genericClick();
+            if (genericClick != null) {
+                Canvas.ButtonClick buttonClick = genericClick.click();
+                if (buttonClick != null) {
+                    try {
+                        buttonClick.onClick((Player) event.getWhoClicked(), item, event, canvas);
+                    } catch (Throwable e) {
+                        if (genericClick.throwableConsumer() != null) {
+                            genericClick.throwableConsumer().accept(e);
+                        } else {
+                            Bukkit.getLogger().warning(e.getMessage());
+                        }
+                    }
+                }
+            }
+
+            if (slot > size) {
+                Canvas.ClickContext selfInventory = canvas.selfInventory();
+                if (selfInventory != null) {
+                    Canvas.ButtonClick buttonClick = selfInventory.click();
+                    if (buttonClick != null) {
+                        try {
+                            buttonClick.onClick((Player) event.getWhoClicked(), item, event, canvas);
+                        } catch (Throwable e) {
+                            if (selfInventory.throwableConsumer() != null) {
+                                selfInventory.throwableConsumer().accept(e);
+                            } else {
+                                Bukkit.getLogger().warning(e.getMessage());
+                            }
+                        }
+                    }
+                }
+                return;
+            }
+
+            canvas.buttons().stream()
+                    .filter(button -> button.within(slot))
+                    .findFirst()
+                    .ifPresent(button -> {
+                        Player player = (Player) event.getWhoClicked();
+                        Canvas.ClickContext context = button.clickContext();
+                        Canvas.ButtonClick click = context.click();
+                        if (click == null) {
+                            return;
+                        }
+                        try {
+                            click.onClick(player, item, event, canvas);
+                        } catch (Throwable e) {
+                            if (context.throwableConsumer() != null) {
+                                context.throwableConsumer().accept(e);
+                            } else {
+                                Bukkit.getLogger().warning(e.getMessage());
+                            }
+                        }
+                    });
         }).asRegistered(plugin);
     }
 
