@@ -19,6 +19,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
+import org.bukkit.inventory.meta.FireworkEffectMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.MapMeta;
@@ -255,6 +256,18 @@ public class Item extends Taggable<Item, ItemMeta> {
             enchant(Enchantment.ARROW_INFINITE, 1);
         }
         return addItemFlag(ItemFlag.HIDE_ENCHANTS);
+    }
+
+    /**
+     * Checks if the item can be colored.
+     * @return True if the item can be colored, false otherwise.
+     */
+    public boolean isColorable() {
+        if (!this.isValid()) return false;
+        ItemMeta meta = this.meta();
+        if (meta == null) return false;
+        // Colorable items
+        return meta instanceof LeatherArmorMeta || meta instanceof PotionMeta || meta instanceof MapMeta;
     }
 
     /**
