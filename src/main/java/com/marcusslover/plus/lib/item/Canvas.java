@@ -230,6 +230,16 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
             return this;
         }
 
+        /**
+         * Set the view strategy.
+         * @param viewStrategy A custom view strategy.
+         * @return The populator context.
+         */
+        public @NotNull PopulatorContext<T> viewStrategy(@Nullable ViewStrategy viewStrategy) {
+            this.viewStrategy = viewStrategy;
+            return this;
+        }
+
         @SuppressWarnings("unchecked")
         public void updateContent(@NotNull Player player, Populator<?> populator) {
             this.content(player, (Populator<T>) populator);
