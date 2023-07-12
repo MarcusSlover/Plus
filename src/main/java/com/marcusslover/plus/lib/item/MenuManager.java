@@ -11,12 +11,9 @@ import org.bukkit.inventory.InventoryView;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 public final class MenuManager {
     private final @NotNull Plugin plugin;
@@ -201,13 +198,14 @@ public final class MenuManager {
                 Canvas.PopulatorContext.Populator<?> populator = populatorContext.populator();
                 if (populator != null) {
                     try {
-                        canvas.buttons().clear();
+                        canvas.buttons().removeIf(Button::populated); // remove all populated buttons
                         populatorContext.updateContent(player, populator);
                     } catch (Throwable e) {
                         e.printStackTrace();
                     }
                 }
             }
+
             this.updateInventory(topInventory, canvas);
         }
     }

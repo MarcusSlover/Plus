@@ -20,6 +20,7 @@ public class Button {
     private @NotNull Button.DetectableArea detectableArea; // The area where the button is detectable
     private @Nullable Item item = null; // The item that represents the button
     private Canvas.ClickContext clickContext; // The click event of the button
+    private boolean populated = false; // If the button has been populated via viewing strategy
 
     /**
      * Creates a button with the given coordinates.

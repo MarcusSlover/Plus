@@ -308,6 +308,7 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
                 // getting the element
                 T element = this.elements.get(index);
                 Button button = Button.create(counter); // creating the button
+                button.populated(true); // mark as populated
 
                 if (this.viewStrategy != null) {
                     // modifying the button based on the view strategy
@@ -352,7 +353,21 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
                     button.slot(middleSlots.get(counter));
                 }
                 return middleSlots.size();
-            });
+            }),
+
+            /**
+             * Fills all slots on the canvas, except the edges on the sides.
+             * Note that this strategy DOES fill the upper and lower edges.
+             */
+            AVOID_SIDE_EDGES((counter, canvas, button) -> {
+                List<Integer> middleSlots = DefaultViewStrategy.avoidEdges(canvas.rows());
+                if (middleSlots.size() > counter) {
+                    button.slot(middleSlots.get(counter));
+                }
+                return middleSlots.size();
+            })
+
+            ;
 
             @Getter
             private final ViewStrategy viewStrategy;
@@ -377,6 +392,23 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
                         for (int j = 0; j < 7; j++) {
                             middleSlots.add(startSlot + j);
                         }
+                    }
+                }
+                return middleSlots;
+            }
+
+            /**
+             * Gets all slots that are not on the edges.
+             * @param rows the rows
+             * @return the slots
+             */
+            public static List<Integer> avoidEdges(int rows) {
+                List<Integer> middleSlots = new ArrayList<>();
+                for (int i = 0; i < rows; i++) {
+                    int min = 9 * i + 1;
+                    int max = min + 8 - 1;
+                    for (int j = min; j <= max; j++) {
+                        middleSlots.add(j);
                     }
                 }
                 return middleSlots;
