@@ -31,6 +31,11 @@ public final class CommandManager {
         return new CommandManager(plugin);
     }
 
+    public @NotNull CommandManager register(@NotNull ICommand... commands) {
+        Arrays.stream(commands).forEach(this::register);
+        return this;
+    }
+
     public @NotNull CommandManager register(@NotNull ICommand command) {
         Command commandAnnotation = this.getCommandAnnotation(command);
         if (commandAnnotation == null) {
