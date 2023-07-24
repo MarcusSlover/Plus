@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import lombok.Data;
+import lombok.SneakyThrows;
 import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -43,6 +44,17 @@ public class MojangProfileAPI {
     private static @NotNull Optional<MojangProfile> searchByUsername(@NotNull String username) {
         return CACHED_PROFILE_MAP.values().stream().filter(mojangProfile -> mojangProfile.getName().equals(username)).findFirst();
     }
+    /**
+     * Gets the cached profile of a player.
+     * This function does not call the Mojang API. It only returns the cached profile.
+     *
+     * @param uuid The UUID of the player.
+     * @return The cached profile of the player. If the player is not cached, then an empty optional is returned.
+     */
+    private static @NotNull Optional<MojangProfile> searchByUuid(@NotNull UUID uuid) {
+        return CACHED_PROFILE_MAP.values().stream().filter(mojangProfile -> mojangProfile.getUuid().equals(uuid)).findFirst();
+    }
+
 
     /**
      * Cleans the cache of a player.
@@ -53,21 +65,10 @@ public class MojangProfileAPI {
         CACHED_PROFILE_MAP.remove(uuid);
     }
 
-    /**
-     * Gets the UUID of a player from their username.
-     * This function is asynchronous and will return a {@link CompletableFuture}
-     * that will be completed when the UUID is retrieved.
-     *
-     * @param username The username of the player.
-     * @return The UUID of the player.
-     */
-    public static @NotNull CompletableFuture<@Nullable MojangProfile> getUniqueId(@NotNull String username) {
-        // Check if the username is in the cache
-        Optional<MojangProfile> cachedProfile = searchByUsername(username);
-        return cachedProfile.map(CompletableFuture::completedFuture).orElseGet(() -> CompletableFuture.supplyAsync(() -> {
+    private static @NotNull CompletableFuture<@Nullable JsonObject> makeJsonRequest(URL url) {
+        return CompletableFuture.supplyAsync(() -> {
             try {
                 // Create a connection to the Mojang API
-                URL url = new URL("https://api.mojang.com/users/profiles/minecraft/" + username + "?at=" + System.currentTimeMillis());
                 URLConnection urlConnection = url.openConnection();
                 HttpURLConnection httpURLConnection = (HttpURLConnection) urlConnection;
                 httpURLConnection.setRequestMethod("GET");
@@ -84,11 +85,76 @@ public class MojangProfileAPI {
 
                 // Parse the response
                 JsonElement jsonElement = JsonParser.parseString(content.toString());
-                if (!jsonElement.isJsonObject()) {
-                    throw new RuntimeException("Invalid response from Mojang API");
-                }
+                return jsonElement.getAsJsonObject();
+            } catch (Throwable t) {
+                t.printStackTrace();
+                return null;
+            }
+        });
+    }
 
-                JsonObject json = jsonElement.getAsJsonObject();
+    /**
+     * Gets the UUID of a player from their username.
+     * This function is asynchronous and will return a {@link CompletableFuture}
+     * that will be completed when the UUID is retrieved.
+     *
+     * @param username The username of the player.
+     * @return The UUID of the player.
+     */
+    public static @NotNull CompletableFuture<@Nullable MojangProfile> getUniqueId(@NotNull String username) {
+        // Check if the username is in the cache
+        Optional<MojangProfile> cachedProfile = searchByUsername(username);
+        return cachedProfile.map(CompletableFuture::completedFuture).orElseGet(() -> fetchProfileByUsername(username));
+    }
+
+    /**
+     * Gets the username of a player based on their UUID.
+     * This function is asynchronous and will return a {@link CompletableFuture}
+     * that will be completed when the UUID is retrieved.
+     *
+     * @param uuid The UUID of the player.
+     * @return The username of the player.
+     */
+    public static @NotNull CompletableFuture<@Nullable MojangProfile> getUsername(@NotNull UUID uuid) {
+        Optional<MojangProfile> cachedProfile = searchByUuid(uuid);
+        return cachedProfile.map(CompletableFuture::completedFuture).orElseGet(() -> fetchProfileByUuid(uuid));
+    }
+
+    /**
+     * Fetches the profile of a player from the player's UUID.
+     * This method bypasses the cache, but it does still update it.
+     * @param uuid The UUID to fetch the profile for.
+     * @return The newly-fetched profile.
+     */
+    @SneakyThrows
+    public static @NotNull CompletableFuture<@Nullable MojangProfile> fetchProfileByUuid(@NotNull UUID uuid) {
+        URL url = new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + uuidToString(uuid));
+        return makeJsonRequest(url).thenApply((json) -> {
+            if (json == null) return null;
+            try {
+                String name = json.get("name").getAsString();
+                MojangProfile mojangProfile = new MojangProfile(uuid, name, System.currentTimeMillis());
+                CACHED_PROFILE_MAP.put(uuid, mojangProfile);
+                return mojangProfile;
+            } catch (Throwable t) {
+                t.printStackTrace();
+                return null;
+            }
+        });
+    }
+
+    /**
+     * Fetches the profile of a player from the player's username.
+     * This method bypasses the cache, but it does still update it.
+     * @param username The username to fetch the profile for.
+     * @return The newly-fetched profile.
+     */
+    @SneakyThrows
+    public static @NotNull CompletableFuture<@Nullable MojangProfile> fetchProfileByUsername(@NotNull String username) {
+        URL url = new URL("https://api.mojang.com/users/profiles/minecraft/" + username);
+        return makeJsonRequest(url).thenApply((json) -> {
+            if (json == null) return null;
+            try {
                 if (!json.has("id")) {
                     throw new RuntimeException("Invalid response from Mojang API");
                 }
@@ -97,7 +163,7 @@ public class MojangProfileAPI {
 
                 // Convert the UUID to a UUID object
                 try {
-                    uuid = UUID.fromString(id.replaceFirst("(\\p{XDigit}{8})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}+)", "$1-$2-$3-$4-$5"));
+                    uuid = parseUuid(id);
                 } catch (IllegalArgumentException e) {
                     throw new RuntimeException("Could not parse UUID from Mojang API response", e);
                 }
@@ -110,12 +176,34 @@ public class MojangProfileAPI {
 
                 // Return the profile
                 return mojangProfile;
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (Throwable t) {
+                t.printStackTrace();
                 return null;
             }
-        }));
+        });
+    }
 
+
+    /**
+     * Translate a UUID from the style used in the Mojang API to the one used by Java.
+     * @param uuid The UUID to translate. This should be in a dashless form.
+     * @return The UUID.
+     * @see UUID#fromString(String)
+     * @see #uuidToString(UUID)
+     */
+    public static UUID parseUuid(String uuid) {
+        var translated = uuid.replaceFirst("(\\p{XDigit}{8})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}+)", "$1-$2-$3-$4-$5");
+        return UUID.fromString(translated);
+    }
+
+    /**
+     * Translate a UUID from the style used in Java to the one used in the Mojang API.
+     * @param uuid The UUID to translate.
+     * @return The dashless UUID.
+     * @see #parseUuid(String)
+     */
+    public static String uuidToString(UUID uuid) {
+        return uuid.toString().replace("-", "");
     }
 
     /**
