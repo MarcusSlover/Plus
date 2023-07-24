@@ -40,8 +40,12 @@ public abstract class Taggable<V extends IMetaContainer<V, P>, P extends Persist
         return p.has(n, type);
     }
 
-    // Alias for setTag()
-    public @NotNull <K> V tag(@NotNull String key, @NotNull K value, @NotNull PersistentDataType<K, K> type) {
+    /**
+     * Alias for {@link #setTag(String, Object, PersistentDataType)}.
+     *
+     * @see #setTag(String, Object, PersistentDataType)
+     */
+    public @NotNull <T, Z> V tag(@NotNull String key, @NotNull Z value, @NotNull PersistentDataType<T, Z> type) {
         return this.setTag(key, value, type);
     }
 
@@ -51,10 +55,11 @@ public abstract class Taggable<V extends IMetaContainer<V, P>, P extends Persist
      * @param key   The key of the tag.
      * @param value The value of the tag.
      * @param type  The type of the value. You can use {@link DataType} for all the default types.
-     * @param <K>   The type of the value.
+     * @param <T>   The type that is serialised to NBT.
+     * @param <Z>   The type that's used in code.
      * @return The holder.
      */
-    public @NotNull <K> V setTag(@NotNull String key, @NotNull K value, @NotNull PersistentDataType<K, K> type) {
+    public @NotNull <T, Z> V setTag(@NotNull String key, @NotNull Z value, @NotNull PersistentDataType<T, Z> type) {
         this.holder().meta(itemMeta -> {
             PersistentDataContainer p = itemMeta.getPersistentDataContainer();
             NamespacedKey n = new NamespacedKey("plus", key);
@@ -74,10 +79,11 @@ public abstract class Taggable<V extends IMetaContainer<V, P>, P extends Persist
      *
      * @param key  The key of the tag.
      * @param type The type of the value. You can use {@link DataType} for all the default types.
-     * @param <K>  The type of the value.
+     * @param <T>   The type that is serialised to NBT.
+     * @param <Z>   The type that's used in code.
      * @return The optional value of the tag. If the item doesn't have the tag, the optional will be empty.
      */
-    public @NotNull <K> Optional<K> getTag(@NotNull String key, @NotNull PersistentDataType<K, K> type) {
+    public @NotNull <T, Z> Optional<Z> getTag(@NotNull String key, @NotNull PersistentDataType<T, Z> type) {
         if (this.holder().meta() == null) {
             return Optional.empty();
         }
