@@ -7,7 +7,6 @@ import lombok.AllArgsConstructor;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -33,7 +32,7 @@ public class Text implements ISendable<Text> {
 
     private Text(@NotNull String text) {
         // Colorize the raw text before deserialization
-        this(ColorUtil.hex(text), LEGACY.deserialize(ColorUtil.hex(text)).decoration(TextDecoration.ITALIC, false)); // Fix for italic? idk
+        this(ColorUtil.hex(text), text.isEmpty() ? Component.empty() : LEGACY.deserialize(ColorUtil.hex(text)).decoration(TextDecoration.ITALIC, false)); // Fix for italic? idk
     }
 
     private Text(@NotNull Component component) {
@@ -124,11 +123,31 @@ public class Text implements ISendable<Text> {
         return Text.legacy(this.text);
     }
 
+    /**
+     * Checks if the text is empty.
+     * (Does not remove spaces)
+     * If the text has spaces, it will not be considered empty.
+     * @return true if the text is empty.
+     */
     public boolean isEmpty() {
-        if (this.component instanceof TextComponent textComponent) {
-            return textComponent.content().isEmpty();
-        }
-        return true;
+        return this.isEmpty(false);
+    }
+
+    /**
+     * Checks if the text is empty.
+     * @param strip if the spaces should be removed.
+     * @return true if the text is empty.
+     */
+    public boolean isEmpty(boolean strip) {
+        return strip ? this.text.isBlank() : this.text.isEmpty();
+    }
+
+    /**
+     * Checks if the component is empty.
+     * @return true if the component is empty.
+     */
+    public boolean isCompEmpty() {
+        return this.component == Component.empty();
     }
 
     public @NotNull Component comp() {
