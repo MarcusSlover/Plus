@@ -12,15 +12,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Consumer;
 
 /**
@@ -33,6 +29,7 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
     // buttons of the canvas
     @Getter(AccessLevel.PACKAGE)
     private final @NotNull List<Button> buttons = new ArrayList<>();
+    private final @NotNull LinkedList<ItemDecorator> decorators = new LinkedList<>();
 
     // means literally nothing but used for some hacky stuff
     @Getter(AccessLevel.PRIVATE)
@@ -149,6 +146,30 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
     }
 
     /**
+     * Adds a new layer of decorating to the canvas.
+     *
+     * @param decorator the decorator
+     * @return the canvas
+     * @see ItemDecorator for more information
+     */
+    public @NotNull Canvas decorate(@NotNull ItemDecorator decorator) {
+        if (this.decorators.contains(decorator)) return this; // prevent duplicates
+        this.decorators.add(decorator);
+        return this;
+    }
+
+    /**
+     * Removes a decorator from the canvas.
+     *
+     * @param decorator the decorator
+     * @return the canvas
+     */
+    public @NotNull Canvas removeDecorator(@NotNull ItemDecorator decorator) {
+        this.decorators.remove(decorator);
+        return this;
+    }
+
+    /**
      * Starts the population of the elements on the canvas.
      *
      * @param elements the elements
@@ -232,6 +253,7 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
 
         /**
          * Set the view strategy.
+         *
          * @param viewStrategy A custom view strategy.
          * @return The populator context.
          */
@@ -365,9 +387,7 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
                     button.slot(middleSlots.get(counter));
                 }
                 return middleSlots.size();
-            })
-
-            ;
+            });
 
             @Getter
             private final ViewStrategy viewStrategy;
@@ -399,6 +419,7 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
 
             /**
              * Gets all slots that are not on the edges.
+             *
              * @param rows the rows
              * @return the slots
              */
@@ -469,6 +490,94 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
 
         public @NotNull Canvas end() {
             return this.canvas;
+        }
+    }
+
+    /**
+     * Represents a decorator that puts "free" items in the inventory.
+     * Free items can be interpreted as items that are not associated with any button.
+     * This is useful, for example, to put a border around the inventory -
+     * We do not want to create objects for each item in the border.
+     * Instead, we can use this light-weight decorator.
+     */
+    @FunctionalInterface
+    public interface ItemDecorator {
+
+        /**
+         * Decorates the inventory.
+         *
+         * @param canvas    The canvas associated with the inventory.
+         * @param inventory The inventory to decorate.
+         */
+        void handle(@NotNull Canvas canvas, @NotNull Inventory inventory);
+    }
+
+    /**
+     * A full decorator that fills all empty slots with a given item.
+     *
+     * @see ItemDecorator for more information about decorators.
+     */
+    @Data
+    public static class FullDecorator implements ItemDecorator {
+        private final @NotNull Item filler; // the filler item
+
+        @Override
+        public void handle(@NotNull Canvas canvas, @NotNull Inventory inventory) {
+            ItemStack itemStack = this.filler.get();
+
+            for (int i = 0; i < inventory.getSize(); i++) {
+                inventory.setItem(i, itemStack);
+            }
+        }
+    }
+
+    /**
+     * A decorator that fills all empty slots with a given item, except the edges.
+     *
+     * @see ItemDecorator for more information about decorators.
+     */
+    @Data
+    public static class AvoidEdgesDecorator implements ItemDecorator {
+        private final @NotNull Item filler; // the filler item
+
+        @Override
+        public void handle(@NotNull Canvas canvas, @NotNull Inventory inventory) {
+            ItemStack itemStack = this.filler.get();
+
+            for (int i = 0; i < inventory.getSize(); i++) {
+                if (i < 9 || i > inventory.getSize() - 9) {
+                    continue;
+                }
+                if (i % 9 == 0 || i % 9 == 8) {
+                    continue;
+                }
+                inventory.setItem(i, itemStack);
+            }
+        }
+    }
+
+    /**
+     * A decorator that fills all edge slots with a given item.
+     *
+     * @see ItemDecorator for more information about decorators.
+     */
+    @Data
+    public static class EdgeDecorator implements ItemDecorator {
+        private final @NotNull Item filler; // the filler item
+
+        @Override
+        public void handle(@NotNull Canvas canvas, @NotNull Inventory inventory) {
+            ItemStack itemStack = this.filler.get();
+
+            for (int i = 0; i < inventory.getSize(); i++) {
+                if (i < 9 || i > inventory.getSize() - 9) {
+                    inventory.setItem(i, itemStack);
+                    continue;
+                }
+                if (i % 9 == 0 || i % 9 == 8) {
+                    inventory.setItem(i, itemStack);
+                }
+            }
         }
     }
 }

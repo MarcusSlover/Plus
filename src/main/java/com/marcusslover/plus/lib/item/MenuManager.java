@@ -2,6 +2,8 @@ package com.marcusslover.plus.lib.item;
 
 import com.marcusslover.plus.lib.events.EventReference;
 import com.marcusslover.plus.lib.events.Events;
+import com.marcusslover.plus.lib.item.Button.DetectableArea;
+import com.marcusslover.plus.lib.item.Canvas.ItemDecorator;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -172,7 +174,6 @@ public final class MenuManager {
      */
     public void internallyOpen(@NotNull Player player, @NotNull Menu menu) {
         InventoryView openInventory = player.getOpenInventory();
-        @SuppressWarnings("deprecation") String currentTitle = openInventory.getTitle();
         Canvas canvas = menu.canvasMap().get(player.getUniqueId());
 
         if (canvas == null) {
@@ -219,12 +220,18 @@ public final class MenuManager {
     private void updateInventory(@NotNull Inventory inventory, @NotNull Canvas canvas) {
         inventory.clear(); // clear inventory
 
+        // free items first aka (decorations)
+        for (ItemDecorator decorator : canvas.decorators()) {
+            decorator.handle(canvas, inventory); // handle the decoration
+        }
+
+        // then buttons
         for (Button button : canvas.buttons()) {
             Item item = button.item();
             if (item == null) {
                 continue;
             }
-            Button.DetectableArea matrix = button.detectableArea();
+            DetectableArea matrix = button.detectableArea();
             Set<Integer> slots = matrix.slots();
 
             for (Integer slot : slots) {
