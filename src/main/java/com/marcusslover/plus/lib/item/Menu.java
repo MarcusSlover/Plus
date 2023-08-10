@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import net.kyori.adventure.audience.Audience;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -52,6 +53,29 @@ public abstract class Menu implements IMenu {
                 this.manager.getPlugin().getLogger().info(message);
             }
         }
+    }
+
+    /**
+     * Allows you to perform an update on the menu.
+     * All current menu viewers will have their menu updated.
+     */
+    public void performUpdate() {
+        this.canvasMap.keySet().forEach(this::performUpdate); // update all viewers
+    }
+
+    /**
+     * Allows you to perform an update on the menu.
+     * @param uuid The player to update the menu for.
+     */
+    public void performUpdate(UUID uuid) {
+        if (!this.canvasMap.containsKey(uuid)) {
+            return; // player is not viewing the menu
+        }
+        Player viewer = Bukkit.getPlayer(uuid);
+        if (viewer == null) {
+            return; // player is not online
+        }
+        this.send(viewer); // update the menu
     }
 
     @Override
