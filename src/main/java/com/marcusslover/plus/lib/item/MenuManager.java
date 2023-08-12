@@ -199,7 +199,15 @@ public final class MenuManager {
                 Canvas.PopulatorContext.Populator<?> populator = populatorContext.populator();
                 if (populator != null) {
                     try {
-                        canvas.buttons().removeIf(Button::populated); // remove all populated buttons
+                        // remove all populated buttons
+                        canvas.buttons().removeIf(Button::populated);
+                        if (populatorContext.pageBackwards() != null) {
+                            canvas.buttons().remove(populatorContext.pageBackwards());
+                        }
+                        if (populatorContext.pageForwards() != null) {
+                            canvas.buttons().remove(populatorContext.pageForwards());
+                        }
+                        // repopulate
                         populatorContext.updateContent(player, populator);
                     } catch (Throwable e) {
                         e.printStackTrace();
