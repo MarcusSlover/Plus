@@ -387,7 +387,7 @@ public class Item extends Taggable<Item, ItemMeta> {
         return itemMeta.getCustomModelData();
     }
 
-    public @NotNull Item customModelData(int customModelData) {
+    public @NotNull Item customModelData(@Nullable Integer customModelData) {
         return this.meta(itemMeta -> itemMeta.setCustomModelData(customModelData));
     }
 
