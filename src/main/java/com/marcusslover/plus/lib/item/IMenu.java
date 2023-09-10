@@ -9,10 +9,20 @@ import org.jetbrains.annotations.NotNull;
  */
 public interface IMenu extends ISendable<IMenu> {
     /**
-     * Opens the menu to the player.
+     * Called when the menu is opened.
      *
-     * @param menuCanvas the canvas
-     * @param player     the player
+     * @param ctx    the canvas
+     * @param player the player
      */
-    void open(@NotNull Canvas menuCanvas, @NotNull Player player);
+    void open(@NotNull Canvas ctx, @NotNull Player player);
+
+    /**
+     * Called when the menu is closed.
+     *
+     * @param ctx    the canvas
+     * @param player the player
+     */
+    default void close(@NotNull Canvas ctx, @NotNull Player player) {
+        // nothing here
+    }
 }

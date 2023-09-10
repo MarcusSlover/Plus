@@ -29,13 +29,33 @@ public final class MenuManager {
         this.closeEvent = Events.listen(InventoryCloseEvent.class).handler(event -> {
             InventoryView view = event.getView();
             Inventory inventory = view.getTopInventory();
+            Player player = (Player) event.getPlayer();
 
             if (!(inventory.getHolder() instanceof Canvas canvas)) {
                 return;
             }
 
+            // handle the close event action
+            Canvas.ClickContext closeInventory = canvas.closeInventory();
+            if (closeInventory != null) {
+                Canvas.CloseInventory function = closeInventory.closeInventory();
+                if (function != null) {
+                    try {
+                        function.onClose(player, event, canvas);
+                    } catch (Throwable e) {
+                        if (closeInventory.throwableConsumer() != null) {
+                            closeInventory.throwableConsumer().accept(e);
+                        } else {
+                            Bukkit.getLogger().warning(e.getMessage());
+                        }
+                    }
+                }
+            }
+
             Menu menu = canvas.assosiatedMenu();
-            menu.canvasMap().remove(event.getPlayer().getUniqueId());
+            menu.close(canvas, player); // call the close method so developers can handle it
+            menu.canvasMap().remove(player.getUniqueId());
+
         }).asRegistered(plugin);
 
         this.clickEvent = Events.listen(InventoryClickEvent.class).handler(event -> {

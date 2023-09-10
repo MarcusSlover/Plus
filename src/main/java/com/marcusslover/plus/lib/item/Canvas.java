@@ -10,6 +10,7 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
@@ -48,7 +49,7 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
     @Getter(AccessLevel.PACKAGE)
     @Setter(AccessLevel.PACKAGE)
     private @Nullable Inventory assosiatedInventory = null;
-    private @Nullable ClickContext genericClick = null, selfInventory = null;
+    private @Nullable ClickContext genericClick = null, selfInventory = null, closeInventory = null;
 
     @Getter(AccessLevel.PACKAGE)
     @Setter(AccessLevel.PRIVATE)
@@ -115,7 +116,7 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
      * @return the click context associated with the self inventory action
      */
     public @NotNull ClickContext selfInventory(@Nullable Canvas.SelfInventoryClick selfInventory) {
-        this.selfInventory = new ClickContext(this, selfInventory);
+        this.selfInventory = new ClickContext(this, selfInventory, null);
         return this.selfInventory;
     }
 
@@ -127,8 +128,20 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
      * @return the click context associated with the generic click action
      */
     public @NotNull ClickContext genericClick(@Nullable Canvas.GenericClick genericClick) {
-        this.genericClick = new ClickContext(this, genericClick);
+        this.genericClick = new ClickContext(this, genericClick, null);
         return this.genericClick;
+    }
+
+    /**
+     * Set the close inventory action.
+     * This action is called when the player closes the inventory.
+     *
+     * @param closeInventory the close inventory action
+     * @return the canvas
+     */
+    public @NotNull ClickContext closeInventory(@Nullable Canvas.CloseInventory closeInventory) {
+        this.closeInventory = new ClickContext(this, null, closeInventory);
+        return this.closeInventory;
     }
 
     /**
@@ -140,7 +153,7 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
      */
     public @NotNull ClickContext button(@NotNull Button button, @Nullable Canvas.ButtonClick buttonClick) {
         this.buttons.add(button);
-        ClickContext context = new ClickContext(this, buttonClick);
+        ClickContext context = new ClickContext(this, buttonClick, null);
         button.clickContext(context);
         return context;
     }
@@ -215,6 +228,14 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
      */
     @FunctionalInterface
     public interface SelfInventoryClick extends ButtonClick {
+    }
+
+    /**
+     * A close inventory. This is called when a player closes the inventory.
+     */
+    @FunctionalInterface
+    public interface CloseInventory {
+        void onClose(@NotNull Player target, @NotNull InventoryCloseEvent event, @NotNull Canvas it);
     }
 
     /**
@@ -475,12 +496,13 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
     }
 
     /**
-     * A button click context.
+     * A button click context or some inventory related action.
      */
     @Data
     public static class ClickContext {
         private final @NotNull Canvas canvas;
         private final @Nullable ButtonClick click;
+        private final @Nullable CloseInventory closeInventory;
         private @Nullable Consumer<Throwable> throwableConsumer;
 
         public @NotNull ClickContext handleException(@NotNull Consumer<Throwable> exception) {
