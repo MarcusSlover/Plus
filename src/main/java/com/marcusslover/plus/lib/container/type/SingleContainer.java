@@ -36,6 +36,30 @@ public abstract class SingleContainer<V> extends AbstractContainer<V> {
      */
     protected abstract @NotNull V emptyValue();
 
+    /**
+     * Called when a new object gets loaded.
+     * <p>
+     * This function is mainly called when {@link #storeLocally(V)} is called.
+     * </p>
+     *
+     * @param value The object that was most recently loaded.
+     */
+    protected void onValueLoaded(@Nullable V value) {
+        // do some extra thing when the value is loaded
+    }
+
+    /**
+     * Called when an object gets unloaded.
+     * <p>
+     * This function is mainly called when {@link #cleanLocally()}} is called.
+     * </p>
+     *
+     * @param value The object that was most recently unloaded.
+     */
+    protected void onValueUnloaded(@Nullable V value) {
+        // do some extra thing when the value is unloaded
+    }
+
     @Override
     public void update(@NotNull V value) {
         this.writeData(this.retrieveLocally());
@@ -81,6 +105,7 @@ public abstract class SingleContainer<V> extends AbstractContainer<V> {
      * </p>
      */
     public void cleanLocally() {
+        this.onValueUnloaded(this.cache);
         this.cache = null;
     }
 
@@ -94,6 +119,7 @@ public abstract class SingleContainer<V> extends AbstractContainer<V> {
      */
     public void storeLocally(@Nullable V value) {
         this.cache = value;
+        this.onValueLoaded(value);
     }
 
     /**
