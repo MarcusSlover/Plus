@@ -45,6 +45,7 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
     @Setter(AccessLevel.PACKAGE)
     private @NotNull Menu assosiatedMenu;
     private @Nullable Component title;
+    private @Nullable Menu.UpdateContext menuUpdateContext = null;
 
     @Getter(AccessLevel.PACKAGE)
     @Setter(AccessLevel.PACKAGE)
@@ -53,7 +54,7 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
 
     @Getter(AccessLevel.PACKAGE)
     @Setter(AccessLevel.PRIVATE)
-    private PopulatorContext<?> poplatorContext = null;
+    private PopulatorContext<?> populatorContext = null;
 
     /**
      * Set the title of the canvas.
@@ -109,13 +110,13 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
     }
 
     /**
-     * Set the self inventory action.
+     * Set the self-inventory action.
      * This action is called when the player clicks on the inventory.
      *
-     * @param selfInventory the self inventory action
+     * @param selfInventory the self-inventory action
      * @return the click context associated with the self inventory action
      */
-    public @NotNull ClickContext selfInventory(@Nullable Canvas.SelfInventoryClick selfInventory) {
+    public @NotNull ClickContext selfInventory(@Nullable SelfInventoryClick selfInventory) {
         this.selfInventory = new ClickContext(this, selfInventory, null);
         return this.selfInventory;
     }
@@ -127,7 +128,7 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
      * @param genericClick the generic click action
      * @return the click context associated with the generic click action
      */
-    public @NotNull ClickContext genericClick(@Nullable Canvas.GenericClick genericClick) {
+    public @NotNull ClickContext genericClick(@Nullable GenericClick genericClick) {
         this.genericClick = new ClickContext(this, genericClick, null);
         return this.genericClick;
     }
@@ -139,7 +140,7 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
      * @param closeInventory the close inventory action
      * @return the canvas
      */
-    public @NotNull ClickContext closeInventory(@Nullable Canvas.CloseInventory closeInventory) {
+    public @NotNull ClickContext closeInventory(@Nullable CloseInventory closeInventory) {
         this.closeInventory = new ClickContext(this, null, closeInventory);
         return this.closeInventory;
     }
@@ -151,11 +152,22 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
      * @param buttonClick the button click
      * @return the click context associated with the button
      */
-    public @NotNull ClickContext button(@NotNull Button button, @Nullable Canvas.ButtonClick buttonClick) {
+    public @NotNull ClickContext button(@NotNull Button button, @Nullable ButtonClick buttonClick) {
         this.buttons.add(button);
         ClickContext context = new ClickContext(this, buttonClick, null);
         button.clickContext(context);
         return context;
+    }
+
+    /**
+     * Add a button to the canvas.
+     *
+     * @param button the button
+     * @return the canvas
+     */
+    public @NotNull Canvas button(@NotNull Button button) {
+        this.buttons.add(button);
+        return this;
     }
 
     /**
@@ -191,13 +203,31 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
      */
     @SuppressWarnings("unchecked")
     public <T> @NotNull PopulatorContext<T> populate(@NotNull List<T> elements) {
-        this.poplatorContext = new PopulatorContext<>(this, elements);
-        return (PopulatorContext<T>) poplatorContext;
+        this.populatorContext = new PopulatorContext<>(this, elements);
+        return (PopulatorContext<T>) populatorContext;
     }
 
     @Override
     public @NotNull Inventory getInventory() {
         return Objects.requireNonNull(this.assosiatedInventory);
+    }
+
+    /**
+     * Clears the canvas.
+     */
+    public void clear() {
+        // clear everything that's possible to clear
+        for (Button button : this.buttons) button.clickContext(null);
+        this.buttons.clear();
+        this.decorators.clear();
+        this.pages.clear();
+        this.title = null;
+        this.menuUpdateContext = null;
+        this.assosiatedInventory = null;
+        this.genericClick = null;
+        this.selfInventory = null;
+        this.closeInventory = null;
+        this.populatorContext = null;
     }
 
     /**
@@ -216,7 +246,7 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
 
     /**
      * A generic click. This is called when a player clicks on the inventory.
-     * This is called before the button click.
+     * This is called before the button clicks.
      */
     @FunctionalInterface
     public interface GenericClick extends ButtonClick {
@@ -224,7 +254,7 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
     }
 
     /**
-     * A self inventory click. This is called when a player clicks on their inventory.
+     * A self-inventory click. This is called when a player clicks on their inventory.
      */
     @FunctionalInterface
     public interface SelfInventoryClick extends ButtonClick {
@@ -291,7 +321,7 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
         /**
          * Modify how the elements are populated on the canvas.
          * The populator is called for each element.
-         * Additionally, adds the page manipulation buttons.
+         * Additionally, add the page manipulation buttons.
          *
          * @param player    the player
          * @param populator the populator
@@ -377,6 +407,7 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
         /**
          * Default view strategies.
          */
+        @Getter
         @Accessors(fluent = true, chain = true)
         public enum DefaultViewStrategy {
             /**
@@ -410,21 +441,20 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
                 return middleSlots.size();
             });
 
-            @Getter
-            private final ViewStrategy viewStrategy;
+            private final @NotNull ViewStrategy viewStrategy;
 
-            DefaultViewStrategy(ViewStrategy viewStrategy) {
+            DefaultViewStrategy(@NotNull ViewStrategy viewStrategy) {
                 this.viewStrategy = viewStrategy;
             }
 
             /**
-             * Gets all middle slots from the given sized menu.
+             * Gets all middle slots from the given-sized menu.
              * The middle slots are the slots that are not on the edges.
              *
              * @param rows the rows
              * @return the middle slots
              */
-            public static List<Integer> middleSlots(int rows) {
+            public static @NotNull List<@NotNull Integer> middleSlots(int rows) {
                 List<Integer> middleSlots = new ArrayList<>();
                 if (rows > 2) {
                     int middleRows = rows - 2;
@@ -444,7 +474,7 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
              * @param rows the rows
              * @return the slots
              */
-            public static List<Integer> avoidEdges(int rows) {
+            public static @NotNull List<@NotNull Integer> avoidEdges(int rows) {
                 List<Integer> middleSlots = new ArrayList<>();
                 for (int i = 0; i < rows; i++) {
                     int min = 9 * i + 1;

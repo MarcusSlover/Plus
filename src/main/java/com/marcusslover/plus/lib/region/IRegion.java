@@ -151,10 +151,8 @@ public interface IRegion {
      * @param strategy The strategy to use.
      * @return True if the vector is within the region.
      */
-    default boolean within(@NotNull Vector vector, @NotNull IRegion.DefaultVectorStrategy strategy) {
-        Vector min = this.min();
-        Vector max = this.max();
-        return this.within(vector, min, max, strategy);
+    default boolean within(@NotNull Vector vector, @NotNull DefaultVectorStrategy strategy) {
+        return this.within(vector, this.min(), this.max(), strategy);
     }
 
     /**
@@ -167,12 +165,8 @@ public interface IRegion {
      * @param strategy The strategy to use.
      * @return True if the vector is within the region.
      */
-    default boolean within(@NotNull Vector vector, @NotNull Vector min, @NotNull Vector max, @NotNull IRegion.DefaultVectorStrategy strategy) {
-        if (strategy == DefaultVectorStrategy.FULL) {
-            return vector.isInAABB(min, max);
-        } else {
-            return vector.getX() >= min.getX() && vector.getX() <= max.getX() && vector.getZ() >= min.getZ() && vector.getZ() <= max.getZ();
-        }
+    default boolean within(@NotNull Vector vector, @NotNull Vector min, @NotNull Vector max, @NotNull DefaultVectorStrategy strategy) {
+        return strategy.within(vector, min, max);
     }
 
     /**
@@ -180,33 +174,33 @@ public interface IRegion {
      */
     enum DefaultVectorStrategy implements IVectorStrategy {
         /**
-         * Checking if all the axis are within the region.
+         * Checking if all the axis is within the region.
          */
         FULL(Vector::isInAABB), // Minecraft's method.
         /**
-         * Checking if the x and z axis are within the region.
+         * Checking if the x and z-axis are within the region.
          */
-        EXCLUDE_Y((vector, min, max) -> vector.getX() >= min.getX() && vector.getX() <= max.getX() && vector.getZ() >= min.getZ() && vector.getZ() <= max.getZ()),
+        EXCLUDE_Y((v, min, max) -> v.getX() >= min.getX() && v.getX() <= max.getX() && v.getZ() >= min.getZ() && v.getZ() <= max.getZ()),
         /**
-         * Checking if the x and y axis are within the region.
+         * Checking if the x and y-axis are within the region.
          */
-        EXCLUDE_Z((vector, min, max) -> vector.getX() >= min.getX() && vector.getX() <= max.getX() && vector.getY() >= min.getY() && vector.getY() <= max.getY()),
+        EXCLUDE_Z((v, min, max) -> v.getX() >= min.getX() && v.getX() <= max.getX() && v.getY() >= min.getY() && v.getY() <= max.getY()),
         /**
-         * Checking if the y and z axis are within the region.
+         * Checking if the y and z-axis are within the region.
          */
-        EXCLUDE_X((vector, min, max) -> vector.getY() >= min.getY() && vector.getY() <= max.getY() && vector.getZ() >= min.getZ() && vector.getZ() <= max.getZ()),
+        EXCLUDE_X((v, min, max) -> v.getY() >= min.getY() && v.getY() <= max.getY() && v.getZ() >= min.getZ() && v.getZ() <= max.getZ()),
         /**
-         * Checking if only the x axis is within the region.
+         * Checking if only the x-axis is within the region.
          */
-        ONLY_X((vector, min, max) -> vector.getX() >= min.getX() && vector.getX() <= max.getX()),
+        ONLY_X((v, min, max) -> v.getX() >= min.getX() && v.getX() <= max.getX()),
         /**
-         * Checking if only the y axis is within the region.
+         * Checking if only the y-axis is within the region.
          */
-        ONLY_Y((vector, min, max) -> vector.getY() >= min.getY() && vector.getY() <= max.getY()),
+        ONLY_Y((v, min, max) -> v.getY() >= min.getY() && v.getY() <= max.getY()),
         /**
-         * Checking if only the z axis is within the region.
+         * Checking if only the z-axis is within the region.
          */
-        ONLY_Z((vector, min, max) -> vector.getZ() >= min.getZ() && vector.getZ() <= max.getZ());
+        ONLY_Z((v, min, max) -> v.getZ() >= min.getZ() && v.getZ() <= max.getZ());
 
         private final IVectorStrategy strategy;
 

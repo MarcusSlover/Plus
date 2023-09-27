@@ -12,6 +12,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -54,7 +55,10 @@ public final class MenuManager {
 
             Menu menu = canvas.assosiatedMenu();
             menu.close(canvas, player); // call the close method so developers can handle it
-            menu.canvasMap().remove(player.getUniqueId());
+            Canvas remove = menu.canvasMap().remove(player.getUniqueId());
+            if (remove != null) {
+                remove.clear(); // help the gc
+            }
 
         }).asRegistered(plugin);
 
@@ -113,6 +117,9 @@ public final class MenuManager {
                     .ifPresent(button -> {
                         Player player = (Player) event.getWhoClicked();
                         Canvas.ClickContext context = button.clickContext();
+                        if (context == null) {
+                            return;
+                        }
                         Canvas.ButtonClick click = context.click();
                         if (click == null) {
                             return;
@@ -193,11 +200,28 @@ public final class MenuManager {
      * @param menu   the menu
      */
     public void internallyOpen(@NotNull Player player, @NotNull Menu menu) {
+        this.internallyOpen(player, menu, false, null);
+    }
+
+    /**
+     * Opens a menu to the player.
+     *
+     * @param player the player
+     * @param menu   the menu
+     * @param force  if the menu should be forced
+     * @param ctx    the context of the update
+     */
+    public void internallyOpen(@NotNull Player player, @NotNull Menu menu, boolean force, @Nullable Menu.UpdateContext ctx) {
         InventoryView openInventory = player.getOpenInventory();
         Canvas canvas = menu.canvasMap().get(player.getUniqueId());
 
-        if (canvas == null) {
+        if (canvas == null || force) {
+            // just for performance
+            if (canvas != null) {
+                canvas.clear(); // help the gc
+            }
             canvas = new Canvas(6, menu);
+            canvas.menuUpdateContext(ctx); // set the context of the update
             menu.canvasMap().put(player.getUniqueId(), canvas);
             canvas.assosiatedMenu(menu);
             try {
@@ -208,13 +232,15 @@ public final class MenuManager {
             // craft inventory
             Inventory inventory = canvas.craftInventory();
             canvas.assosiatedInventory(inventory);
-            this.updateInventory(inventory, canvas);
+            this.updateInventory(player, inventory, canvas);
             player.openInventory(inventory);
         } else {
+            // update the canvas
+            canvas.menuUpdateContext(ctx); // set the context of the update
 
             // update inventory
             Inventory topInventory = openInventory.getTopInventory();
-            Canvas.PopulatorContext<?> populatorContext = canvas.poplatorContext();
+            Canvas.PopulatorContext<?> populatorContext = canvas.populatorContext();
             if (populatorContext != null) {
                 Canvas.PopulatorContext.Populator<?> populator = populatorContext.populator();
                 if (populator != null) {
@@ -234,18 +260,24 @@ public final class MenuManager {
                     }
                 }
             }
-
-            this.updateInventory(topInventory, canvas);
+            try {
+                menu.update(canvas, player); // update event
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            // update inventory
+            this.updateInventory(player, topInventory, canvas);
         }
     }
 
     /**
      * Updates the inventory.
      *
+     * @param player    the player
      * @param inventory the inventory
      * @param canvas    the canvas
      */
-    private void updateInventory(@NotNull Inventory inventory, @NotNull Canvas canvas) {
+    private void updateInventory(@NotNull Player player, @NotNull Inventory inventory, @NotNull Canvas canvas) {
         inventory.clear(); // clear inventory
 
         // free items first aka (decorations)
@@ -255,16 +287,17 @@ public final class MenuManager {
 
         // then buttons
         for (Button button : canvas.buttons()) {
-            Item item = button.item();
+            Button.ItemFactory itemFactory = button.itemFactory();
+            if (itemFactory == null) {
+                continue;
+            }
+            Item item = itemFactory.create(player);
             if (item == null) {
                 continue;
             }
             DetectableArea matrix = button.detectableArea();
             Set<Integer> slots = matrix.slots();
-
-            for (Integer slot : slots) {
-                inventory.setItem(slot, item.get());
-            }
+            slots.forEach(slot -> inventory.setItem(slot, item.get()));
         }
     }
 

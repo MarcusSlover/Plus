@@ -25,4 +25,14 @@ public interface IMenu extends ISendable<IMenu> {
     default void close(@NotNull Canvas ctx, @NotNull Player player) {
         // nothing here
     }
+
+    /**
+     * Called when the menu is updated.
+     *
+     * @param ctx    the canvas
+     * @param player the player
+     */
+    default void update(@NotNull Canvas ctx, @NotNull Player player) {
+        // nothing here
+    }
 }

@@ -2,7 +2,9 @@ package com.marcusslover.plus.lib.item;
 
 import com.marcusslover.plus.lib.region.IRegion;
 import lombok.Data;
+import lombok.ToString;
 import lombok.experimental.Accessors;
+import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -13,14 +15,33 @@ import java.util.UUID;
 
 /**
  * Represents a button in a menu.
+ * Buttons are used to detect clicks and to display items.
  */
 @Data
 @Accessors(fluent = true, chain = true)
 public class Button {
     private @NotNull Button.DetectableArea detectableArea; // The area where the button is detectable
-    private @Nullable Item item = null; // The item that represents the button
-    private Canvas.ClickContext clickContext; // The click event of the button
+    private @Nullable ItemFactory itemFactory; // (4.0.10) The item factory
+    private @Nullable Canvas.ClickContext clickContext; // The click event of the button
     private boolean populated = false; // If the button has been populated via viewing strategy
+
+    // for backwards compatibility (4.0.9)
+    public Button setItem(@Nullable Item item) {
+        this.itemFactory = player -> item;
+        return this;
+    }
+
+    // for backwards compatibility (4.0.9)
+    public Button item(@Nullable Item item) {
+        this.itemFactory = player -> item;
+        return this;
+    }
+
+    // for backwards compatibility (4.0.9)
+    public Button item(@Nullable ItemFactory item) {
+        this.itemFactory = player -> item != null ? item.create(player) : null;
+        return this;
+    }
 
     /**
      * Creates a button with the given coordinates.
@@ -34,13 +55,65 @@ public class Button {
     }
 
     /**
+     * Creates a button with the given coordinates.
+     * Deprecated, use dynamically created items instead.
+     *
+     * @param x    The x coordinate
+     * @param y    The y coordinate
+     * @param item The item
+     * @return The button
+     */
+    @Deprecated(forRemoval = false)
+    public static @NotNull Button create(int x, int y, @Nullable Item item) {
+        return create(x, y, false).item(item);
+    }
+
+    /**
+     * Creates a button with the given coordinates.
+     *
+     * @param x    The x coordinate
+     * @param y    The y coordinate
+     * @param item The item factory
+     * @return The button
+     * @since 4.0.10
+     */
+    public static @NotNull Button create(int x, int y, @NotNull ItemFactory item) {
+        return create(x, y, false).item(item);
+    }
+
+    /**
      * Creates a button with the given slot.
      *
      * @param slot The slot
      * @return The button
      */
     public static @NotNull Button create(int slot) {
-        return create(transformX(slot), transformY(slot), true);
+        return create(transformX(slot), transformY(slot), false);
+    }
+
+    /**
+     * Creates a button with the given slot.
+     * Deprecated, use dynamically created items instead.
+     *
+     * @param slot The slot
+     * @param item The item
+     * @return The button
+     */
+    @Deprecated(forRemoval = false)
+    public static @NotNull Button create(int slot, @Nullable Item item) {
+        return create(transformX(slot), transformY(slot), false).item(item);
+    }
+
+    /**
+     * Creates a button with the given slot.
+     *
+     * @param slot The slot
+     * @param item The item factory
+     * @return The button
+     * @since 4.0.10
+     */
+    public static @NotNull Button create(int slot, @NotNull ItemFactory item) {
+        return create(transformX(slot), transformY(slot), false).item(item);
     }
 
     /**
@@ -151,9 +224,9 @@ public class Button {
      * @return True if the slot is within the button
      */
     public boolean within(int slot) {
-        int y = transformY(slot);
         int x = transformX(slot);
-        return this.detectableArea.within(new Vector(x, 0, y));
+        int y = transformY(slot);
+        return this.detectableArea.within(new Vector(x, 0, y), true);
     }
 
     /**
@@ -162,10 +235,14 @@ public class Button {
      */
     @Data
     @Accessors(fluent = true, chain = true)
+    @ToString
     public static class DetectableArea implements IRegion {
         private final @NotNull String id = UUID.randomUUID().toString();
+        @ToString.Include
         private final @NotNull Vector min; // two-dimensional array
+        @ToString.Include
         private final @NotNull Vector max; // two-dimensional array
+        @ToString.Include
         private int size = 0; // for matrix scaling
 
         /**
@@ -225,7 +302,7 @@ public class Button {
          * @return True if the vector is within the region
          */
         @Override
-        public boolean within(@NotNull Vector vector, @NotNull IRegion.DefaultVectorStrategy strategy) {
+        public boolean within(@NotNull Vector vector, @NotNull DefaultVectorStrategy strategy) {
             if (this.singular()) {
                 return IRegion.super.within(vector, this.min(), this.max().clone().add(new Vector(this.size, 0, this.size)), strategy);
             }
@@ -257,5 +334,19 @@ public class Button {
 
             return slots;
         }
+    }
+
+    /**
+     * Represents a factory for creating items. Used for dynamic items.
+     */
+    @FunctionalInterface
+    public interface ItemFactory {
+        /**
+         * Creates an item for the given player.
+         *
+         * @param player The player
+         * @return The item
+         */
+        @Nullable Item create(@NotNull Player player);
     }
 }
