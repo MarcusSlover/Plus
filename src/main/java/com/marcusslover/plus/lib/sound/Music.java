@@ -1,22 +1,18 @@
 package com.marcusslover.plus.lib.sound;
 
 import com.marcusslover.plus.lib.common.ISendable;
-import com.marcusslover.plus.lib.server.ServerUtils;
-import com.marcusslover.plus.lib.task.Task;
 import lombok.Data;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.experimental.Accessors;
 import net.kyori.adventure.audience.Audience;
-import net.kyori.adventure.key.Key;
-import net.kyori.adventure.pointer.Pointer;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.BiFunction;
-import java.util.function.Function;
+import java.util.UUID;
 
 /**
  * Music can be used to loop notes for an audience or command sender.
@@ -33,237 +29,127 @@ import java.util.function.Function;
 @Data
 @Accessors(fluent = true)
 public class Music implements ISendable<Music> {
-	protected final Map<Audience, Session> sessions = new HashMap<>();
-	/**
-	 * The intro note to play before the loop.
-	 */
-	protected Note intro;
-	/**
-	 * The length of the intro in ticks.
-	 */
-	protected long introLength;
-	/**
-	 * The note to play on loop.
-	 */
-	protected Note loop;
-	/**
-	 * The length of the loop in ticks.
-	 */
-	protected long loopLength;
-	/**
-	 * The note to play when stopped.
-	 */
-	protected Note tail;
+    protected final Map<UUID, Session> sessions = new HashMap<>();
+    /**
+     * The intro note to play before the loop.
+     */
+    protected @Nullable Note intro;
+    /**
+     * The length of the intro in ticks.
+     */
+    protected long introLength;
+    /**
+     * The note to play on loop.
+     */
+    protected @NotNull Note loop;
+    /**
+     * The length of the loop in ticks.
+     */
+    protected long loopLength;
+    /**
+     * The note to play when stopped.
+     */
+    protected @Nullable Note tail;
+
+    private Music(@Nullable Note intro, long introLength, @NotNull Note loop, long loopLength, @Nullable Note tail) {
+        this.intro = intro;
+        this.introLength = introLength;
+        this.loop = loop;
+        this.loopLength = loopLength;
+        this.tail = tail;
+    }
+
+    /**
+     * Creates a new music object.
+     *
+     * @param loop       The note to play on loop.
+     * @param noteLength The length of the note in ticks.
+     * @return The music object.
+     */
+    public static @NotNull Music of(@NotNull Note loop, long noteLength) {
+        return new Music(null, 0, loop, noteLength, null);
+    }
+
+    /**
+     * Create a new music object with an intro and tail note.
+     *
+     * @param intro       Note to play before the loop.
+     * @param introLength Length of the intro in ticks.
+     * @param loop        Note to play on loop.
+     * @param loopLength  Length of the loop in ticks.
+     * @param tail        Note to play when stopped.
+     * @return The music object.
+     */
+    public static @NotNull Music of(@NotNull Note intro, long introLength, @NotNull Note loop, long loopLength, @NotNull Note tail) {
+        return new Music(intro, introLength, loop, loopLength, tail);
+    }
+
+    /**
+     * Checks if the given player is playing the music.
+     *
+     * @param uuid The player to check.
+     * @return True if the player is playing the music.
+     */
+    public boolean isPlaying(UUID uuid) {
+        return this.sessions.containsKey(uuid);
+    }
+
+    @Override
+    public @NotNull <T extends CommandSender> Music send(@NotNull T target) {
+        if (target instanceof Player) this.send((Audience) target);
+        return this;
+    }
+
+    @Override
+    public @NotNull Music send(Audience audience) {
+        audience.forEachAudience(p -> {
+            if (p instanceof Player player) {
+                this.sessions.put(player.getUniqueId(), new Session());
+            }
+        });
+        return this;
+    }
+
+    /**
+     * Set the intro note and length.
+     *
+     * @param note        Note to play before the loop.
+     * @param introLength Length of the intro in ticks.
+     * @return The music object.
+     */
+    public @NotNull Music intro(@NotNull Note note, long introLength) {
+        this.intro = note;
+        this.introLength = introLength;
+        return this;
+    }
+
+    /**
+     * Set the loop note and length.
+     *
+     * @param note       Note to play on loop.
+     * @param loopLength Length of the loop in ticks.
+     * @return The music object.
+     */
+    public @NotNull Music loop(@NotNull Note note, long loopLength) {
+        this.loop = note;
+        this.loopLength = loopLength;
+        return this;
+    }
+
+    /**
+     * Set the tail note and length.
+     *
+     * @param note Note to play when stopped.
+     * @return The music object.
+     */
+    public @NotNull Music tail(@NotNull Note note) {
+        this.tail = note;
+        return this;
+    }
 
 
-	private Music(Note intro, long introLength, Note loop, long loopLength, Note tail) {
-		this.intro = intro;
-		this.introLength = introLength;
-		this.loop = loop;
-		this.loopLength = loopLength;
-		this.tail = tail;
-	}
+    @Getter
+    public static class Session {
 
-	/**
-	 * Creates a new music object.
-	 *
-	 * @param note       The note to play on loop.
-	 * @param noteLength The length of the note in ticks.
-	 * @return The music object.
-	 */
-	public static @NotNull Music of(@NotNull Note note, long noteLength, @NotNull Audience audience) {
-		Music music = new Music(null, 0, note, noteLength, null);
-		music.sessions.put(audience, music.createSession(audience));
-		return music;
-	}
-
-	/**
-	 * Create a new music object with an intro and tail note.
-	 *
-	 * @param intro       Note to play before the loop.
-	 * @param introLength Length of the intro in ticks.
-	 * @param loop        Note to play on loop.
-	 * @param loopLength  Length of the loop in ticks.
-	 * @param tail        Note to play when stopped.
-	 * @return The music object.
-	 */
-	public static @NotNull Music of(@NotNull Note intro, long introLength, @NotNull Note loop, long loopLength, @NotNull Note tail, @NotNull Audience audience) {
-		Music music = new Music(intro, introLength, loop, loopLength, tail);
-		music.sessions.put(audience, music.createSession(audience));
-		return music;
-	}
-
-	private Session createSession(Audience audience) {
-		return new Session(System.currentTimeMillis(), (audience1, session) -> {
-			session.audience(audience1);
-			if (session.stopped) {
-				this.stop(session);
-				return null;
-			} else if (this.introLength != 0 && this.intro != null) {
-				this.intro.send(audience1);
-				return Task.syncRepeating(ServerUtils.getCallingPlugin(), () -> {
-					this.loop.send(audience1);
-					session.incrementLoops();
-				}, this.introLength, loopLength);
-			} else {
-				return Task.syncRepeating(ServerUtils.getCallingPlugin(), () -> {
-					this.loop.send(audience1);
-					session.incrementLoops();
-				}, 1, loopLength);
-			}
-		}, audience);
-	}
-
-	/**
-	 * Stop the music for an audience and play the tail if it exists.
-	 *
-	 * @param session The session that you would like to stop.
-	 */
-	public void stop(Session session) {
-		this.sessions.get(session.audience()).stop();
-		if (session.loops() > 0) {
-			Task.syncDelayed(ServerUtils.getCallingPlugin(), () -> {
-				session.stopSound(this.loop);
-				if (this.tail != null) {
-					this.tail.send(session.audience);
-				}
-			}, this.loopLength - (session.ticks() % this.loopLength));
-		} else {
-			session.stopSound(this.loop);
-			if (this.tail != null) {
-				this.tail.send(session.audience);
-			}
-		}
-	}
-
-	public void stop(Audience audience) {
-		this.stop(this.sessions().get(audience));
-	}
-
-	/**
-	 * Stop the music from the audience without playing the tail.
-	 *
-	 * @param audience The audience.
-	 */
-	public void forceStop(Audience audience) {
-		this.sessions().get(audience).stop();
-		if (this.intro() != null) {
-			audience.stopSound(this.intro().sound);
-		}
-		if (this.loop() != null) {
-			audience.stopSound(this.loop().sound);
-		}
-		if (this.tail() != null) {
-			audience.stopSound(this.tail().sound);
-		}
-	}
-
-	@Override
-	public @NotNull <T extends CommandSender> Music send(@NotNull T target) {
-		this.sessions().get(target).start();
-		return this;
-	}
-
-	@Override
-	public @NotNull Music send(Audience audience) {
-		this.sessions().get(audience).start();
-		return this;
-	}
-
-	/**
-	 * Set the intro note and length.
-	 *
-	 * @param intro       Note to play before the loop.
-	 * @param introLength Length of the intro in ticks.
-	 * @return The music object.
-	 */
-	public @NotNull Music intro(@NotNull Note intro, long introLength) {
-		this.intro = intro;
-		this.introLength = introLength;
-		return this;
-	}
-
-	/**
-	 * Set the loop note and length.
-	 *
-	 * @param loop       Note to play on loop.
-	 * @param loopLength Length of the loop in ticks.
-	 * @return The music object.
-	 */
-	public @NotNull Music loop(@NotNull Note loop, long loopLength) {
-		this.loop = loop;
-		this.loopLength = loopLength;
-		return this;
-	}
-
-	/**
-	 * Set the tail note and length.
-	 *
-	 * @param tail Note to play when stopped.
-	 * @return The music object.
-	 */
-	public @NotNull Music tail(@NotNull Note tail) {
-		this.tail = tail;
-		return this;
-	}
-
-	public Music playAllSessions() {
-		this.sessions().forEach((audience, session) -> session.start());
-		return this;
-	}
-
-	public void play(Audience audience) {
-		this.sessions().get(audience).start();
-	}
-
-
-	@Getter
-	private static class Session {
-		private final long startTime;
-		private final Task tickTask;
-		private final Task loopTask;
-		@Setter
-		private long ticks = 0;
-		@Setter
-		private int loops = 0;
-		@Setter
-		private boolean stopped = false;
-		@Setter
-		private Audience audience;
-
-		protected Session(long startTime, BiFunction<Audience, Session, Task> loopTask, Audience audience) {
-			this.startTime = startTime;
-			this.tickTask = Task.syncRepeating(ServerUtils.getCallingPlugin(), this::tick, 1, 1);
-			this.loopTask = loopTask.apply(audience, this);
-			this.audience = audience;
-		}
-
-		protected void tick() {
-			if (!this.stopped) {
-				this.ticks++;
-			}
-		}
-
-		protected void incrementLoops() {
-			if (!this.stopped) {
-				this.loops++;
-			}
-		}
-
-		protected void stop() {
-			this.stopped(true);
-			this.tickTask.cancel();
-			if (this.loopTask != null) {
-				this.loopTask.cancel();
-			}
-		}
-
-		protected void stopSound(Note note) {
-			this.audience.stopSound(note.sound);
-		}
-
-		protected void start() {
-			this.stopped(false);
-		}
-	}
+    }
 }
