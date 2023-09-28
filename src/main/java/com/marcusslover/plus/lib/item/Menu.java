@@ -138,7 +138,7 @@ public abstract class Menu implements IMenu {
     /**
      * Context about the menu update.
      */
-    public abstract class UpdateContext {
+    public abstract static class UpdateContext {
 
     }
 }
