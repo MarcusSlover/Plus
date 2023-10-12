@@ -4,6 +4,7 @@ import com.marcusslover.plus.lib.events.EventReference;
 import com.marcusslover.plus.lib.events.Events;
 import com.marcusslover.plus.lib.item.Button.DetectableArea;
 import com.marcusslover.plus.lib.item.Canvas.ItemDecorator;
+import com.marcusslover.plus.lib.item.event.PlayerMenuOpenEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -212,6 +213,8 @@ public final class MenuManager {
      * @param ctx    the context of the update
      */
     public void internallyOpen(@NotNull Player player, @NotNull Menu menu, boolean force, @Nullable Menu.UpdateContext ctx) {
+        if (!new PlayerMenuOpenEvent(player, menu, force, ctx).callEvent()) return; // Call the event
+
         InventoryView openInventory = player.getOpenInventory();
         Canvas canvas = menu.canvasMap().get(player.getUniqueId());
 

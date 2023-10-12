@@ -1,6 +1,5 @@
 package com.marcusslover.plus.lib.item;
 
-import com.marcusslover.plus.lib.item.event.PlayerMenuOpenEvent;
 import lombok.*;
 import lombok.experimental.Accessors;
 import net.kyori.adventure.audience.Audience;
@@ -115,7 +114,6 @@ public abstract class Menu implements IMenu {
     public @NotNull <T extends CommandSender> IMenu send(@NotNull T target, boolean force, @Nullable Menu.UpdateContext ctx) {
         if (target instanceof Player player) {
             if (this.manager == null) return this;
-            if (!new PlayerMenuOpenEvent(player, this, force, ctx).callEvent()) return this; // Call the event
             this.manager.internallyOpen(player, this, force, ctx);
         }
         return this;
@@ -132,7 +130,6 @@ public abstract class Menu implements IMenu {
     public @NotNull IMenu send(Audience audience, boolean force, @Nullable Menu.UpdateContext ctx) {
         if (audience instanceof Player player) {
             if (this.manager == null) return this;
-            if (!new PlayerMenuOpenEvent(player, this, force, ctx).callEvent()) return this; // Call the event
             this.manager.internallyOpen(player, this, force, ctx);
         }
         return this;
