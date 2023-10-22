@@ -64,6 +64,18 @@ public class Sidebar implements ISendable<Sidebar> {
         return new Sidebar(title);
     }
 
+    public static @NotNull Sidebar of(@NotNull Text title, @NotNull Scoreboard scoreboard) {
+        return new Sidebar(title, scoreboard);
+    }
+
+    public static @NotNull Sidebar of(@NotNull String title, @NotNull Scoreboard scoreboard) {
+        return new Sidebar(Text.of(title), scoreboard);
+    }
+
+    public static @NotNull Sidebar of(@NotNull Component title, @NotNull Scoreboard scoreboard) {
+        return new Sidebar(Text.of(title), scoreboard);
+    }
+
     public static @NotNull Optional<Sidebar> get(@NotNull Player player) {
         return get(player.getUniqueId());
     }
