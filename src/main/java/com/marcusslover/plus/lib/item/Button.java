@@ -230,6 +230,27 @@ public class Button {
     }
 
     /**
+     * Converts the button to a slot.
+     * If the button is not a single point, -1 will be returned.
+     * @return The slot
+     */
+    public int toSlot() {
+        if (this.detectableArea.size > 0) {
+            return -1;
+        }
+        return transformSlot((int) this.detectableArea.min().getZ(), (int) this.detectableArea.min().getX());
+    }
+
+    /**
+     * Converts the button to a set of slots.
+     * If the button is a single point, a set with only one slot will be returned.
+     * @return The slots
+     */
+    public @NotNull Set<Integer> toSlots() {
+        return this.detectableArea.slots();
+    }
+
+    /**
      * Represents a detectable area of a button.
      * This is used to detect if a player clicked on a button.
      */
