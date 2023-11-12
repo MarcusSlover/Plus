@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.marcusslover.plus.lib.container.AbstractContainer;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -253,6 +254,7 @@ public abstract class MapContainer<K, V> extends AbstractContainer<K> {
             try (FileReader fileReader = new FileReader(file)) {
                 data = gson.fromJson(fileReader, this.valueType);
             } catch (IOException e) {
+                Bukkit.getLogger().severe("Could not read file: " + file.getAbsolutePath());
                 throw new RuntimeException(e);
             }
             return data;
