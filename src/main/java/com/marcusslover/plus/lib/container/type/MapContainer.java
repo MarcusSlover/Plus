@@ -109,13 +109,17 @@ public abstract class MapContainer<K, V> extends AbstractContainer<K> {
             return;
         }
         for (File file : files) {
-            String fileName = file.getName();
-            K apply = this.keyComposer.apply(fileName.replaceFirst("(\\.json)", ""));
-            V read = this.read(fileName);
-            if (this.containsKeyLocally(apply)) {
-                continue;
+            try {
+                String fileName = file.getName();
+                K apply = this.keyComposer.apply(fileName.replaceFirst("(\\.json)", ""));
+                V read = this.read(fileName);
+                if (this.containsKeyLocally(apply)) {
+                    continue;
+                }
+                this.storeLocally(apply, read);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-            this.storeLocally(apply, read);
         }
     }
 
