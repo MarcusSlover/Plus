@@ -28,7 +28,7 @@ public class Tiny {
         LETTERS.put('n', 'ɴ');
         LETTERS.put('o', 'ᴏ');
         LETTERS.put('p', 'ᴘ');
-        LETTERS.put('q', 'ꞯ');
+        LETTERS.put('q', 'ǫ');
         LETTERS.put('r', 'ʀ');
         LETTERS.put('s', 's');
         LETTERS.put('t', 'ᴛ');
