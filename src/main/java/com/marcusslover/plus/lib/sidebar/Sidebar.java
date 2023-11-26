@@ -129,6 +129,11 @@ public class Sidebar implements ISendable<Sidebar> {
         return this;
     }
 
+    public @NotNull Sidebar addField() {
+        addField("", "");
+        return this;
+    }
+
     public @NotNull Sidebar insertField(int index, @NotNull String prefix, @NotNull String suffix) {
         return this.insertField(index, Text.of(prefix), Text.of(suffix));
     }
