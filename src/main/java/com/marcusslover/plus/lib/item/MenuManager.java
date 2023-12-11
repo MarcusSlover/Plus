@@ -222,6 +222,9 @@ public final class MenuManager {
             // just for performance
             if (canvas != null) {
                 canvas.clear(); // help the gc
+
+                // remove canvas from the tracked map
+                menu.canvasMap().remove(player.getUniqueId());
             }
             canvas = new Canvas(6, menu);
             canvas.menuUpdateContext(ctx); // set the context of the update
