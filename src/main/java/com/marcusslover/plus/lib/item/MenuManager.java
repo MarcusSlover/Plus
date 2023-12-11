@@ -37,6 +37,9 @@ public final class MenuManager {
                 return;
             }
 
+            // empty or invalid inventory shouldn't be handled
+            if (canvas.assosiatedInventory() == null) return;
+
             // handle the close event action
             Canvas.ClickContext closeInventory = canvas.closeInventory();
             if (closeInventory != null) {
@@ -226,19 +229,19 @@ public final class MenuManager {
                 // remove canvas from the tracked map
                 menu.canvasMap().remove(player.getUniqueId());
             }
-            canvas = new Canvas(6, menu);
-            canvas.menuUpdateContext(ctx); // set the context of the update
-            menu.canvasMap().put(player.getUniqueId(), canvas);
-            canvas.assosiatedMenu(menu);
+            Canvas newCanvas = new Canvas(6, menu);
+            newCanvas.menuUpdateContext(ctx); // set the context of the update
+            menu.canvasMap().put(player.getUniqueId(), newCanvas);
+            newCanvas.assosiatedMenu(menu);
             try {
-                menu.open(canvas, player); // fill the canvas
+                menu.open(newCanvas, player); // fill the canvas
             } catch (Exception e) {
                 e.printStackTrace();
             }
             // craft inventory
-            Inventory inventory = canvas.craftInventory();
-            canvas.assosiatedInventory(inventory);
-            this.updateInventory(player, inventory, canvas);
+            Inventory inventory = newCanvas.craftInventory();
+            newCanvas.assosiatedInventory(inventory);
+            this.updateInventory(player, inventory, newCanvas);
             player.openInventory(inventory);
         } else {
             // update the canvas
