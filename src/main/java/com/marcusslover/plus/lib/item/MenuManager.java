@@ -249,26 +249,27 @@ public final class MenuManager {
 
             // update inventory
             Inventory topInventory = openInventory.getTopInventory();
-            Canvas.PopulatorContext<?> populatorContext = canvas.populatorContext();
-            if (populatorContext != null) {
-                Canvas.PopulatorContext.Populator<?> populator = populatorContext.populator();
-                if (populator != null) {
-                    try {
-                        // remove all populated buttons
-                        canvas.buttons().removeIf(Button::populated);
-                        if (populatorContext.pageBackwards() != null) {
-                            canvas.buttons().remove(populatorContext.pageBackwards());
+            canvas.populatorContext().forEach(populatorContext -> {
+                if (populatorContext != null) {
+                    Canvas.PopulatorContext.Populator<?> populator = populatorContext.populator();
+                    if (populator != null) {
+                        try {
+                            // remove all populated buttons
+                            canvas.buttons().removeIf(Button::populated);
+                            if (populatorContext.pageBackwards() != null) {
+                                canvas.buttons().remove(populatorContext.pageBackwards());
+                            }
+                            if (populatorContext.pageForwards() != null) {
+                                canvas.buttons().remove(populatorContext.pageForwards());
+                            }
+                            // repopulate
+                            populatorContext.updateContent(player, populator);
+                        } catch (Throwable e) {
+                            e.printStackTrace();
                         }
-                        if (populatorContext.pageForwards() != null) {
-                            canvas.buttons().remove(populatorContext.pageForwards());
-                        }
-                        // repopulate
-                        populatorContext.updateContent(player, populator);
-                    } catch (Throwable e) {
-                        e.printStackTrace();
                     }
                 }
-            }
+            });
             try {
                 menu.update(canvas, player); // update event
             } catch (Exception e) {

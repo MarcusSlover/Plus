@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -60,7 +61,7 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
 
     @Getter(AccessLevel.PACKAGE)
     @Setter(AccessLevel.PRIVATE)
-    private PopulatorContext<?> populatorContext = null;
+    private LinkedList<@NotNull PopulatorContext<?>> populatorContext = new LinkedList<>();
 
     /**
      * Set the title of the canvas.
@@ -209,8 +210,39 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
      */
     @SuppressWarnings("unchecked")
     public <T> @NotNull PopulatorContext<T> populate(@NotNull List<T> elements) {
-        this.populatorContext = new PopulatorContext<>(this, elements);
-        return (PopulatorContext<T>) populatorContext;
+        PopulatorContext<T> newContext = new PopulatorContext<>(this, elements);
+        this.populatorContext.add(newContext);
+        return newContext;
+    }
+
+    /**
+     * Removes the last populator context.
+     *
+     * @return the canvas
+     * @throws NoSuchElementException if there is no populator context
+     */
+    public @NotNull Canvas removeLastPopulatorContext() throws NoSuchElementException {
+        this.populatorContext.removeLast();
+        return this;
+    }
+
+    /**
+     * Removes the first populator context.
+     *
+     * @return the canvas
+     * @throws NoSuchElementException if there is no populator context
+     */
+    public @NotNull Canvas removeFirstPopulatorContext() throws NoSuchElementException {
+        this.populatorContext.removeFirst();
+        return this;
+    }
+
+    /**
+     * Gets list of all populator contexts.
+     * @return the list of all populator contexts
+     */
+    public @NotNull List<@NotNull PopulatorContext<?>> populatorContexts() {
+        return this.populatorContext;
     }
 
     @Override
@@ -233,7 +265,7 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
         this.genericClick = null;
         this.selfInventory = null;
         this.closeInventory = null;
-        this.populatorContext = null;
+        this.populatorContext.clear(); // clear the populator context
     }
 
     /**
