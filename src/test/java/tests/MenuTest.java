@@ -2,7 +2,7 @@ package tests;
 
 import com.marcusslover.plus.lib.item.Button;
 import com.marcusslover.plus.lib.item.Canvas;
-import com.marcusslover.plus.lib.item.Canvas.PopulatorContext.DefaultViewStrategy;
+import com.marcusslover.plus.lib.item.Canvas.PopulatorContext.ViewStrategy;
 import com.marcusslover.plus.lib.item.Item;
 import com.marcusslover.plus.lib.item.Menu;
 import com.marcusslover.plus.lib.sound.Note;
@@ -14,6 +14,14 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 public class MenuTest extends Menu {
+    private final ViewStrategy vs = ViewStrategy.parse(new String[]{
+            "ooooooooo",
+            "ooooxoooo",
+            "ooooxoooo",
+            "ooooxoooo",
+            "ooooxoooo",
+            "ooooxoooo",
+    });
 
     @Override
     public void open(@NotNull Canvas emptyCanvas, @NotNull Player player) {
@@ -25,7 +33,7 @@ public class MenuTest extends Menu {
                 // Populate the menu with elements
                 .populate(List.of(1, 2, 3))
                 // View strategy
-                .viewStrategy(DefaultViewStrategy.MIDDLE)
+                .viewStrategy(vs/*Canvas.PopulatorContext.DefaultViewStrategy.MIDDLE*/)
                 // Pages
                 .pageForwards(Button.create(0, 0).item(Item.of(Material.ARROW, 1, "Next page")))
                 .pageBackwards(Button.create(0, 1).item(Item.of(Material.ARROW, 1, "Previous page")))

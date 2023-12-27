@@ -17,7 +17,13 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 /**
@@ -512,6 +518,61 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
          */
         @FunctionalInterface
         public interface ViewStrategy {
+            /**
+             * Parses an array of strings to create a {@link ViewStrategy} for rendering elements on a canvas.
+             * <p>
+             * The provided array of strings represents a grid, where each character in the strings
+             * indicates the presence or absence of an element at a specific grid position.
+             * Use 'x' to indicate the presence of an element and 'o' to indicate the absence of an element.
+             * <p>
+             * Example:
+             * <pre>
+             *         {@code
+             *         String[] rows = new String[] {
+             *              "ooooooooo",
+             *              "ooooxoooo",
+             *              "ooooxoooo",
+             *              "ooooxoooo",
+             *              "ooooxoooo",
+             *              "ooooxoooo"
+             *         };
+             *         }
+             *         ViewStrategy viewStrategy = ViewStrategy.parse(rows);
+             *         canvas.viewStrategy(viewStrategy);
+             * </pre>
+             *
+             * @param rows An array of strings representing the grid.
+             * @return A {@link ViewStrategy} that defines the rendering behavior based on the parsed grid.
+             * @throws IllegalArgumentException If the length of any row is not equal to 9.
+             */
+            static ViewStrategy parse(String[] rows) {
+                // Define a ViewStrategy using a lambda expression
+                return (counter, canvas, button) -> {
+                    int elementsPerPage = 0;
+
+                    // Iterate through each row in the grid
+                    for (int i = 0; i < rows.length; i++) {
+                        String row = rows[i];
+
+                        // Check if the length of the row is 9, throw an exception if not
+                        if (row.length() != 9) {
+                            throw new IllegalArgumentException("Row length must be 9");
+                        }
+
+                        // Iterate through each character in the row
+                        for (int j = 0; j < row.length(); j++) {
+                            // If the character is 'x', mark the corresponding button slot and increment the element count
+                            if (row.charAt(j) == 'x') {
+                                button.slot(i * 9 + j);
+                                elementsPerPage++;
+                            }
+                        }
+                    }
+
+                    // Return the total number of elements per page
+                    return elementsPerPage;
+                };
+            }
 
             /**
              * Allows you to modify the button depending on the given context.
