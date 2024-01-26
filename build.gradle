@@ -6,52 +6,33 @@ plugins {
 
 repositories {
     mavenCentral()
-    maven { url = 'https://papermc.io/repo/repository/maven-public/' }
+    maven { url = 'https://repo.papermc.io/repository/maven-public/' }
     maven { url = "https://repo.dmulloy2.net/repository/public/" }
 }
 
 dependencies {
     compileOnly 'org.jetbrains:annotations:23.0.0'
-    compileOnly 'io.papermc.paper:paper-api:1.19.4-R0.1-SNAPSHOT'
+    compileOnly 'io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT'
     compileOnly 'com.comphenix.protocol:ProtocolLib:4.8.0'
     compileOnly 'org.projectlombok:lombok:1.18.24'
     annotationProcessor 'org.projectlombok:lombok:1.18.24'
 
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
-    testImplementation 'io.papermc.paper:paper-api:1.19.4-R0.1-SNAPSHOT'
+    testImplementation 'io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT'
 }
 
 group 'com.marcusslover'
-version '4.0.12-SNAPSHOT'
+version '4.1.0-SNAPSHOT'
 ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 
-// All the building settings
-javadoc {
-    options {
-        encoding = 'UTF-8'
-        // ignore html syntax
-        addStringOption 'Xdoclint:none', '-quiet'
-    }
-}
-compileJava {
-    options.encoding = 'UTF-8'
-    options.compilerArgs << "-Xlint:none"
-}
-compileTestJava {
-    options.encoding = 'UTF-8'
-    options.compilerArgs << "-Xlint:none"
-}
 java {
-    withJavadocJar()
-    withSourcesJar()
     toolchain.languageVersion.set(JavaLanguageVersion.of(17))
 }
 test {
     useJUnitPlatform()
 }
 
-// publishing
 publishing {
     publications {
         mavenJava(MavenPublication) {
