@@ -248,6 +248,7 @@ public class Item extends Taggable<Item, ItemMeta> {
 
     /**
      * Checks if the item can be colored.
+     *
      * @return True if the item can be colored, false otherwise.
      */
     public boolean isColorable() {
@@ -477,17 +478,65 @@ public class Item extends Taggable<Item, ItemMeta> {
         });
     }
 
+    /**
+     * Set the skull texture of this item. Example:
+     * eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODNjMjVhN2ExODgxOTZiMTg3MTcyNjRmZmU4MzdjYTM0OGNmNzE5ZTgyNzE3OWVkYzRiNzhjYmNiOGM3ZGQ4In19fQ==
+     *
+     * @param skullValue the skull texture
+     * @return this item
+     */
+    public @NotNull Item skullValue(@NotNull String skullValue) {
+        return this.meta(itemMeta -> {
+            if (itemMeta instanceof SkullMeta skullMeta) {
+                Base64.Encoder encoder = Base64.getEncoder();
+                String texture = new String(encoder.encode(skullValue.getBytes()));
+                this.skull(skullMeta, texture);
+            }
+        });
+    }
+
+    /**
+     * Set the skull texture of this item. Example:
+     * 83c25a7a188196b18717264ffe837ca348cf719e827179edc4b78cbcb8c7dd8
+     * @param minecraftUrl the minecraft url
+     * @return this item
+     */
+    public @NotNull Item skullMinecraftUrl(@NotNull String minecraftUrl) {
+        return this.meta(itemMeta -> {
+            if (itemMeta instanceof SkullMeta skullMeta) {
+                String suffix = "http://textures.minecraft.net/texture/";
+                String texture;
+                if (minecraftUrl.startsWith(suffix)) {
+                    Base64.Encoder encoder = Base64.getEncoder();
+                    texture = new String(encoder.encode(minecraftUrl.getBytes()));
+                } else {
+                    texture = new String(this.getEncodedTexture(suffix + minecraftUrl));
+                }
+                if (texture.isEmpty()) {
+                    return;
+                }
+                this.skull(skullMeta, texture);
+            }
+        });
+    }
+
+    private void skull(@NotNull SkullMeta skullMeta, @NotNull String texture) {
+        int len = texture.length();
+        UUID uuid = new UUID(texture.substring(len - 20).hashCode(), texture.substring(len - 10).hashCode());
+
+        PlayerProfile profile = Bukkit.createProfile(uuid, null);
+        ProfileProperty property = new ProfileProperty("textures", texture);
+        profile.setProperty(property);
+
+        skullMeta.setPlayerProfile(profile);
+    }
+
+    @Deprecated(forRemoval = true)
     public @NotNull Item skull(@NotNull String url) {
         return this.meta(itemMeta -> {
             if (itemMeta instanceof SkullMeta skullMeta) {
                 String texture = new String(this.getEncodedTexture(url));
-                int len = texture.length();
-                UUID uuid = new UUID(texture.substring(len - 20).hashCode(), texture.substring(len - 10).hashCode());
-
-                PlayerProfile profile = Bukkit.createProfile(uuid, null);
-                ProfileProperty property = new ProfileProperty("textures", texture);
-                profile.setProperty(property);
-                skullMeta.setPlayerProfile(profile);
+                skull(skullMeta, texture);
             }
         });
     }
