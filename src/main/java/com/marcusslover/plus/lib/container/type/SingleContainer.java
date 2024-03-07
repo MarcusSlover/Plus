@@ -23,8 +23,8 @@ import java.io.IOException;
 @Data
 @EqualsAndHashCode(callSuper = false)
 public abstract class SingleContainer<V> extends AbstractContainer<V> {
-    private final Class<V> valueType;
-    private final String fileName;
+    protected final Class<V> valueType;
+    protected final String fileName;
     protected @Nullable V cache = null;
 
     /**

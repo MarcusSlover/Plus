@@ -36,9 +36,9 @@ public abstract class MapContainer<K, V> extends AbstractContainer<K> {
     /*Container data*/
     protected final Map<K, V> cache = new HashMap<>();
     /*File naming solution*/
-    private final Function<K, String> keyTransformer;
-    private final Function<String, K> keyComposer;
-    private final Class<V> valueType;
+    protected final Function<K, String> keyTransformer;
+    protected final Function<String, K> keyComposer;
+    protected final Class<V> valueType;
 
     /**
      * Creates a new instance of an object.
