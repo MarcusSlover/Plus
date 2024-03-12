@@ -581,6 +581,7 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
                 // Define a ViewStrategy using a lambda expression
                 return (counter, canvas, button) -> {
                     int elementsPerPage = 0;
+                    int[] slots = new int[0];
 
                     // Iterate through each row in the grid
                     for (int i = 0; i < rows.length; i++) {
@@ -595,10 +596,20 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
                         for (int j = 0; j < row.length(); j++) {
                             // If the character is 'x', mark the corresponding button slot and increment the element count
                             if (row.charAt(j) == 'x') {
-                                button.slot(i * 9 + j);
+                                // Add slot to slots array
+                                int[] newSlots = new int[slots.length + 1];
+                                System.arraycopy(slots, 0, newSlots, 0, slots.length);
+                                newSlots[slots.length] = i * 9 + j;
+                                slots = newSlots;
+
                                 elementsPerPage++;
                             }
                         }
+                    }
+
+                    // Set the button slot based on the counter
+                    if (slots.length > counter) {
+                        button.slot(slots[counter]);
                     }
 
                     // Return the total number of elements per page
