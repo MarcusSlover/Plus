@@ -58,11 +58,11 @@ public final class MenuManager {
             }
 
             Menu menu = canvas.assosiatedMenu();
-            menu.close(canvas, player); // call the close method so developers can handle it
             Canvas remove = menu.canvasMap().remove(player.getUniqueId());
             if (remove != null) {
                 remove.clear(); // help the gc
             }
+            menu.close(canvas, player); // call the close method so developers can handle it
 
         }).asRegistered(plugin);
 
