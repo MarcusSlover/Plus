@@ -249,13 +249,15 @@ public final class MenuManager {
 
             // update inventory
             Inventory topInventory = openInventory.getTopInventory();
+
+            // remove all populated buttons
+            canvas.buttons().removeIf(Button::populated);
+
             canvas.populatorContext().forEach(populatorContext -> {
                 if (populatorContext != null) {
                     Canvas.PopulatorContext.Populator<?> populator = populatorContext.populator();
                     if (populator != null) {
                         try {
-                            // remove all populated buttons
-                            canvas.buttons().removeIf(Button::populated);
                             if (populatorContext.pageBackwards() != null) {
                                 canvas.buttons().remove(populatorContext.pageBackwards());
                             }
