@@ -8,15 +8,12 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import net.kyori.adventure.audience.Audience;
-import net.kyori.adventure.key.Key;
-import net.kyori.adventure.pointer.Pointer;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 
 /**
  * Music can be used to loop notes for an audience or command sender.
@@ -101,15 +98,15 @@ public class Music implements ISendable<Music> {
 				return null;
 			} else if (this.introLength != 0 && this.intro != null) {
 				this.intro.send(audience1);
-				return Task.syncRepeating(ServerUtils.getCallingPlugin(), () -> {
+				return Task.syncRepeating(ServerUtils.getCallingPlugin(), this.introLength, loopLength, () -> {
 					this.loop.send(audience1);
 					session.incrementLoops();
-				}, this.introLength, loopLength);
+				});
 			} else {
-				return Task.syncRepeating(ServerUtils.getCallingPlugin(), () -> {
+				return Task.syncRepeating(ServerUtils.getCallingPlugin(), 1, loopLength, () -> {
 					this.loop.send(audience1);
 					session.incrementLoops();
-				}, 1, loopLength);
+				});
 			}
 		}, audience);
 	}
@@ -122,12 +119,12 @@ public class Music implements ISendable<Music> {
 	public void stop(Session session) {
 		this.sessions.get(session.audience()).stop();
 		if (session.loops() > 0) {
-			Task.syncDelayed(ServerUtils.getCallingPlugin(), () -> {
+			Task.syncDelayed(this.loopLength - (session.ticks() % this.loopLength), () -> {
 				session.stopSound(this.loop);
 				if (this.tail != null) {
 					this.tail.send(session.audience);
 				}
-			}, this.loopLength - (session.ticks() % this.loopLength));
+			});
 		} else {
 			session.stopSound(this.loop);
 			if (this.tail != null) {
@@ -233,7 +230,7 @@ public class Music implements ISendable<Music> {
 
 		protected Session(long startTime, BiFunction<Audience, Session, Task> loopTask, Audience audience) {
 			this.startTime = startTime;
-			this.tickTask = Task.syncRepeating(ServerUtils.getCallingPlugin(), this::tick, 1, 1);
+			this.tickTask = Task.syncRepeating(ServerUtils.getCallingPlugin(), 1, 1, this::tick);
 			this.loopTask = loopTask.apply(audience, this);
 			this.audience = audience;
 		}

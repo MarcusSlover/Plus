@@ -1,6 +1,7 @@
 package com.marcusslover.plus.lib.task;
 
 import com.marcusslover.plus.lib.server.ServerUtils;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -16,7 +17,19 @@ import java.util.function.Consumer;
 public class Task {
 
     private final int task;
+    /**
+     * -- GETTER --
+     *
+     * @return The type of this Task
+     */
+    @Getter
     private final TaskType type;
+    /**
+     * -- GETTER --
+     *
+     * @return The Plugin which scheduled this task
+     */
+    @Getter
     private final Plugin plugin;
 
     private Task(int task, TaskType type, Plugin plugin) {
@@ -44,7 +57,7 @@ public class Task {
      * @return The Task that has been scheduled
      */
     public static Task syncDelayed(Plugin plugin, Runnable run) {
-        return syncDelayed(plugin, run, 0);
+        return syncDelayed(plugin, 0, run);
     }
 
     /**
@@ -66,56 +79,56 @@ public class Task {
      * @return The Task that has been scheduled
      */
     public static Task syncDelayed(Plugin plugin, Consumer<Task> run) {
-        return syncDelayed(plugin, run, 0);
+        return syncDelayed(plugin, 0, run);
     }
 
     /**
      * Schedules a sync delayed task to run after a delay
      *
-     * @param run   The task to run
      * @param delay The delay in ticks to wait before running the task
+     * @param run   The task to run
      * @return The Task that has been scheduled
      */
     @Deprecated
-    public static Task syncDelayed(Runnable run, long delay) {
-        return syncDelayed(ServerUtils.getCallingPlugin(), run, delay);
+    public static Task syncDelayed(long delay, Runnable run) {
+        return syncDelayed(ServerUtils.getCallingPlugin(), delay, run);
     }
 
     /**
      * Schedules a sync delayed task to run after a delay
      *
      * @param plugin The plugin scheduling the task
-     * @param run    The task to run - Do not use bukkit runnable. (Cancelling the bukkit runnable will not cancel the created task)
      * @param delay  The delay in ticks to wait before running the task
+     * @param run    The task to run - Do not use bukkit runnable. (Cancelling the bukkit runnable will not cancel the created task)
      * @return The Task that has been scheduled
      */
-    public static Task syncDelayed(Plugin plugin, Runnable run, long delay) {
+    public static Task syncDelayed(Plugin plugin, long delay, Runnable run) {
         checkRunnable(run);
 
-        return syncDelayed(plugin, t -> run.run(), delay);
+        return syncDelayed(plugin, delay, t -> run.run());
     }
 
     /**
      * Schedules a sync delayed task to run after a delay
      *
-     * @param run   The task to run
      * @param delay The delay in ticks to wait before running the task
+     * @param run   The task to run
      * @return The Task that has been scheduled
      */
     @Deprecated
-    public static Task syncDelayed(Consumer<Task> run, long delay) {
-        return syncDelayed(ServerUtils.getCallingPlugin(), run, delay);
+    public static Task syncDelayed(long delay, Consumer<Task> run) {
+        return syncDelayed(ServerUtils.getCallingPlugin(), delay, run);
     }
 
     /**
      * Schedules a sync delayed task to run after a delay
      *
      * @param plugin The plugin scheduling the task
-     * @param run    The task to run - Do not use bukkit runnable. (Cancelling the bukkit runnable will not cancel the created task)
      * @param delay  The delay in ticks to wait before running the task
+     * @param run    The task to run - Do not use bukkit runnable. (Cancelling the bukkit runnable will not cancel the created task)
      * @return The Task that has been scheduled
      */
-    public static Task syncDelayed(Plugin plugin, Consumer<Task> run, long delay) {
+    public static Task syncDelayed(Plugin plugin, long delay, Consumer<Task> run) {
         Task[] task = {null};
         task[0] = new Task(Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> run.accept(task[0]), delay), TaskType.SYNC_DELAYED, plugin);
         return task[0];
@@ -124,54 +137,54 @@ public class Task {
     /**
      * Schedules a sync repeating task to run later
      *
-     * @param run    The task to run - Do not use bukkit runnable. (Cancelling the bukkit runnable will not cancel the created task)
      * @param delay  The delay in ticks to wait before running the task
      * @param period The number of ticks between executions of the task
+     * @param run    The task to run - Do not use bukkit runnable. (Cancelling the bukkit runnable will not cancel the created task)
      * @return The Task that has been scheduled
      */
     @Deprecated
-    public static Task syncRepeating(Runnable run, long delay, long period) {
-        return syncRepeating(ServerUtils.getCallingPlugin(), run, delay, period);
+    public static Task syncRepeating(long delay, long period, Runnable run) {
+        return syncRepeating(ServerUtils.getCallingPlugin(), delay, period, run);
     }
 
     /**
      * Schedules a sync repeating task to run later
      *
      * @param plugin The plugin scheduling the task
-     * @param run    The task to run - Do not use bukkit runnable. (Cancelling the bukkit runnable will not cancel the created task)
      * @param delay  The delay in ticks to wait before running the task
      * @param period The number of ticks between executions of the task
+     * @param run    The task to run - Do not use bukkit runnable. (Cancelling the bukkit runnable will not cancel the created task)
      * @return The Task that has been scheduled
      */
-    public static Task syncRepeating(Plugin plugin, Runnable run, long delay, long period) {
+    public static Task syncRepeating(Plugin plugin, long delay, long period, Runnable run) {
         checkRunnable(run);
 
-        return syncRepeating(plugin, t -> run.run(), delay, period);
+        return syncRepeating(plugin, delay, period, t -> run.run());
     }
 
     /**
      * Schedules a sync repeating task to run later
      *
-     * @param run    The task to run - Do not use bukkit runnable. (Cancelling the bukkit runnable will not cancel the created task)
      * @param delay  The delay in ticks to wait before running the task
      * @param period The number of ticks between executions of the task
+     * @param run    The task to run - Do not use bukkit runnable. (Cancelling the bukkit runnable will not cancel the created task)
      * @return The Task that has been scheduled
      */
     @Deprecated
-    public static Task syncRepeating(Consumer<Task> run, long delay, long period) {
-        return syncRepeating(ServerUtils.getCallingPlugin(), run, delay, period);
+    public static Task syncRepeating(long delay, long period, Consumer<Task> run) {
+        return syncRepeating(ServerUtils.getCallingPlugin(), delay, period, run);
     }
 
     /**
      * Schedules a sync repeating task to run later
      *
      * @param plugin The plugin scheduling the task
-     * @param run    The task to run - Do not use bukkit runnable. (Cancelling the bukkit runnable will not cancel the created task)
      * @param delay  The delay in ticks to wait before running the task
      * @param period The number of ticks between executions of the task
+     * @param run    The task to run - Do not use bukkit runnable. (Cancelling the bukkit runnable will not cancel the created task)
      * @return The Task that has been scheduled
      */
-    public static Task syncRepeating(Plugin plugin, Consumer<Task> run, long delay, long period) {
+    public static Task syncRepeating(Plugin plugin, long delay, long period, Consumer<Task> run) {
         Task[] task = {null};
         task[0] = new Task(Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> run.accept(task[0]), delay, period), TaskType.SYNC_REPEATING, plugin);
         return task[0];
@@ -198,7 +211,7 @@ public class Task {
     public static Task asyncDelayed(Plugin plugin, Runnable run) {
         checkRunnable(run);
 
-        return asyncDelayed(plugin, t -> run.run(), 0);
+        return asyncDelayed(plugin, 0, t -> run.run());
     }
 
     /**
@@ -220,57 +233,57 @@ public class Task {
      * @return The Task that has been scheduled
      */
     public static Task asyncDelayed(Plugin plugin, Consumer<Task> run) {
-        return asyncDelayed(plugin, run, 0);
+        return asyncDelayed(plugin, 0, run);
     }
 
     /**
      * Schedules an async delayed task to run after a delay
      *
-     * @param run   The task to run
      * @param delay The delay in ticks to wait before running the task
+     * @param run   The task to run
      * @return The Task that has been scheduled
      */
     @Deprecated
-    public static Task asyncDelayed(Runnable run, long delay) {
-        return asyncDelayed(ServerUtils.getCallingPlugin(), run, delay);
+    public static Task asyncDelayed(long delay, Runnable run) {
+        return asyncDelayed(ServerUtils.getCallingPlugin(), delay, run);
     }
 
     /**
      * Schedules an async delayed task to run after a delay
      *
      * @param plugin The plugin scheduling the task
-     * @param run    The task to run - Do not use bukkit runnable. (Cancelling the bukkit runnable will not cancel the created task)
      * @param delay  The delay in ticks to wait before running the task
+     * @param run    The task to run - Do not use bukkit runnable. (Cancelling the bukkit runnable will not cancel the created task)
      * @return The Task that has been scheduled
      */
-    public static Task asyncDelayed(Plugin plugin, Runnable run, long delay) {
+    public static Task asyncDelayed(Plugin plugin, long delay, Runnable run) {
         checkRunnable(run);
 
-        return asyncDelayed(plugin, t -> run.run(), delay);
+        return asyncDelayed(plugin, delay, t -> run.run());
     }
 
     /**
      * Schedules an async delayed task to run after a delay
      *
-     * @param run   The task to run
      * @param delay The delay in ticks to wait before running the task
+     * @param run   The task to run
      * @return The Task that has been scheduled
      */
     @Deprecated
-    public static Task asyncDelayed(Consumer<Task> run, long delay) {
-        return asyncDelayed(ServerUtils.getCallingPlugin(), run, delay);
+    public static Task asyncDelayed(long delay, Consumer<Task> run) {
+        return asyncDelayed(ServerUtils.getCallingPlugin(), delay, run);
     }
 
     /**
      * Schedules an async delayed task to run after a delay
      *
      * @param plugin The plugin scheduling the task
-     * @param run    The task to run - Do not use bukkit runnable. (Cancelling the bukkit runnable will not cancel the created task)
      * @param delay  The delay in ticks to wait before running the task
+     * @param run    The task to run - Do not use bukkit runnable. (Cancelling the bukkit runnable will not cancel the created task)
      * @return The Task that has been scheduled
      */
     @Deprecated
-    public static Task asyncDelayed(Plugin plugin, Consumer<Task> run, long delay) {
+    public static Task asyncDelayed(Plugin plugin, long delay, Consumer<Task> run) {
         Task[] task = {null};
         task[0] = new Task(Bukkit.getScheduler().scheduleAsyncDelayedTask(plugin, () -> run.accept(task[0]), delay), TaskType.ASYNC_DELAYED, plugin);
         return task[0];
@@ -279,27 +292,27 @@ public class Task {
     /**
      * Schedules an async repeating task to run later
      *
-     * @param run    The task to run - Do not use bukkit runnable. (Cancelling the bukkit runnable will not cancel the created task)
      * @param delay  The delay in ticks to wait before running the task
      * @param period The number of ticks between executions of the task
+     * @param run    The task to run - Do not use bukkit runnable. (Cancelling the bukkit runnable will not cancel the created task)
      * @return The Task that has been scheduled
      */
     @Deprecated
-    public static Task asyncRepeating(Consumer<Task> run, long delay, long period) {
-        return asyncRepeating(ServerUtils.getCallingPlugin(), run, delay, period);
+    public static Task asyncRepeating(long delay, long period, Consumer<Task> run) {
+        return asyncRepeating(ServerUtils.getCallingPlugin(), delay, period, run);
     }
 
     /**
      * Schedules an async repeating task to run later
      *
      * @param plugin The plugin scheduling the task
-     * @param run    The task to run - Do not use bukkit runnable. (Cancelling the bukkit runnable will not cancel the created task)
      * @param delay  The delay in ticks to wait before running the task
      * @param period The number of ticks between executions of the task
+     * @param run    The task to run - Do not use bukkit runnable. (Cancelling the bukkit runnable will not cancel the created task)
      * @return The Task that has been scheduled
      */
-    @Deprecated
-    public static Task asyncRepeating(Plugin plugin, Consumer<Task> run, long delay, long period) {
+    @Deprecated(forRemoval = true)
+    public static Task asyncRepeating(Plugin plugin, long delay, long period, Consumer<Task> run) {
         Task[] task = {null};
         task[0] = new Task(Bukkit.getScheduler().scheduleAsyncRepeatingTask(plugin, () -> run.accept(task[0]), delay, period), TaskType.ASYNC_REPEATING, plugin);
         return task[0];
@@ -308,14 +321,14 @@ public class Task {
     /**
      * Schedules an async repeating task to run later
      *
-     * @param run    The task to run - Do not use bukkit runnable. (Cancelling the bukkit runnable will not cancel the created task)
      * @param delay  The delay in ticks to wait before running the task
      * @param period The number of ticks between executions of the task
+     * @param run    The task to run - Do not use bukkit runnable. (Cancelling the bukkit runnable will not cancel the created task)
      * @return The Task that has been scheduled
      */
     @Deprecated
-    public static Task asyncRepeating(Runnable run, long delay, long period) {
-        return asyncRepeating(ServerUtils.getCallingPlugin(), run, delay, period);
+    public static Task asyncRepeating(long delay, long period, Runnable run) {
+        return asyncRepeating(ServerUtils.getCallingPlugin(), delay, period, run);
     }
 
     /**
@@ -327,8 +340,8 @@ public class Task {
      * @param period The number of ticks between executions of the task
      * @return The Task that has been scheduled
      */
-    public static Task asyncRepeating(Plugin plugin, Runnable run, long delay, long period) {
-        return asyncRepeating(plugin, t -> run.run(), delay, period);
+    public static Task asyncRepeating(Plugin plugin, long delay, long period, Runnable run) {
+        return asyncRepeating(plugin, delay, period, t -> run.run());
     }
 
     /**
@@ -338,13 +351,6 @@ public class Task {
         if (run instanceof BukkitRunnable) {
             throw new InvalidParameterException("Cannot schedule a BukkitRunnable as a Task please use \"() -> {}\" or \"new Runnable() {}\"... or crazy idea just use the consumer method.");
         }
-    }
-
-    /**
-     * @return The type of this Task
-     */
-    public TaskType getType() {
-        return this.type;
     }
 
     /**
@@ -369,21 +375,11 @@ public class Task {
     }
 
     /**
-     * @return The Plugin which scheduled this task
-     */
-    public Plugin getPlugin() {
-        return this.plugin;
-    }
-
-    /**
      * Represents a type of task
      */
     public enum TaskType {
 
-        SYNC_DELAYED,
-        ASYNC_DELAYED,
-        SYNC_REPEATING,
-        ASYNC_REPEATING
+        SYNC_DELAYED, ASYNC_DELAYED, SYNC_REPEATING, ASYNC_REPEATING
 
     }
 }
