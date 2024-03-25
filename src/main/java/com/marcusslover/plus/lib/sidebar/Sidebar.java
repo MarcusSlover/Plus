@@ -2,14 +2,19 @@ package com.marcusslover.plus.lib.sidebar;
 
 import com.marcusslover.plus.lib.common.ISendable;
 import com.marcusslover.plus.lib.text.Text;
+import io.papermc.paper.scoreboard.numbers.NumberFormat;
+import lombok.Data;
+import lombok.experimental.Accessors;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.Criteria;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.NotNull;
@@ -22,19 +27,24 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+@Data
+@Accessors(fluent = true, chain = true)
 public class Sidebar implements ISendable<Sidebar> {
+    @SuppressWarnings("deprecation")
     private static final @NotNull ChatColor[] COLOR = ChatColor.values();
     private static final @NotNull Map<UUID, Sidebar> SIDEBAR_MAP = new HashMap<>();
-
-    private static int customID = 0;
+    private static long customID = 0;
 
     public final @NotNull Scoreboard scoreboard;
     public final @NotNull Objective objective;
-
     protected final @NotNull LinkedList<@NotNull SidebarField> fields;
 
     private Sidebar(@NotNull String title) {
         this(Text.of(title));
+    }
+
+    private Sidebar(@NotNull String title, @NotNull Scoreboard scoreboard) {
+        this(Text.of(title), scoreboard);
     }
 
     private Sidebar(@NotNull Text title) {
@@ -43,8 +53,9 @@ public class Sidebar implements ISendable<Sidebar> {
 
     private Sidebar(@NotNull Text title, @NotNull Scoreboard scoreboard) {
         this.scoreboard = scoreboard;
-        this.objective = this.scoreboard.registerNewObjective(Sidebar.customID + "DS", "dummy", title.comp());
+        this.objective = this.scoreboard.registerNewObjective(Sidebar.customID + "DS", Criteria.DUMMY, title.comp());
         this.objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+        this.objective.setAutoUpdateDisplay(true);
 
         this.fields = new LinkedList<>();
 
@@ -77,43 +88,53 @@ public class Sidebar implements ISendable<Sidebar> {
     }
 
     public static @NotNull Optional<Sidebar> get(@NotNull Player player) {
-        return get(player.getUniqueId());
+        return Sidebar.get(player.getUniqueId());
     }
 
-    public static @NotNull Optional<Sidebar> get(@NotNull UUID uuid) {
-        if (Sidebar.SIDEBAR_MAP.containsKey(uuid)) {
-            return Optional.of(Sidebar.SIDEBAR_MAP.get(uuid));
-        }
-        return Optional.empty();
+    public static Optional<Sidebar> get(@NotNull UUID uuid) {
+        return Optional.ofNullable(Sidebar.SIDEBAR_MAP.get(uuid));
     }
 
     public static void destroy(@NotNull Player player) {
-        destroy(player.getUniqueId());
+        Sidebar.destroy(player.getUniqueId());
     }
 
     public static void destroy(@NotNull UUID uuid) {
-        get(uuid).ifPresent(sidebar -> Sidebar.SIDEBAR_MAP.remove(uuid));
+        Sidebar.get(uuid).ifPresent(sidebar -> Sidebar.SIDEBAR_MAP.remove(uuid));
     }
 
-    public static int getCustomID() {
+    public static long customId() {
         return Sidebar.customID;
     }
 
-    public static @NotNull Map<UUID, Sidebar> getSidebarMap() {
+    public static @NotNull Map<UUID, Sidebar> map() {
         return Sidebar.SIDEBAR_MAP;
     }
 
-    private @NotNull String getEntry(int currentSize) {
-        return Sidebar.COLOR[currentSize].toString() + Sidebar.COLOR[currentSize / 4].toString() + Sidebar.COLOR[COLOR.length - 1];
+    private @NotNull String entry(int currentSize) {
+        return Sidebar.COLOR[currentSize].toString() + Sidebar.COLOR[currentSize / 4] + Sidebar.COLOR[COLOR.length - 1];
+    }
+
+    public @NotNull Sidebar numberFormat(@Nullable NumberFormat numberFormat) {
+        this.objective.numberFormat(numberFormat);
+        return this;
     }
 
     public @NotNull Sidebar addField(@NotNull String prefix, @NotNull String suffix) {
-        return this.addField(Text.of(prefix), Text.of(suffix));
+        return this.addField(Text.of(prefix), Text.of(suffix), null);
+    }
+
+    public @NotNull Sidebar addField(@NotNull String prefix, @NotNull String suffix, @Nullable NumberFormat numberFormat) {
+        return this.addField(Text.of(prefix), Text.of(suffix), numberFormat);
     }
 
     public @NotNull Sidebar addField(@NotNull Text prefix, @NotNull Text suffix) {
-        int currentSize = this.getSize();
-        String entry = this.getEntry(currentSize);
+        return this.addField(prefix, suffix, null);
+    }
+
+    public @NotNull Sidebar addField(@NotNull Text prefix, @NotNull Text suffix, @Nullable NumberFormat numberFormat) {
+        int currentSize = this.size();
+        String entry = this.entry(currentSize);
 
         Team team = this.scoreboard.registerNewTeam(currentSize + "TPLUS");
         team.addEntry(entry);
@@ -125,12 +146,14 @@ public class Sidebar implements ISendable<Sidebar> {
         int fieldsSize = this.fields.size();
         this.fields.add(new SidebarField(team, entry, fieldsSize));
 
-        this.objective.getScore(entry).setScore(16 - currentSize);
+        Score score = this.objective.getScore(entry);
+        score.setScore(16 - currentSize);
+        score.numberFormat(numberFormat);
         return this;
     }
 
     public @NotNull Sidebar addField() {
-        addField("", "");
+        this.addField("", "");
         return this;
     }
 
@@ -138,9 +161,17 @@ public class Sidebar implements ISendable<Sidebar> {
         return this.insertField(index, Text.of(prefix), Text.of(suffix));
     }
 
+    public @NotNull Sidebar insertField(int index, @NotNull String prefix, @NotNull String suffix, @Nullable NumberFormat numberFormat) {
+        return this.insertField(index, Text.of(prefix), Text.of(suffix), numberFormat);
+    }
+
     public @NotNull Sidebar insertField(int index, @NotNull Text prefix, @NotNull Text suffix) {
-        int currentSize = this.getSize();
-        String entry = this.getEntry(currentSize);
+        return this.insertField(index, prefix, suffix, null);
+    }
+
+    public @NotNull Sidebar insertField(int index, @NotNull Text prefix, @NotNull Text suffix, @Nullable NumberFormat numberFormat) {
+        int currentSize = this.size();
+        String entry = this.entry(currentSize);
 
         Team team = this.scoreboard.registerNewTeam(currentSize + "TPLUS");
         team.addEntry(entry);
@@ -150,14 +181,23 @@ public class Sidebar implements ISendable<Sidebar> {
 
         // Add to the list
         int fieldsSize = this.fields.size();
-        this.fields.add(index, new SidebarField(team, entry, fieldsSize));
+        SidebarField newField = new SidebarField(team, entry, fieldsSize);
+        this.fields.add(index, newField);
 
         // Clear old ones
         Set<String> entries = this.scoreboard.getEntries();
         entries.forEach(this.scoreboard::resetScores);
 
         // Update the whole sidebar
-        this.fields.forEach(field -> this.objective.getScore(field.entry()).setScore(16 - currentSize));
+        for (SidebarField field : this.fields) {
+            Score score = this.objective.getScore(field.entry());
+            score.setScore(16 - currentSize);
+
+            // Update the number format
+            if (newField == field) {
+                score.numberFormat(numberFormat);
+            }
+        }
         return this;
     }
 
@@ -165,17 +205,31 @@ public class Sidebar implements ISendable<Sidebar> {
         return this.updateField(index, Text.of(prefix), Text.of(suffix));
     }
 
+    public @NotNull Sidebar updateField(int index, @NotNull String prefix, @NotNull String suffix, @Nullable NumberFormat numberFormat) {
+        return this.updateField(index, Text.of(prefix), Text.of(suffix), numberFormat);
+    }
+
     public @NotNull Sidebar updateField(int index, @NotNull Text prefix, @NotNull Text suffix) {
+        return this.updateField(index, prefix, suffix, null);
+    }
+
+    public @NotNull Sidebar updateField(int index, @NotNull Text prefix, @NotNull Text suffix, @Nullable NumberFormat numberFormat) {
         Team team = this.scoreboard.getTeam(index + "TPLUS");
         if (team == null) {
             return this;
         }
         team.prefix(prefix.comp());
         team.suffix(suffix.comp());
+
+        // Update the number format
+        SidebarField sidebarField = this.fields.get(index);
+        Score score = this.objective.getScore(sidebarField.entry());
+        score.numberFormat(numberFormat);
+
         return this;
     }
 
-    public @Nullable SidebarField getField(int index) {
+    public @Nullable SidebarField field(int index) {
         return this.fields.get(index);
     }
 
@@ -216,20 +270,8 @@ public class Sidebar implements ISendable<Sidebar> {
         return this;
     }
 
-    public @NotNull Objective getObjective() {
-        return this.objective;
-    }
-
-    public @NotNull Scoreboard getScoreboard() {
-        return this.scoreboard;
-    }
-
-    public int getSize() {
+    public int size() {
         return this.fields.size();
-    }
-
-    public @NotNull LinkedList<@NotNull SidebarField> getFields() {
-        return this.fields;
     }
 
     @Override
