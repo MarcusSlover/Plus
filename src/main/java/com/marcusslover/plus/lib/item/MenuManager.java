@@ -161,6 +161,26 @@ public final class MenuManager {
     }
 
     /**
+     * Registers a menu to the manager.
+     * @param menus the menus
+     * @return the manager
+     */
+    public @NotNull MenuManager register(@NotNull Menu... menus) {
+        for (Menu menu : menus) this.addMenu(menu);
+        return this;
+    }
+
+    /**
+     * Unregisters a menu from the manager.
+     * @param menus the menus
+     * @return the manager
+     */
+    public @NotNull MenuManager unregister(@NotNull Menu... menus) {
+        for (Menu menu : menus) this.removeMenu(menu);
+        return this;
+    }
+
+    /**
      * Adds a menu to the manager.
      *
      * @param menu the menu

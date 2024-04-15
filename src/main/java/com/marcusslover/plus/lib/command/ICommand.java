@@ -9,9 +9,9 @@ import java.util.List;
  * The implementation class must have the {@link Command} annotation above the class.
  */
 public interface ICommand extends ITabCompleterHelper {
-    boolean execute(@NotNull CommandContext cmd);
+    boolean execute(@NotNull CommandContext ctx);
 
-    default @NotNull List<@NotNull String> tab(@NotNull TabCompleteContext tab) {
+    default @NotNull List<@NotNull String> tab(@NotNull TabCompleteContext ctx) {
         return Collections.emptyList();
     }
 }
