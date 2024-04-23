@@ -26,6 +26,7 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * A canvas is a representation of a menu.
@@ -62,6 +63,10 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
     @Getter(AccessLevel.PACKAGE)
     @Setter(AccessLevel.PRIVATE)
     private LinkedList<@NotNull PopulatorContext<?>> populatorContext = new LinkedList<>();
+
+    @Getter(AccessLevel.PACKAGE)
+    @Setter(AccessLevel.PRIVATE)
+    private List<DynamicSupplier<?>> dynamicSuppliers = new ArrayList<>();
 
     /**
      * Set the title of the canvas.
@@ -109,7 +114,8 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
      *
      * @return the inventory
      */
-    @NotNull Inventory craftInventory() {
+    @NotNull
+    Inventory craftInventory() {
         if (this.title == null) {
             return Bukkit.createInventory(this, this.rows * 9);
         }
@@ -239,6 +245,7 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
 
     /**
      * Gets list of all populator contexts.
+     *
      * @return the list of all populator contexts
      */
     public @NotNull List<@NotNull PopulatorContext<?>> populatorContexts() {
@@ -266,6 +273,35 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
         this.selfInventory = null;
         this.closeInventory = null;
         this.populatorContext.clear(); // clear the populator context
+        this.dynamicSuppliers.clear(); // clear the dynamic suppliers
+    }
+
+    /**
+     * Registers a dynamic content supplier.
+     * @param type Type of the content
+     * @param supplier  Supplier of the content
+     * @return The canvas
+     * @param <T> the type of the content
+     */
+    public <T> @NotNull Canvas registerDynamicContent(@NotNull Class<T> type, @NotNull Supplier<T> supplier) {
+        this.dynamicSuppliers.add(new DynamicSupplier<>(type, supplier));
+        return this;
+    }
+
+    /**
+     * Gets the dynamic content supplier.
+     * @param type Type of the content
+     * @return The supplier
+     * @param <T> the type of the content
+     */
+    public <T> @NotNull Supplier<@Nullable T> dynamicContent(@NotNull Class<T> type) {
+        for (DynamicSupplier<?> dynamicSupplier : this.dynamicSuppliers) {
+            if (dynamicSupplier.type().equals(type)) {
+                //noinspection unchecked
+                return (Supplier<T>) dynamicSupplier.supplier();
+            }
+        }
+        return () -> null;
     }
 
     /**
@@ -304,6 +340,38 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
     @FunctionalInterface
     public interface CloseInventory {
         void onClose(@NotNull Player target, @NotNull InventoryCloseEvent event, @NotNull Canvas it);
+    }
+
+    /**
+     * Represents a decorator that puts "free" items in the inventory.
+     * Free items can be interpreted as items that are not associated with any button.
+     * This is useful, for example, to put a border around the inventory -
+     * We do not want to create objects for each item in the border.
+     * Instead, we can use this light-weight decorator.
+     */
+    @FunctionalInterface
+    public interface ItemDecorator {
+
+        /**
+         * Decorates the inventory.
+         *
+         * @param canvas    The canvas associated with the inventory.
+         * @param inventory The inventory to decorate.
+         */
+        void handle(@NotNull Canvas canvas, @NotNull Inventory inventory);
+    }
+
+    /**
+     * Represents a dynamic supplier.
+     *
+     * @param <T> the type of the supplier
+     *            This is used to provide dynamic content to the canvas.
+     */
+    @Data
+    @Accessors(fluent = true, chain = true)
+    public static class DynamicSupplier<T> {
+        private final @NotNull Class<T> type;
+        private final @NotNull Supplier<T> supplier;
     }
 
     /**
@@ -647,25 +715,6 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
         public @NotNull Canvas end() {
             return this.canvas;
         }
-    }
-
-    /**
-     * Represents a decorator that puts "free" items in the inventory.
-     * Free items can be interpreted as items that are not associated with any button.
-     * This is useful, for example, to put a border around the inventory -
-     * We do not want to create objects for each item in the border.
-     * Instead, we can use this light-weight decorator.
-     */
-    @FunctionalInterface
-    public interface ItemDecorator {
-
-        /**
-         * Decorates the inventory.
-         *
-         * @param canvas    The canvas associated with the inventory.
-         * @param inventory The inventory to decorate.
-         */
-        void handle(@NotNull Canvas canvas, @NotNull Inventory inventory);
     }
 
     /**
