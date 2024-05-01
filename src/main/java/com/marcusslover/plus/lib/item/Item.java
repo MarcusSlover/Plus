@@ -101,6 +101,14 @@ public class Item extends Taggable<Item, ItemMeta> {
         return !this.type().isAir();
     }
 
+    public boolean isEmpty() {
+        return !this.isValid();
+    }
+
+    public boolean isPresent() {
+        return this.isValid();
+    }
+
     /**
      * @return the max item stack of the material used in this item
      */
