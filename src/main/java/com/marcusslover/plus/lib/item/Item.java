@@ -119,8 +119,25 @@ public class Item extends Taggable<Item, ItemMeta> {
     /**
      * @return the material type of this item
      */
+    public @NotNull Material material() {
+        return this.type();
+    }
+
+    /**
+     * @return the material type of this item
+     */
     public @NotNull Material type() {
         return this.itemStack.getType();
+    }
+
+    /**
+     * Change the material type used in this item.
+     *
+     * @param material the material type of this item
+     * @return this item
+     */
+    public @NotNull Item material(@NotNull Material material) {
+        return this.type(material);
     }
 
     /**
@@ -132,6 +149,17 @@ public class Item extends Taggable<Item, ItemMeta> {
     public @NotNull Item type(@NotNull Material material) {
         this.itemStack.setType(material);
         return this;
+    }
+
+    /**
+     * Change the material type used in this item.
+     * IMPORTANT: This method creates a new item with the specified material.
+     *
+     * @param material the material type of this item
+     * @return brand new item
+     */
+    public @NotNull Item withType(@NotNull Material material) {
+        return Item.of(this.itemStack.withType(material));
     }
 
     /**
@@ -150,6 +178,74 @@ public class Item extends Taggable<Item, ItemMeta> {
     public @NotNull Item amount(int amount) {
         this.itemStack.setAmount(Math.min(64, Math.max(0, amount)));
         return this;
+    }
+
+    /**
+     * Increment the amount of items in the stack by 1.
+     * @return the item
+     */
+    public @NotNull Item increment() {
+        return this.increase();
+    }
+
+    /**
+     * Increment the amount of items in the stack by the specified amount.
+     * @param amount the amount to increment by
+     * @return the item
+     */
+    public @NotNull Item increment(int amount) {
+        return this.increase(amount);
+    }
+
+    /**
+     * Increment the amount of items in the stack by 1.
+     * @return the item
+     */
+    public @NotNull Item increase() {
+        return this.increase(1);
+    }
+
+    /**
+     * Increment the amount of items in the stack by the specified amount.
+     * @param amount the amount to increment by
+     * @return the item
+     */
+    public @NotNull Item increase(int amount) {
+        return this.amount(this.amount() + amount);
+    }
+
+    /**
+     * Decrement the amount of items in the stack by 1.
+     * @return the item
+     */
+    public @NotNull Item decrement() {
+        return this.decrease();
+    }
+
+    /**
+     * Decrement the amount of items in the stack by the specified amount.
+     * @param amount the amount to decrement by
+     * @return the item
+     */
+    public @NotNull Item decrement(int amount) {
+        return this.decrease(amount);
+    }
+
+    /**
+     * Decrement the amount of items in the stack by 1.
+     * @return the item
+     */
+    public @NotNull Item decrease() {
+        return this.decrease(1);
+    }
+
+    /**
+     * Decrement the amount of items in the stack by the specified amount.
+     * @param amount the amount to decrement by
+     * @return the item
+     */
+    public @NotNull Item decrease(int amount) {
+        return this.amount(this.amount() - amount);
     }
 
     /**
@@ -246,12 +342,21 @@ public class Item extends Taggable<Item, ItemMeta> {
     }
 
     public @NotNull Item glow() {
-        if (this.itemStack.getType().equals(Material.BOW)) {
-            enchant(Enchantment.DIG_SPEED, 1);
+        return this.glow(true);
+    }
+
+    public @NotNull Item glow(boolean glow) {
+        if (glow) {
+            if (this.itemStack.getType().equals(Material.BOW)) {
+                enchant(Enchantment.DIG_SPEED, 1);
+            } else {
+                enchant(Enchantment.ARROW_INFINITE, 1);
+            }
+            return addItemFlag(ItemFlag.HIDE_ENCHANTS);
         } else {
-            enchant(Enchantment.ARROW_INFINITE, 1);
+            clearEnchants();
+            return removeItemFlag(ItemFlag.HIDE_ENCHANTS);
         }
-        return addItemFlag(ItemFlag.HIDE_ENCHANTS);
     }
 
     /**
