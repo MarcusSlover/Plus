@@ -56,7 +56,7 @@ public abstract class Menu implements IMenu {
      * All current menu viewers will have their menu updated.
      */
     public void performUpdate() {
-        this.canvasMap.keySet().forEach(uuid -> performUpdate(uuid, false, null)); // update all viewers
+        this.canvasMap.keySet().stream().toList().forEach(uuid -> performUpdate(uuid, false, null)); // update all viewers
     }
 
     /**
@@ -71,7 +71,7 @@ public abstract class Menu implements IMenu {
      * @param ctx   The context of the update.
      */
     public void performUpdate(boolean force, @Nullable Menu.UpdateContext ctx) {
-        this.canvasMap.keySet().forEach(uuid -> performUpdate(uuid, force, ctx)); // update all viewers
+        this.canvasMap.keySet().stream().toList().forEach(uuid -> performUpdate(uuid, force, ctx)); // update all viewers
     }
 
     /**
