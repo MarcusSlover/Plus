@@ -26,6 +26,9 @@ public final class MenuManager {
     private final @NotNull EventReference<InventoryCloseEvent> closeEvent;
     private final @NotNull EventReference<InventoryClickEvent> clickEvent;
 
+    // Global click context
+    private @Nullable Canvas.GenericClick genericClick = null;
+
     public MenuManager(@NotNull Plugin plugin) {
         this.plugin = plugin;
         this.closeEvent = Events.listen(InventoryCloseEvent.class).handler(event -> {
@@ -79,6 +82,15 @@ public final class MenuManager {
             int size = inventory.getSize();
 
             Item item = Item.of(event.getCurrentItem());
+
+            // handle the generic click context (global)
+            if (this.genericClick != null) {
+                try {
+                    this.genericClick.onClick((Player) event.getWhoClicked(), item, event, canvas);
+                } catch (Throwable e) {
+                    Bukkit.getLogger().warning(e.getMessage());
+                }
+            }
 
             Canvas.ClickContext genericClick = canvas.genericClick();
             if (genericClick != null) {
@@ -340,6 +352,16 @@ public final class MenuManager {
      */
     public @NotNull List<@NotNull Menu> getMenus() {
         return this.menus;
+    }
+
+    /**
+     * Sets the generic click context, this will affect all menus.
+     * @param context the context
+     * @return the manager
+     */
+    public @NotNull MenuManager genericClick(@Nullable Canvas.GenericClick context) {
+        this.genericClick = context;
+        return this;
     }
 
     /**
