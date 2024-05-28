@@ -47,16 +47,23 @@ public class Potion implements IApplicable<LivingEntity, Potion> {
         return new Potion(type, durationTicks, amplifier, particles, transparent, icon, force);
     }
 
-    @Override
-    public @NotNull Potion apply(@NotNull LivingEntity entity) {
-        PotionEffect potionEffect = new PotionEffect(this.type, this.duration, this.amplifier)
+    /**
+     * Converts this potion to a {@link PotionEffect}.
+     * @return the potion effect
+     */
+    public @NotNull PotionEffect potionEffect() {
+        return new PotionEffect(this.type, this.duration, this.amplifier)
                 .withParticles(this.particles)
                 .withAmbient(this.transparent)
                 .withIcon(this.icon);
+    }
+
+    @Override
+    public @NotNull Potion apply(@NotNull LivingEntity entity) {
+        PotionEffect potionEffect = this.potionEffect();
 
         //noinspection deprecation
         entity.addPotionEffect(potionEffect, this.force);
-
         return this;
     }
 }
