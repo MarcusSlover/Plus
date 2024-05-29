@@ -94,13 +94,12 @@ public class Text implements ISendable<Text> {
     }
 
     /**
-     * Deserializes text using MiniMessage.
-     * @return MiniMessage deserialized component.
+     * Deserializes text using MiniMessage and appends it to existing text.
+     * @return MiniMessage appended component.
      */
-    public @NotNull Text mini() {
+    public @NotNull Text mini(String text) {
         MiniMessage mm = MiniMessage.miniMessage();
-        this.component = mm.deserialize(text);
-        return this;
+        return this.append(mm.deserialize(text));
     }
 
     public @NotNull Text append(@NotNull String text) {
