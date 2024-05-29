@@ -10,6 +10,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -89,6 +90,16 @@ public class Text implements ISendable<Text> {
 
     public @NotNull Text click(@Nullable ClickEvent click) {
         this.component = this.component.clickEvent(click);
+        return this;
+    }
+
+    /**
+     * Deserializes text using MiniMessage.
+     * @return MiniMessage deserialized component.
+     */
+    public @NotNull Text mini() {
+        MiniMessage mm = MiniMessage.miniMessage();
+        this.component = mm.deserialize(text);
         return this;
     }
 
