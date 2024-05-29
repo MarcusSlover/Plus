@@ -48,6 +48,15 @@ public class Text implements ISendable<Text> {
         return new Text(component);
     }
 
+    /**
+     * Deserializes text using MiniMessage formatting.
+     * @return MiniMessage formatted text.
+     */
+    public static @NotNull Text mini(String text) {
+        MiniMessage mm = MiniMessage.miniMessage();
+        return new Text(mm.deserialize(text));
+    }
+
     @Deprecated
     public static @NotNull List<@NotNull Text> list(@NotNull List<@NotNull Component> lore) {
         return lore.stream().map(Text::new).collect(Collectors.toList());
@@ -91,15 +100,6 @@ public class Text implements ISendable<Text> {
     public @NotNull Text click(@Nullable ClickEvent click) {
         this.component = this.component.clickEvent(click);
         return this;
-    }
-
-    /**
-     * Deserializes text using MiniMessage and appends it to existing text.
-     * @return MiniMessage appended component.
-     */
-    public @NotNull Text mini(String text) {
-        MiniMessage mm = MiniMessage.miniMessage();
-        return this.append(mm.deserialize(text));
     }
 
     public @NotNull Text append(@NotNull String text) {
