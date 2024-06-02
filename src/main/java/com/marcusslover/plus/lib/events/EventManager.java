@@ -37,7 +37,7 @@ public final class EventManager {
     }
 
     public void unregister(@NotNull Listener listener) {
-        this.testPlugin();
+        //this.testPlugin();
         if (!this.listeners.contains(listener)) {
             return;
         }
