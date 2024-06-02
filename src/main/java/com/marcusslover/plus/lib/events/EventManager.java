@@ -50,7 +50,7 @@ public final class EventManager {
     }
 
     public void unregisterAll() {
-        this.testPlugin();
+        //this.testPlugin();
         this.listeners.forEach(HandlerList::unregisterAll);
         this.listeners.clear();
     }
