@@ -77,6 +77,28 @@ public final class CommandManager {
         return this;
     }
 
+    /**
+     * Unregister a command.
+     * @param command the command
+     */
+    public void unregister(@NotNull ICommand command) {
+        Command commandAnnotation = this.getCommandAnnotation(command);
+        if (commandAnnotation == null) {
+            return;
+        }
+        String name = commandAnnotation.name();
+        CommandMap commandMap = Bukkit.getCommandMap();
+        List<String> keys = new ArrayList<>();
+        commandMap.getKnownCommands().forEach((key, value) -> {
+            if (value.getName().equals(name)) {
+                keys.add(key);
+            }
+        });
+        for (String key : keys) {
+            commandMap.getKnownCommands().remove(key);
+        }
+    }
+
     @NotNull
     public Set<org.bukkit.command.Command> getCommands() {
         return this.commandSet;
