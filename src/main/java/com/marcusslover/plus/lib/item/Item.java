@@ -43,13 +43,23 @@ public class Item extends Taggable<Item, ItemMeta> {
 
     protected @NotNull ItemStack itemStack;
 
+    private Item(@NotNull Material material, int amount, @Nullable Text name) {
+        this(material, amount);
+        this.name(name);
+    }
+
     private Item(@NotNull Material material, int amount) {
         this(new ItemStack(material, amount));
     }
 
-    private Item(@NotNull Material material, int amount, @Nullable Text name) {
-        this(material, amount);
-        this.name(name);
+    public @NotNull Item name(@Nullable Text name) {
+        return this.meta(itemMeta -> {
+            if (name != null) {
+                itemMeta.displayName(name.comp());
+            } else {
+                itemMeta.displayName(null);
+            }
+        });
     }
 
     private Item(@NotNull Material material, int amount, @Nullable Text name, @Nullable List<@NotNull Text> lore) {
@@ -61,15 +71,68 @@ public class Item extends Taggable<Item, ItemMeta> {
         }
     }
 
+    public @NotNull Item lore(@Nullable Collection<@NotNull String> lore) {
+        return this.meta(itemMeta -> {
+            if (lore != null) {
+                if (lore.isEmpty()) {
+                    itemMeta.lore(null);
+                } else {
+                    itemMeta.lore(lore.stream().map(line -> Text.of(line).comp()).toList());
+                }
+            } else {
+                itemMeta.lore(null);
+            }
+        });
+    }
+
     private Item(@NotNull Material material, int amount, @Nullable String name) {
         this(material, amount);
         this.name(name);
+    }
+
+    public @NotNull Item name(@Nullable String name) {
+        return this.meta(itemMeta -> {
+            if (name != null) {
+                if (name.isEmpty()) {
+                    itemMeta.displayName(null);
+                } else {
+                    itemMeta.displayName(Text.of(name).comp());
+                }
+            } else {
+                itemMeta.displayName(null);
+            }
+        });
     }
 
     private Item(@NotNull Material material, int amount, @Nullable String name, @Nullable List<@NotNull String> lore) {
         this(material, amount);
         this.name(name);
         this.lore(lore);
+    }
+
+    /**
+     * Create an item from a compound string.
+     * <p>
+     * The input should match the same input as expected by Minecraft's {@code /give}
+     * command. For example,
+     * <pre>"minecraft:diamond_sword[minecraft:enchantments={levels:{"minecraft:sharpness": 3}}]"</pre>
+     * would yield an ItemStack of {@link Material#DIAMOND_SWORD} with an {@link ItemMeta}
+     * containing a level 3 {@link Enchantment#SHARPNESS} enchantment.
+     *
+     * @param item The compound string.
+     * @return The item.
+     * @since 4.3.0
+     */
+    public static @NotNull Item of(@NotNull String item) {
+        return Item.of(Bukkit.getItemFactory().createItemStack(item));
+    }
+
+    public static @NotNull Item of(@Nullable ItemStack itemStack) {
+        if (itemStack == null) {
+            return Item.of();
+        } else {
+            return new Item(itemStack);
+        }
     }
 
     public static @NotNull Item of() {
@@ -100,20 +163,19 @@ public class Item extends Taggable<Item, ItemMeta> {
         return new Item(material, amount, name, lore);
     }
 
-    public static @NotNull Item of(@Nullable ItemStack itemStack) {
-        if (itemStack == null) {
-            return Item.of();
-        } else {
-            return new Item(itemStack);
-        }
+    public boolean isEmpty() {
+        return !this.isValid();
     }
 
     public boolean isValid() {
         return !this.type().isAir();
     }
 
-    public boolean isEmpty() {
-        return !this.isValid();
+    /**
+     * @return the material type of this item
+     */
+    public @NotNull Material type() {
+        return this.itemStack.getType();
     }
 
     public boolean isPresent() {
@@ -132,13 +194,6 @@ public class Item extends Taggable<Item, ItemMeta> {
      */
     public @NotNull Material material() {
         return this.type();
-    }
-
-    /**
-     * @return the material type of this item
-     */
-    public @NotNull Material type() {
-        return this.itemStack.getType();
     }
 
     /**
@@ -174,10 +229,31 @@ public class Item extends Taggable<Item, ItemMeta> {
     }
 
     /**
-     * @return the amount of items in the stack
+     * Increment the amount of items in the stack by 1.
+     *
+     * @return the item
      */
-    public int amount() {
-        return this.itemStack.getAmount();
+    public @NotNull Item increment() {
+        return this.increase();
+    }
+
+    /**
+     * Increment the amount of items in the stack by 1.
+     *
+     * @return the item
+     */
+    public @NotNull Item increase() {
+        return this.increase(1);
+    }
+
+    /**
+     * Increment the amount of items in the stack by the specified amount.
+     *
+     * @param amount the amount to increment by
+     * @return the item
+     */
+    public @NotNull Item increase(int amount) {
+        return this.amount(this.amount() + amount);
     }
 
     /**
@@ -192,15 +268,15 @@ public class Item extends Taggable<Item, ItemMeta> {
     }
 
     /**
-     * Increment the amount of items in the stack by 1.
-     * @return the item
+     * @return the amount of items in the stack
      */
-    public @NotNull Item increment() {
-        return this.increase();
+    public int amount() {
+        return this.itemStack.getAmount();
     }
 
     /**
      * Increment the amount of items in the stack by the specified amount.
+     *
      * @param amount the amount to increment by
      * @return the item
      */
@@ -209,24 +285,8 @@ public class Item extends Taggable<Item, ItemMeta> {
     }
 
     /**
-     * Increment the amount of items in the stack by 1.
-     * @return the item
-     */
-    public @NotNull Item increase() {
-        return this.increase(1);
-    }
-
-    /**
-     * Increment the amount of items in the stack by the specified amount.
-     * @param amount the amount to increment by
-     * @return the item
-     */
-    public @NotNull Item increase(int amount) {
-        return this.amount(this.amount() + amount);
-    }
-
-    /**
      * Decrement the amount of items in the stack by 1.
+     *
      * @return the item
      */
     public @NotNull Item decrement() {
@@ -234,16 +294,8 @@ public class Item extends Taggable<Item, ItemMeta> {
     }
 
     /**
-     * Decrement the amount of items in the stack by the specified amount.
-     * @param amount the amount to decrement by
-     * @return the item
-     */
-    public @NotNull Item decrement(int amount) {
-        return this.decrease(amount);
-    }
-
-    /**
      * Decrement the amount of items in the stack by 1.
+     *
      * @return the item
      */
     public @NotNull Item decrease() {
@@ -252,11 +304,22 @@ public class Item extends Taggable<Item, ItemMeta> {
 
     /**
      * Decrement the amount of items in the stack by the specified amount.
+     *
      * @param amount the amount to decrement by
      * @return the item
      */
     public @NotNull Item decrease(int amount) {
         return this.amount(this.amount() - amount);
+    }
+
+    /**
+     * Decrement the amount of items in the stack by the specified amount.
+     *
+     * @param amount the amount to decrement by
+     * @return the item
+     */
+    public @NotNull Item decrement(int amount) {
+        return this.decrease(amount);
     }
 
     /**
@@ -306,16 +369,6 @@ public class Item extends Taggable<Item, ItemMeta> {
     }
 
     /**
-     * Get the level of the applied enchantment.
-     *
-     * @param enchantment enchantment
-     * @return enchantment level
-     */
-    public int enchant(@NotNull Enchantment enchantment) {
-        return this.itemStack.getEnchantmentLevel(enchantment);
-    }
-
-    /**
      * Add an enchantment to this item.
      *
      * @param enchantment enchantment
@@ -352,22 +405,74 @@ public class Item extends Taggable<Item, ItemMeta> {
         return this.enchant(enchantment) > 0;
     }
 
+    /**
+     * Get the level of the applied enchantment.
+     *
+     * @param enchantment enchantment
+     * @return enchantment level
+     */
+    public int enchant(@NotNull Enchantment enchantment) {
+        return this.itemStack.getEnchantmentLevel(enchantment);
+    }
+
     public @NotNull Item glow() {
         return this.glow(true);
     }
 
     public @NotNull Item glow(boolean glow) {
-        if (glow) {
+        this.meta(meta -> meta.setEnchantmentGlintOverride(glow));
+        return this;
+        //region Old implementation
+        /*if (glow) {
             if (this.itemStack.getType().equals(Material.BOW)) {
-                enchant(Enchantment.DIG_SPEED, 1);
+                meta(it -> {
+                    it.setEnchantmentGlintOverride(glow);
+                });
+                //enchant(Enchantment.DIG_SPEED, 1);
             } else {
-                enchant(Enchantment.ARROW_INFINITE, 1);
+                //enchant(Enchantment.ARROW_INFINITE, 1);
             }
             return addItemFlag(ItemFlag.HIDE_ENCHANTS);
         } else {
             clearEnchants();
             return removeItemFlag(ItemFlag.HIDE_ENCHANTS);
+        }*/
+        //endregion
+    }
+
+    /**
+     * Hides the tooltip of the item.
+     *
+     * @return This item.
+     * @since 4.3.0
+     */
+    public @NotNull Item hideTooltip() {
+        return this.hideTooltip(true);
+    }
+
+    /**
+     * Hides the tooltip of the item.
+     *
+     * @param hide True to hide the tooltip, false otherwise.
+     * @return This item.
+     * @since 4.3.0
+     */
+    public @NotNull Item hideTooltip(boolean hide) {
+        return this.meta(meta -> meta.setHideTooltip(hide));
+    }
+
+    /**
+     * Checks if the item tooltip is hidden.
+     *
+     * @return True if the item tooltip is hidden, false otherwise.
+     * @since 4.3.0
+     */
+    public boolean isHideTooltip() {
+        ItemMeta itemMeta = this.itemStack.getItemMeta();
+        if (itemMeta == null) {
+            return false;
         }
+        return itemMeta.isHideTooltip();
     }
 
     /**
@@ -381,6 +486,37 @@ public class Item extends Taggable<Item, ItemMeta> {
         if (meta == null) return false;
         // Colorable items
         return meta instanceof LeatherArmorMeta || meta instanceof PotionMeta || meta instanceof MapMeta;
+    }
+
+    @Override
+    public @Nullable ItemMeta meta() {
+        return this.itemStack.getItemMeta();
+    }
+
+    @Override
+    public @NotNull Item meta(@NotNull ItemMeta meta) {
+        this.itemStack.setItemMeta(meta);
+        return this;
+    }
+
+    @Override
+    public @NotNull Item meta(@NotNull Consumer<@NotNull ItemMeta> meta) {
+        this.itemStack.editMeta(meta);
+        return this;
+    }
+
+    /**
+     * Checks if the item is dyed.
+     *
+     * @return True if the item is dyed, false otherwise.
+     * @since 4.3.0
+     */
+    public boolean isDyed() {
+        if (!this.isValid()) return false;
+        ItemMeta meta = this.meta();
+        if (meta == null) return false;
+        // Dyed items
+        return meta instanceof LeatherArmorMeta leatherArmorMeta && leatherArmorMeta.isDyed();
     }
 
     /**
@@ -410,6 +546,7 @@ public class Item extends Taggable<Item, ItemMeta> {
      * Works with {@link Material#POTION}, {@link Material#SPLASH_POTION}, {@link Material#LINGERING_POTION},
      * {@link Material#TIPPED_ARROW}, {@link Material#LEATHER_HELMET}, {@link Material#LEATHER_CHESTPLATE},
      * {@link Material#LEATHER_LEGGINGS}, {@link Material#LEATHER_BOOTS}, {@link Material#LEATHER_HORSE_ARMOR},
+     * {@link Material#WOLF_ARMOR}
      * and colored maps.
      *
      * @param color The color.
@@ -524,16 +661,6 @@ public class Item extends Taggable<Item, ItemMeta> {
         return itemMeta.hasDisplayName();
     }
 
-    public @NotNull Item name(@Nullable Text name) {
-        return this.meta(itemMeta -> {
-            if (name != null) {
-                itemMeta.displayName(name.comp());
-            } else {
-                itemMeta.displayName(null);
-            }
-        });
-    }
-
     public @Nullable Text name() {
         ItemMeta itemMeta = this.meta();
         if (itemMeta == null) {
@@ -549,41 +676,13 @@ public class Item extends Taggable<Item, ItemMeta> {
         return null;
     }
 
-    public @NotNull Item name(@Nullable String name) {
-        return this.meta(itemMeta -> {
-            if (name != null) {
-                if (name.isEmpty()) {
-                    itemMeta.displayName(null);
-                } else {
-                    itemMeta.displayName(Text.of(name).comp());
-                }
-            } else {
-                itemMeta.displayName(null);
-            }
-        });
-    }
-
-    public boolean hasLore() {
-        return this.itemStack.hasItemMeta() && this.itemStack.getItemMeta().hasLore();
-    }
-
     public @NotNull List<@NotNull String> lore() {
         //noinspection ConstantConditions,deprecation
         return this.hasLore() ? ColorUtil.translateList(this.meta().getLore()) : new ArrayList<>();
     }
 
-    public @NotNull Item lore(@Nullable Collection<@NotNull String> lore) {
-        return this.meta(itemMeta -> {
-            if (lore != null) {
-                if (lore.isEmpty()) {
-                    itemMeta.lore(null);
-                } else {
-                    itemMeta.lore(lore.stream().map(line -> Text.of(line).comp()).toList());
-                }
-            } else {
-                itemMeta.lore(null);
-            }
-        });
+    public boolean hasLore() {
+        return this.itemStack.hasItemMeta() && this.itemStack.getItemMeta().hasLore();
     }
 
     public @NotNull Item skull(@Nullable PlayerProfile playerProfile) {
@@ -619,9 +718,21 @@ public class Item extends Taggable<Item, ItemMeta> {
         });
     }
 
+    private void skull(@NotNull SkullMeta skullMeta, @NotNull String texture) {
+        int len = texture.length();
+        UUID uuid = new UUID(texture.substring(len - 20).hashCode(), texture.substring(len - 10).hashCode());
+
+        PlayerProfile profile = Bukkit.createProfile(uuid, null);
+        ProfileProperty property = new ProfileProperty("textures", texture);
+        profile.setProperty(property);
+
+        skullMeta.setPlayerProfile(profile);
+    }
+
     /**
      * Set the skull texture of this item. Example:
      * 83c25a7a188196b18717264ffe837ca348cf719e827179edc4b78cbcb8c7dd8
+     *
      * @param minecraftUrl the minecraft url
      * @return this item
      */
@@ -644,15 +755,9 @@ public class Item extends Taggable<Item, ItemMeta> {
         });
     }
 
-    private void skull(@NotNull SkullMeta skullMeta, @NotNull String texture) {
-        int len = texture.length();
-        UUID uuid = new UUID(texture.substring(len - 20).hashCode(), texture.substring(len - 10).hashCode());
-
-        PlayerProfile profile = Bukkit.createProfile(uuid, null);
-        ProfileProperty property = new ProfileProperty("textures", texture);
-        profile.setProperty(property);
-
-        skullMeta.setPlayerProfile(profile);
+    private byte[] getEncodedTexture(@NotNull String url) {
+        Base64.Encoder encoder = Base64.getEncoder();
+        return encoder.encode(String.format("{textures:{SKIN:{url:\"%s\"}}}", url).getBytes());
     }
 
     @Deprecated(forRemoval = true)
@@ -665,29 +770,17 @@ public class Item extends Taggable<Item, ItemMeta> {
         });
     }
 
-    private byte[] getEncodedTexture(@NotNull String url) {
-        Base64.Encoder encoder = Base64.getEncoder();
-        return encoder.encode(String.format("{textures:{SKIN:{url:\"%s\"}}}", url).getBytes());
-    }
-
-    @Override
-    public @NotNull Item meta(@NotNull Consumer<@NotNull ItemMeta> meta) {
-        this.itemStack.editMeta(meta);
-        return this;
-    }
-
-    @Override
-    public @Nullable ItemMeta meta() {
-        return this.itemStack.getItemMeta();
-    }
-
-    @Override
-    public @NotNull Item meta(@NotNull ItemMeta meta) {
-        this.itemStack.setItemMeta(meta);
-        return this;
-    }
-
     public @NotNull ItemStack get() {
+        return this.itemStack;
+    }
+
+    /**
+     * Returns the item stack.
+     *
+     * @return The item stack.
+     * @since 4.3.0
+     */
+    public @NotNull ItemStack itemStack() {
         return this.itemStack;
     }
 
@@ -696,10 +789,6 @@ public class Item extends Taggable<Item, ItemMeta> {
         return this;
     }
 
-    @SuppressWarnings("MethodDoesntCallSuperMethod")
-    public @NotNull Item clone() {
-        return new Item(this.itemStack.clone());
-    }
 
     @Override
     public boolean equals(Object obj) {
@@ -712,6 +801,11 @@ public class Item extends Taggable<Item, ItemMeta> {
         }
 
         return super.equals(obj);
+    }
+
+    @SuppressWarnings("MethodDoesntCallSuperMethod")
+    public @NotNull Item clone() {
+        return new Item(this.itemStack.clone());
     }
 
     @Override
