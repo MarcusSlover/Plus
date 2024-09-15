@@ -36,6 +36,14 @@ test {
     useJUnitPlatform()
 }
 
+tasks.getByName("compileJava") {
+    options.encoding = "UTF-8"
+}
+
+tasks.getByName("javadoc") {
+    options.encoding = "UTF-8"
+}
+
 publishing {
     publications {
         mavenJava(MavenPublication) {
