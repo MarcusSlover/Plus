@@ -165,13 +165,13 @@ public class Music implements ISendable<Music> {
 
     @Override
     public @NotNull <T extends CommandSender> Music send(@NotNull T target) {
-        this.sessions().get(target).start();
+        this.sessions().computeIfAbsent(target, this::createSession).start();
         return this;
     }
 
     @Override
     public @NotNull Music send(Audience audience) {
-        this.sessions().get(audience).start();
+        this.sessions().computeIfAbsent(audience, this::createSession).start();
         return this;
     }
 
@@ -218,7 +218,7 @@ public class Music implements ISendable<Music> {
     }
 
     public void play(Audience audience) {
-        this.sessions().get(audience).start();
+        this.sessions().computeIfAbsent(audience, this::createSession).start();
     }
 
 
