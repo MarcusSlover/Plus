@@ -45,7 +45,6 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
     private final @NotNull Button hackyButton = Button.create(-1);
 
     // pages of the canvas
-    @Getter(AccessLevel.PRIVATE)
     private final @NotNull Map<UUID, Integer> pages = new HashMap<>();
     private @NotNull Integer rows; // 1-6 (using non-primitive to allow @NotNull for the constructor)
 
