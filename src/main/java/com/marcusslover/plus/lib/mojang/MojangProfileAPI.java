@@ -102,8 +102,10 @@ public class MojangProfileAPI {
                     throw new RuntimeException("Could not parse UUID from Mojang API response", e);
                 }
 
+                String name = json.get("name").getAsString();
+
                 // Create the profile
-                MojangProfile mojangProfile = new MojangProfile(uuid, username, System.currentTimeMillis());
+                MojangProfile mojangProfile = new MojangProfile(uuid, name, System.currentTimeMillis());
 
                 // Cache the profile
                 CACHED_PROFILE_MAP.put(uuid, mojangProfile);
