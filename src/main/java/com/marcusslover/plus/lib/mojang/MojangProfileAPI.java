@@ -101,7 +101,9 @@ public class MojangProfileAPI {
                 } catch (IllegalArgumentException e) {
                     throw new RuntimeException("Could not parse UUID from Mojang API response", e);
                 }
-
+                if (!json.has("name")) {
+                    throw new RuntimeException("Invalid response from Mojang API");
+                }
                 String name = json.get("name").getAsString();
 
                 // Create the profile
