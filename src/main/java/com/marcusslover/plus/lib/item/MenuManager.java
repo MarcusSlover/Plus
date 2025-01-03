@@ -1,12 +1,13 @@
 package com.marcusslover.plus.lib.item;
 
-import com.marcusslover.plus.lib.events.EventReference;
-import com.marcusslover.plus.lib.events.Events;
 import com.marcusslover.plus.lib.item.Button.DetectableArea;
 import com.marcusslover.plus.lib.item.Canvas.ItemDecorator;
 import com.marcusslover.plus.lib.item.event.PlayerMenuOpenEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
@@ -19,138 +20,138 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-public final class MenuManager {
+public final class MenuManager implements Listener {
     private final @NotNull Plugin plugin;
     private final @NotNull List<@NotNull Menu> menus = new LinkedList<>();
-
-    private final @NotNull EventReference<InventoryCloseEvent> closeEvent;
-    private final @NotNull EventReference<InventoryClickEvent> clickEvent;
 
     // Global click context
     private @Nullable Canvas.GenericClick genericClick = null;
 
     public MenuManager(@NotNull Plugin plugin) {
         this.plugin = plugin;
-        this.closeEvent = Events.listen(InventoryCloseEvent.class).handler(event -> {
-            InventoryView view = event.getView();
-            Inventory inventory = view.getTopInventory();
-            Player player = (Player) event.getPlayer();
+        Bukkit.getPluginManager().registerEvents(this, plugin);
+    }
 
-            if (!(inventory.getHolder() instanceof Canvas canvas)) {
-                return;
-            }
+    @EventHandler
+    public void onClose(InventoryCloseEvent event) {
+        InventoryView view = event.getView();
+        Inventory inventory = view.getTopInventory();
+        Player player = (Player) event.getPlayer();
 
-            // empty or invalid inventory shouldn't be handled
-            if (canvas.assosiatedInventory() == null) return;
+        if (!(inventory.getHolder() instanceof Canvas canvas)) {
+            return;
+        }
 
-            // handle the close event action
-            Canvas.ClickContext closeInventory = canvas.closeInventory();
-            if (closeInventory != null) {
-                Canvas.CloseInventory function = closeInventory.closeInventory();
-                if (function != null) {
-                    try {
-                        function.onClose(player, event, canvas);
-                    } catch (Throwable e) {
-                        if (closeInventory.throwableConsumer() != null) {
-                            closeInventory.throwableConsumer().accept(e);
-                        } else {
-                            Bukkit.getLogger().warning(e.getMessage());
-                        }
+        // empty or invalid inventory shouldn't be handled
+        if (canvas.assosiatedInventory() == null) return;
+
+        // handle the close event action
+        Canvas.ClickContext closeInventory = canvas.closeInventory();
+        if (closeInventory != null) {
+            Canvas.CloseInventory function = closeInventory.closeInventory();
+            if (function != null) {
+                try {
+                    function.onClose(player, event, canvas);
+                } catch (Throwable e) {
+                    if (closeInventory.throwableConsumer() != null) {
+                        closeInventory.throwableConsumer().accept(e);
+                    } else {
+                        Bukkit.getLogger().warning(e.getMessage());
                     }
                 }
             }
+        }
 
-            Menu menu = canvas.assosiatedMenu();
-            Canvas remove = menu.canvasMap().remove(player.getUniqueId());
-            if (remove != null) {
-                remove.clear(); // help the gc
+        Menu menu = canvas.assosiatedMenu();
+        Canvas remove = menu.canvasMap().remove(player.getUniqueId());
+        if (remove != null) {
+            remove.clear(); // help the gc
+        }
+        menu.close(canvas, player); // call the close method so developers can handle it
+    }
+
+    @EventHandler
+    public void onClick(InventoryClickEvent event) {
+        InventoryView view = event.getView();
+        Inventory inventory = view.getTopInventory();
+
+        if (!(inventory.getHolder() instanceof Canvas canvas)) {
+            return;
+        }
+
+        event.setCancelled(true);
+        int slot = event.getRawSlot();
+        int size = inventory.getSize();
+
+        Item item = Item.of(event.getCurrentItem());
+
+        // handle the generic click context (global)
+        if (this.genericClick != null) {
+            try {
+                this.genericClick.onClick((Player) event.getWhoClicked(), item, event, canvas);
+            } catch (Throwable e) {
+                Bukkit.getLogger().warning(e.getMessage());
             }
-            menu.close(canvas, player); // call the close method so developers can handle it
+        }
 
-        }).asRegistered(plugin);
-
-        this.clickEvent = Events.listen(InventoryClickEvent.class).handler(event -> {
-            InventoryView view = event.getView();
-            Inventory inventory = view.getTopInventory();
-
-            if (!(inventory.getHolder() instanceof Canvas canvas)) {
-                return;
-            }
-
-            event.setCancelled(true);
-            int slot = event.getRawSlot();
-            int size = inventory.getSize();
-
-            Item item = Item.of(event.getCurrentItem());
-
-            // handle the generic click context (global)
-            if (this.genericClick != null) {
+        Canvas.ClickContext genericClick = canvas.genericClick();
+        if (genericClick != null) {
+            Canvas.ButtonClick buttonClick = genericClick.click();
+            if (buttonClick != null) {
                 try {
-                    this.genericClick.onClick((Player) event.getWhoClicked(), item, event, canvas);
+                    buttonClick.onClick((Player) event.getWhoClicked(), item, event, canvas);
                 } catch (Throwable e) {
-                    Bukkit.getLogger().warning(e.getMessage());
+                    if (genericClick.throwableConsumer() != null) {
+                        genericClick.throwableConsumer().accept(e);
+                    } else {
+                        Bukkit.getLogger().warning(e.getMessage());
+                    }
                 }
             }
+        }
 
-            Canvas.ClickContext genericClick = canvas.genericClick();
-            if (genericClick != null) {
-                Canvas.ButtonClick buttonClick = genericClick.click();
+        if (slot > size) {
+            Canvas.ClickContext selfInventory = canvas.selfInventory();
+            if (selfInventory != null) {
+                Canvas.ButtonClick buttonClick = selfInventory.click();
                 if (buttonClick != null) {
                     try {
                         buttonClick.onClick((Player) event.getWhoClicked(), item, event, canvas);
                     } catch (Throwable e) {
-                        if (genericClick.throwableConsumer() != null) {
-                            genericClick.throwableConsumer().accept(e);
+                        if (selfInventory.throwableConsumer() != null) {
+                            selfInventory.throwableConsumer().accept(e);
                         } else {
                             Bukkit.getLogger().warning(e.getMessage());
                         }
                     }
                 }
             }
+            return;
+        }
 
-            if (slot > size) {
-                Canvas.ClickContext selfInventory = canvas.selfInventory();
-                if (selfInventory != null) {
-                    Canvas.ButtonClick buttonClick = selfInventory.click();
-                    if (buttonClick != null) {
-                        try {
-                            buttonClick.onClick((Player) event.getWhoClicked(), item, event, canvas);
-                        } catch (Throwable e) {
-                            if (selfInventory.throwableConsumer() != null) {
-                                selfInventory.throwableConsumer().accept(e);
-                            } else {
-                                Bukkit.getLogger().warning(e.getMessage());
-                            }
+        canvas.buttons().stream()
+                .filter(button -> button.within(slot))
+                .findFirst()
+                .ifPresent(button -> {
+                    Player player = (Player) event.getWhoClicked();
+                    Canvas.ClickContext context = button.clickContext();
+                    if (context == null) {
+                        return;
+                    }
+                    Canvas.ButtonClick click = context.click();
+                    if (click == null) {
+                        return;
+                    }
+                    try {
+                        click.onClick(player, item, event, canvas);
+                    } catch (Throwable e) {
+                        if (context.throwableConsumer() != null) {
+                            context.throwableConsumer().accept(e);
+                        } else {
+                            Bukkit.getLogger().warning(e.getMessage());
                         }
                     }
-                }
-                return;
-            }
-
-            canvas.buttons().stream()
-                    .filter(button -> button.within(slot))
-                    .findFirst()
-                    .ifPresent(button -> {
-                        Player player = (Player) event.getWhoClicked();
-                        Canvas.ClickContext context = button.clickContext();
-                        if (context == null) {
-                            return;
-                        }
-                        Canvas.ButtonClick click = context.click();
-                        if (click == null) {
-                            return;
-                        }
-                        try {
-                            click.onClick(player, item, event, canvas);
-                        } catch (Throwable e) {
-                            if (context.throwableConsumer() != null) {
-                                context.throwableConsumer().accept(e);
-                            } else {
-                                Bukkit.getLogger().warning(e.getMessage());
-                            }
-                        }
-                    });
-        }).asRegistered(plugin);
+                });
     }
 
     @Deprecated
@@ -370,7 +371,6 @@ public final class MenuManager {
      */
     public void clearMenus() {
         this.menus.clear();
-        this.clickEvent.unregister();
-        this.closeEvent.unregister();
+        HandlerList.unregisterAll(this);
     }
 }

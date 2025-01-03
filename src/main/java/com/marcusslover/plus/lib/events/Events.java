@@ -11,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.Consumer;
 
 // not sure if this is a good idea
+@Deprecated
 public class Events {
 
     /**
