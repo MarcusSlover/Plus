@@ -183,10 +183,19 @@ public class Item extends Taggable<Item, ItemMeta> {
     }
 
     /**
-     * @return the max item stack of the material used in this item
+     * @return the max item stack of the item or a
      */
-    public int maxStack() {
-        return this.itemStack.getType().getMaxStackSize();
+    public int maxStack() { // 1.21.3 custom stack size
+        return this.itemStack.getMaxStackSize();
+    }
+
+    /**
+     * Change the max stack size of this item.
+     * @param maxStack the max stack size of this item
+     * @return this item
+     */
+    public @NotNull Item maxStack(int maxStack) { // 1.21.3 custom stack size
+        return this.meta(meta -> meta.setMaxStackSize(maxStack));
     }
 
     /**
