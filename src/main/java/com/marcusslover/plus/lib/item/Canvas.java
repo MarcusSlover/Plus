@@ -456,7 +456,7 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
                     menu.debug("Page: " + _page);
                     MenuManager manager = menu.manager();
                     if (manager != null) { // should never be null
-                        manager.internallyOpen(target, menu);
+                        manager.internallyOpen(target, menu, false, canvas.menuUpdateContext);
                     }
                 }).handleException(Throwable::printStackTrace);
             }
@@ -471,7 +471,7 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
                     menu.debug("Page: " + _page);
                     MenuManager manager = menu.manager();
                     if (manager != null) { // should never be null
-                        manager.internallyOpen(target, menu);
+                        manager.internallyOpen(target, menu, false, canvas.menuUpdateContext);
                     }
                 }).handleException(Throwable::printStackTrace);
             }
