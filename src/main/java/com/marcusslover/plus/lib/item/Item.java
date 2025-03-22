@@ -62,6 +62,10 @@ public class Item extends Taggable<Item, ItemMeta> {
         });
     }
 
+    public @NotNull Item name(@Nullable Component name) {
+        return this.meta(itemMeta -> itemMeta.displayName(name));
+    }
+
     private Item(@NotNull Material material, int amount, @Nullable Text name, @Nullable List<@NotNull Text> lore) {
         this(material, amount);
         this.name(name);
@@ -82,6 +86,12 @@ public class Item extends Taggable<Item, ItemMeta> {
             } else {
                 itemMeta.lore(null);
             }
+        });
+    }
+
+    public @NotNull Item lore(@Nullable List<? extends Component> lore) {
+        return this.meta(itemMeta -> {
+            itemMeta.lore(lore);
         });
     }
 
