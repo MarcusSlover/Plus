@@ -254,7 +254,7 @@ public final class MenuManager implements Listener {
         InventoryView openInventory = player.getOpenInventory();
         Canvas canvas = menu.canvasMap().get(player.getUniqueId());
 
-        if (canvas == null || force) {
+        if (canvas == null || force || (openInventory.getTopInventory().getHolder() != canvas)) {
             // just for performance
             if (canvas != null) {
                 canvas.clear(); // help the gc
