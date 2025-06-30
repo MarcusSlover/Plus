@@ -1,7 +1,7 @@
 # 🔮 Plus
 
 <p align="center">
-<img src="https://github.com/MarcusSlover/Plus/blob/master/shulker-export.png"/ style="width: 160px;height: 160px; image-rendering: pixelated;">
+<img src="https://github.com/MarcusSlover/Plus/blob/master/shulker-export.png"/> style="width: 160px;height: 160px; image-rendering: pixelated;">
 <br/>
 📦 A light set of tools used for programming Minecraft plugins.<br/>
 </p>
@@ -18,18 +18,30 @@ For Minecraft 1.21.3 or newer, use the latest version of Plus for optimal compat
 ## 🐘 Gradle
 ### Groovy
 ```gradle
+repositories {
+    mavenCentral()
+    maven { url = 'https://central.sonatype.com/repository/maven-snapshots/' }
+}
 dependencies {
     implementation 'com.marcusslover:plus:4.3.3-SNAPSHOT'
 }
 ```
 ### Kotlin
 ```kotlin
+repositories {
+    mavenCentral()
+    maven("https://central.sonatype.com/repository/maven-snapshots/")
+}
 dependencies {
     implementation("com.marcusslover:plus:4.3.3-SNAPSHOT")
 }
 ```
 ## 🦢 Maven
 ```xml
+<repository>
+    <id>sonatype-snapshots</id>
+    <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+</repository>
 <dependency>
     <groupId>com.marcusslover</groupId>
     <artifactId>plus</artifactId>
