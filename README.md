@@ -18,31 +18,18 @@ For Minecraft 1.21.3 or newer, use the latest version of Plus for optimal compat
 ## 🐘 Gradle
 ### Groovy
 ```gradle
-repositories {
-    maven { url = 'https://s01.oss.sonatype.org/content/repositories/snapshots/' }
-}
-
 dependencies {
     implementation 'com.marcusslover:plus:4.3.3-SNAPSHOT'
 }
 ```
 ### Kotlin
 ```kotlin
-repositories {
-    maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
-}
-
 dependencies {
     implementation("com.marcusslover:plus:4.3.3-SNAPSHOT")
 }
 ```
 ## 🦢 Maven
 ```xml
-<repository>
-    <id>ossrh</id>
-    <url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>
-</repository>
-
 <dependency>
     <groupId>com.marcusslover</groupId>
     <artifactId>plus</artifactId>

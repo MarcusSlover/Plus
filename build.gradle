@@ -4,10 +4,17 @@ plugins {
     id 'com.gradleup.shadow' version '8.3.0'
 }
 
+group = 'com.marcusslover'
+version = '4.3.3-SNAPSHOT'
+
+ext {
+    isRelease = !version.toString().endsWith("SNAPSHOT")
+}
+
 repositories {
     mavenCentral()
     maven { url = 'https://repo.papermc.io/repository/maven-public/' }
-    maven { url = "https://repo.dmulloy2.net/repository/public/" }
+    maven { url = 'https://repo.dmulloy2.net/repository/public/' }
 }
 
 dependencies {
@@ -18,39 +25,36 @@ dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.36'
     annotationProcessor 'org.projectlombok:lombok:1.18.36'
 
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.11.4'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.11.4'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.11.4'
     testImplementation 'io.papermc.paper:paper-api:1.21.3-R0.1-SNAPSHOT'
 }
-
-group 'com.marcusslover'
-version '4.3.3-SNAPSHOT'
-ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 
 java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(21))
     withSourcesJar()
     withJavadocJar()
 }
+
 test {
     useJUnitPlatform()
 }
 
-tasks.getByName("compileJava") {
-    options.encoding = "UTF-8"
+tasks.named('compileJava') {
+    options.encoding = 'UTF-8'
 }
-
-tasks.getByName("javadoc") {
-    options.encoding = "UTF-8"
+tasks.named('javadoc') {
+    options.encoding = 'UTF-8'
 }
 
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            groupId = 'com.marcusslover'
-            artifactId = 'plus'
-
             from components.java
+            groupId = project.group
+            artifactId = 'plus'
+            version = project.version
+
             pom {
                 name = 'Plus'
                 description = 'A set of tools used for programming Minecraft plugins.'
@@ -81,10 +85,13 @@ publishing {
 
     repositories {
         maven {
-            name = "ossrh"
-            url = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
-            credentials(PasswordCredentials)
+            name = "centralPortal"
+            url = uri("https://central.sonatype.com/repository/maven-snapshots/")
+
+            credentials {
+                username = findProperty("portalUsername") ?: System.getenv("PORTAL_USERNAME")
+                password = findProperty("portalPassword") ?: System.getenv("PORTAL_PASSWORD")
+            }
         }
     }
-
 }
