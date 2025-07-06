@@ -19,12 +19,12 @@ public class Note implements ISendable<Note> {
     protected final Sound sound;
 
     public static @NotNull Note of(@NotNull org.bukkit.Sound sound) {
-        return new Note(Sound.sound(sound.key(), Sound.Source.MASTER, 1F, 1F));
+        return new Note(Sound.sound(sound, Sound.Source.MASTER, 1F, 1F));
     }
 
     public static @NotNull Note of(@NotNull org.bukkit.Sound sound, long seed) {
         var builder = Sound.sound()
-                .type(sound.key())
+                .type(sound)
                 .source(Sound.Source.MASTER)
                 .volume(1F)
                 .pitch(1F)
@@ -33,12 +33,12 @@ public class Note implements ISendable<Note> {
     }
 
     public static @NotNull Note of(@NotNull org.bukkit.Sound sound, float volume, float pitch) {
-        return new Note(Sound.sound(sound.key(), Sound.Source.MASTER, volume, pitch));
+        return new Note(Sound.sound(sound, Sound.Source.MASTER, volume, pitch));
     }
 
     public static @NotNull Note of(@NotNull org.bukkit.Sound sound, float volume, float pitch, long seed) {
         var builder = Sound.sound()
-                .type(sound.key())
+                .type(sound)
                 .source(Sound.Source.MASTER)
                 .volume(volume)
                 .pitch(pitch)
@@ -47,12 +47,12 @@ public class Note implements ISendable<Note> {
     }
 
     public static @NotNull Note of(@NotNull org.bukkit.Sound sound, float volume, float pitch, @NotNull Sound.Source source) {
-        return new Note(Sound.sound(sound.key(), source, volume, pitch));
+        return new Note(Sound.sound(sound, source, volume, pitch));
     }
 
     public static @NotNull Note of(@NotNull org.bukkit.Sound sound, float volume, float pitch, @NotNull Sound.Source source, long seed) {
         var builder = Sound.sound()
-                .type(sound.key())
+                .type(sound)
                 .source(source)
                 .volume(volume)
                 .pitch(pitch)

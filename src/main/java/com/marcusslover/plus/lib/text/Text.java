@@ -33,11 +33,21 @@ public class Text implements ISendable<Text> {
 
     private Text(@NotNull String text) {
         // Colorize the raw text before deserialization
-        this(ColorUtil.hex(text), text.isEmpty() ? Component.empty() : LEGACY.deserialize(ColorUtil.hex(text)).decoration(TextDecoration.ITALIC, false)); // Fix for italic? idk
+        this(ColorUtil.hex(text), text.isEmpty() ? Component.empty() :
+                italicReset(LEGACY.deserialize(ColorUtil.hex(text)))
+        );
     }
 
     private Text(@NotNull Component component) {
         this(LEGACY.serialize(component), component);
+    }
+
+    private static Component italicReset(Component component) {
+        if (component.decoration(TextDecoration.ITALIC) == TextDecoration.State.NOT_SET) {
+            return component.decoration(TextDecoration.ITALIC, false);
+        } else {
+            return component;
+        }
     }
 
     public static @NotNull Text of(@NotNull String text) {
@@ -50,6 +60,7 @@ public class Text implements ISendable<Text> {
 
     /**
      * Deserializes text using MiniMessage formatting.
+     *
      * @return MiniMessage formatted text.
      */
     public static @NotNull Text mini(String text) {
@@ -137,6 +148,7 @@ public class Text implements ISendable<Text> {
      * Checks if the text is empty.
      * (Does not remove spaces)
      * If the text has spaces, it will not be considered empty.
+     *
      * @return true if the text is empty.
      */
     public boolean isEmpty() {
@@ -145,6 +157,7 @@ public class Text implements ISendable<Text> {
 
     /**
      * Checks if the text is empty.
+     *
      * @param strip if the spaces should be removed.
      * @return true if the text is empty.
      */
@@ -154,6 +167,7 @@ public class Text implements ISendable<Text> {
 
     /**
      * Checks if the component is empty.
+     *
      * @return true if the component is empty.
      */
     public boolean isCompEmpty() {

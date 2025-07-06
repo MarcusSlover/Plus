@@ -49,6 +49,7 @@ public class Potion implements IApplicable<LivingEntity, Potion> {
 
     /**
      * Converts this potion to a {@link PotionEffect}.
+     *
      * @return the potion effect
      */
     public @NotNull PotionEffect potionEffect() {

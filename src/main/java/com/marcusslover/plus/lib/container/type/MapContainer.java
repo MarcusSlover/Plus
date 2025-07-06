@@ -12,11 +12,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Function;
 
 /**
@@ -303,6 +299,7 @@ public abstract class MapContainer<K, V> extends AbstractContainer<K> {
 
     /**
      * Gets all the loaded keys from the cache.
+     *
      * @return All the loaded keys and their objects.
      */
     public @NotNull Map<K, V> getCache() {

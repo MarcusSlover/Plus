@@ -2,6 +2,7 @@ package com.marcusslover.plus.lib.item;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
+import com.google.common.collect.MultimapBuilder;
 import com.marcusslover.plus.lib.common.Taggable;
 import com.marcusslover.plus.lib.text.ColorUtil;
 import com.marcusslover.plus.lib.text.Text;
@@ -18,23 +19,12 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.Damageable;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.LeatherArmorMeta;
-import org.bukkit.inventory.meta.MapMeta;
-import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.inventory.meta.*;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Consumer;
 
 @SuppressWarnings({"unused", "UnusedReturnValue"})
@@ -52,20 +42,6 @@ public class Item extends Taggable<Item, ItemMeta> {
         this(new ItemStack(material, amount));
     }
 
-    public @NotNull Item name(@Nullable Text name) {
-        return this.meta(itemMeta -> {
-            if (name != null) {
-                itemMeta.displayName(name.comp());
-            } else {
-                itemMeta.displayName(null);
-            }
-        });
-    }
-
-    public @NotNull Item name(@Nullable Component name) {
-        return this.meta(itemMeta -> itemMeta.displayName(name));
-    }
-
     private Item(@NotNull Material material, int amount, @Nullable Text name, @Nullable List<@NotNull Text> lore) {
         this(material, amount);
         this.name(name);
@@ -75,43 +51,9 @@ public class Item extends Taggable<Item, ItemMeta> {
         }
     }
 
-    public @NotNull Item lore(@Nullable Collection<@NotNull String> lore) {
-        return this.meta(itemMeta -> {
-            if (lore != null) {
-                if (lore.isEmpty()) {
-                    itemMeta.lore(null);
-                } else {
-                    itemMeta.lore(lore.stream().map(line -> Text.of(line).comp()).toList());
-                }
-            } else {
-                itemMeta.lore(null);
-            }
-        });
-    }
-
-    public @NotNull Item lore(@Nullable List<? extends Component> lore) {
-        return this.meta(itemMeta -> {
-            itemMeta.lore(lore);
-        });
-    }
-
     private Item(@NotNull Material material, int amount, @Nullable String name) {
         this(material, amount);
         this.name(name);
-    }
-
-    public @NotNull Item name(@Nullable String name) {
-        return this.meta(itemMeta -> {
-            if (name != null) {
-                if (name.isEmpty()) {
-                    itemMeta.displayName(null);
-                } else {
-                    itemMeta.displayName(Text.of(name).comp());
-                }
-            } else {
-                itemMeta.displayName(null);
-            }
-        });
     }
 
     private Item(@NotNull Material material, int amount, @Nullable String name, @Nullable List<@NotNull String> lore) {
@@ -173,6 +115,54 @@ public class Item extends Taggable<Item, ItemMeta> {
         return new Item(material, amount, name, lore);
     }
 
+    public @NotNull Item name(@Nullable Text name) {
+        return this.meta(itemMeta -> {
+            if (name != null) {
+                itemMeta.displayName(name.comp());
+            } else {
+                itemMeta.displayName(null);
+            }
+        });
+    }
+
+    public @NotNull Item name(@Nullable Component name) {
+        return this.meta(itemMeta -> itemMeta.displayName(name));
+    }
+
+    public @NotNull Item lore(@Nullable Collection<@NotNull String> lore) {
+        return this.meta(itemMeta -> {
+            if (lore != null) {
+                if (lore.isEmpty()) {
+                    itemMeta.lore(null);
+                } else {
+                    itemMeta.lore(lore.stream().map(line -> Text.of(line).comp()).toList());
+                }
+            } else {
+                itemMeta.lore(null);
+            }
+        });
+    }
+
+    public @NotNull Item lore(@Nullable List<? extends Component> lore) {
+        return this.meta(itemMeta -> {
+            itemMeta.lore(lore);
+        });
+    }
+
+    public @NotNull Item name(@Nullable String name) {
+        return this.meta(itemMeta -> {
+            if (name != null) {
+                if (name.isEmpty()) {
+                    itemMeta.displayName(null);
+                } else {
+                    itemMeta.displayName(Text.of(name).comp());
+                }
+            } else {
+                itemMeta.displayName(null);
+            }
+        });
+    }
+
     public boolean isEmpty() {
         return !this.isValid();
     }
@@ -201,6 +191,7 @@ public class Item extends Taggable<Item, ItemMeta> {
 
     /**
      * Change the max stack size of this item.
+     *
      * @param maxStack the max stack size of this item
      * @return this item
      */
@@ -241,14 +232,14 @@ public class Item extends Taggable<Item, ItemMeta> {
      * IMPORTANT: This method creates a new item with the specified material.
      *
      * @param material the material type of this item
-     * @return brand new item
+     * @return brand-new item
      */
     public @NotNull Item withType(@NotNull Material material) {
         return Item.of(this.itemStack.withType(material));
     }
 
     /**
-     * Increment the amount of items in the stack by 1.
+     * Increment the number of items in the stack by 1.
      *
      * @return the item
      */
@@ -257,7 +248,7 @@ public class Item extends Taggable<Item, ItemMeta> {
     }
 
     /**
-     * Increment the amount of items in the stack by 1.
+     * Increment the number of items in the stack by 1.
      *
      * @return the item
      */
@@ -266,7 +257,7 @@ public class Item extends Taggable<Item, ItemMeta> {
     }
 
     /**
-     * Increment the amount of items in the stack by the specified amount.
+     * Increment the number of items in the stack by the specified amount.
      *
      * @param amount the amount to increment by
      * @return the item
@@ -287,14 +278,14 @@ public class Item extends Taggable<Item, ItemMeta> {
     }
 
     /**
-     * @return the amount of items in the stack
+     * @return the number of items in the stack
      */
     public int amount() {
         return this.itemStack.getAmount();
     }
 
     /**
-     * Increment the amount of items in the stack by the specified amount.
+     * Increment the number of items in the stack by the specified amount.
      *
      * @param amount the amount to increment by
      * @return the item
@@ -304,7 +295,7 @@ public class Item extends Taggable<Item, ItemMeta> {
     }
 
     /**
-     * Decrement the amount of items in the stack by 1.
+     * Decrement the number of items in the stack by 1.
      *
      * @return the item
      */
@@ -313,7 +304,7 @@ public class Item extends Taggable<Item, ItemMeta> {
     }
 
     /**
-     * Decrement the amount of items in the stack by 1.
+     * Decrement the number of items in the stack by 1.
      *
      * @return the item
      */
@@ -322,7 +313,7 @@ public class Item extends Taggable<Item, ItemMeta> {
     }
 
     /**
-     * Decrement the amount of items in the stack by the specified amount.
+     * Decrement the number of items in the stack by the specified amount.
      *
      * @param amount the amount to decrement by
      * @return the item
@@ -332,7 +323,7 @@ public class Item extends Taggable<Item, ItemMeta> {
     }
 
     /**
-     * Decrement the amount of items in the stack by the specified amount.
+     * Decrement the number of items in the stack by the specified amount.
      *
      * @param amount the amount to decrement by
      * @return the item
@@ -613,6 +604,17 @@ public class Item extends Taggable<Item, ItemMeta> {
             return false;
         }
         return itemMeta.hasItemFlag(itemFlag);
+    }
+
+    /**
+     * Hacky fix for https://github.com/PaperMC/Paper/issues/10693
+     * Sets the item attributes to an empty multimap.
+     *
+     * @return this item
+     * @since 4.4.0
+     */
+    public @NotNull Item setEmptyItemAttributes() {
+        return this.meta(meta -> meta.setAttributeModifiers(MultimapBuilder.hashKeys().hashSetValues().build()));
     }
 
     public @NotNull Item hideItemFlags() {

@@ -32,6 +32,16 @@ public final class MenuManager implements Listener {
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
+    @Deprecated
+    public static @NotNull MenuManager get(@NotNull Plugin plugin) {
+        return new MenuManager(plugin);
+    }
+
+    @Deprecated
+    public static @NotNull MenuManager createManager(@NotNull Plugin plugin) {
+        return new MenuManager(plugin);
+    }
+
     @EventHandler
     public void onClose(InventoryCloseEvent event) {
         InventoryView view = event.getView();
@@ -154,16 +164,6 @@ public final class MenuManager implements Listener {
                 });
     }
 
-    @Deprecated
-    public static @NotNull MenuManager get(@NotNull Plugin plugin) {
-        return new MenuManager(plugin);
-    }
-
-    @Deprecated
-    public static @NotNull MenuManager createManager(@NotNull Plugin plugin) {
-        return new MenuManager(plugin);
-    }
-
     /**
      * Gets the plugin associated with the manager.
      *
@@ -175,6 +175,7 @@ public final class MenuManager implements Listener {
 
     /**
      * Registers a menu to the manager.
+     *
      * @param menus the menus
      * @return the manager
      */
@@ -185,6 +186,7 @@ public final class MenuManager implements Listener {
 
     /**
      * Unregisters a menu from the manager.
+     *
      * @param menus the menus
      * @return the manager
      */
@@ -357,6 +359,7 @@ public final class MenuManager implements Listener {
 
     /**
      * Sets the generic click context, this will affect all menus.
+     *
      * @param context the context
      * @return the manager
      */

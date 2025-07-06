@@ -1,6 +1,5 @@
 package com.marcusslover.plus;
 
-import com.marcusslover.plus.lib.events.EventHandler;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,16 +16,12 @@ public final class PlusPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
-
         File dataFolder = this.getDataFolder();
-
         if (!dataFolder.exists()) {
             boolean mkdirs = dataFolder.mkdirs();
             if (!mkdirs) {
                 throw new IllegalStateException("Could not create data folder.");
             }
         }
-
-        EventHandler.get().register(this);
     }
 }

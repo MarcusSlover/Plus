@@ -25,24 +25,6 @@ public class Button {
     private @Nullable Canvas.ClickContext clickContext; // The click event of the button
     private boolean populated = false; // If the button has been populated via viewing strategy
 
-    // for backwards compatibility (4.0.9)
-    public Button setItem(@Nullable Item item) {
-        this.itemFactory = player -> item;
-        return this;
-    }
-
-    // for backwards compatibility (4.0.9)
-    public Button item(@Nullable Item item) {
-        this.itemFactory = player -> item;
-        return this;
-    }
-
-    // for backwards compatibility (4.0.9)
-    public Button item(@Nullable ItemFactory item) {
-        this.itemFactory = player -> item != null ? item.create(player) : null;
-        return this;
-    }
-
     /**
      * Creates a button with the given coordinates.
      *
@@ -185,6 +167,24 @@ public class Button {
         return (y * 9) + x;
     }
 
+    // for backwards compatibility (4.0.9)
+    public Button setItem(@Nullable Item item) {
+        this.itemFactory = player -> item;
+        return this;
+    }
+
+    // for backwards compatibility (4.0.9)
+    public Button item(@Nullable Item item) {
+        this.itemFactory = player -> item;
+        return this;
+    }
+
+    // for backwards compatibility (4.0.9)
+    public Button item(@Nullable ItemFactory item) {
+        this.itemFactory = player -> item != null ? item.create(player) : null;
+        return this;
+    }
+
     public @NotNull Button slot(int slot) {
         int x = transformX(slot);
         int y = transformY(slot);
@@ -232,6 +232,7 @@ public class Button {
     /**
      * Converts the button to a slot.
      * If the button is not a single point, -1 will be returned.
+     *
      * @return The slot
      */
     public int toSlot() {
@@ -244,10 +245,25 @@ public class Button {
     /**
      * Converts the button to a set of slots.
      * If the button is a single point, a set with only one slot will be returned.
+     *
      * @return The slots
      */
     public @NotNull Set<Integer> toSlots() {
         return this.detectableArea.slots();
+    }
+
+    /**
+     * Represents a factory for creating items. Used for dynamic items.
+     */
+    @FunctionalInterface
+    public interface ItemFactory {
+        /**
+         * Creates an item for the given player.
+         *
+         * @param player The player
+         * @return The item
+         */
+        @Nullable Item create(@NotNull Player player);
     }
 
     /**
@@ -355,19 +371,5 @@ public class Button {
 
             return slots;
         }
-    }
-
-    /**
-     * Represents a factory for creating items. Used for dynamic items.
-     */
-    @FunctionalInterface
-    public interface ItemFactory {
-        /**
-         * Creates an item for the given player.
-         *
-         * @param player The player
-         * @return The item
-         */
-        @Nullable Item create(@NotNull Player player);
     }
 }

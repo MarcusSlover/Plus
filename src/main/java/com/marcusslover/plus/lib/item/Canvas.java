@@ -17,14 +17,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -277,10 +270,11 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
 
     /**
      * Registers a dynamic content supplier.
-     * @param type Type of the content
-     * @param supplier  Supplier of the content
+     *
+     * @param type     Type of the content
+     * @param supplier Supplier of the content
+     * @param <T>      the type of the content
      * @return The canvas
-     * @param <T> the type of the content
      */
     public <T> @NotNull Canvas registerDynamicContent(@NotNull Class<T> type, @NotNull Supplier<T> supplier) {
         this.dynamicSuppliers.add(new DynamicSupplier<>(type, supplier));
@@ -289,9 +283,10 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
 
     /**
      * Gets the dynamic content supplier.
+     *
      * @param type Type of the content
+     * @param <T>  the type of the content
      * @return The supplier
-     * @param <T> the type of the content
      */
     public <T> @NotNull Supplier<@Nullable T> dynamicContent(@NotNull Class<T> type) {
         for (DynamicSupplier<?> dynamicSupplier : this.dynamicSuppliers) {

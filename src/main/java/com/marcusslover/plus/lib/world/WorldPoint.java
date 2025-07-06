@@ -1,12 +1,6 @@
 package com.marcusslover.plus.lib.world;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
+import com.google.gson.*;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
@@ -27,6 +21,7 @@ import java.util.Objects;
  * us to store a {@link #yaw} and {@link #pitch} as well as being easily serializable.
  */
 @Data
+@Deprecated
 public class WorldPoint {
 
     public static final WorldPointAdapter ADAPTER = new WorldPointAdapter();
