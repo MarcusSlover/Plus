@@ -282,7 +282,7 @@ public class Item extends Taggable<Item, ItemMeta> {
      * @return the item
      */
     public @NotNull Item amount(int amount) {
-        this.itemStack.setAmount(Math.min(64, Math.max(0, amount)));
+        this.itemStack.setAmount(Math.min(maxStack(), Math.max(0, amount)));
         return this;
     }
 
