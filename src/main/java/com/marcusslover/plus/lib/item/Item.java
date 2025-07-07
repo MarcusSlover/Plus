@@ -163,6 +163,71 @@ public class Item extends Taggable<Item, ItemMeta> {
         });
     }
 
+    public boolean hasName() {
+        ItemMeta itemMeta = this.itemStack.getItemMeta();
+        if (itemMeta == null) {
+            return false;
+        }
+        return itemMeta.hasDisplayName();
+    }
+
+    public @Nullable Text name() {
+        ItemMeta itemMeta = this.meta();
+        if (itemMeta == null) {
+            return null;
+        }
+        if (itemMeta.hasDisplayName()) {
+            Component component = itemMeta.displayName();
+            if (component == null) {
+                return null;
+            }
+            return Text.of(component);
+        }
+        return null;
+    }
+
+    /**
+     * Retrieves the display name component of the item's metadata if available.
+     *
+     * @return the display name as a Component if the item metadata exists and has a display name,
+     *         or null otherwise.
+     * @since 4.4.0
+     */
+    public @Nullable Component nameComponent() {
+        ItemMeta itemMeta = this.meta();
+        if (itemMeta == null) {
+            return null;
+        }
+        if (itemMeta.hasDisplayName()) {
+            return itemMeta.displayName();
+        }
+        return null;
+    }
+
+    public @NotNull List<@NotNull String> lore() {
+        //noinspection ConstantConditions,deprecation
+        return this.hasLore() ? ColorUtil.translateList(this.meta().getLore()) : new ArrayList<>();
+    }
+
+    /**
+     * Retrieves the lore components of the item.
+     * If the item meta is null or does not contain lore, an empty list is returned.
+     *
+     * @return a list of lore {@code Component} objects, or an empty list if no lore is present or item meta is null
+     * @since 4.4.0
+     */
+    public @Nullable List<Component> loreComponents() {
+        ItemMeta itemMeta = this.meta();
+        if (itemMeta == null || !itemMeta.hasLore()) {
+            return new ArrayList<>();
+        }
+        return itemMeta.lore();
+    }
+
+    public boolean hasLore() {
+        return this.itemStack.hasItemMeta() && this.itemStack.getItemMeta().hasLore();
+    }
+
     public boolean isEmpty() {
         return !this.isValid();
     }
@@ -672,38 +737,6 @@ public class Item extends Taggable<Item, ItemMeta> {
 
     public @NotNull Item customModelData(@Nullable Integer customModelData) {
         return this.meta(itemMeta -> itemMeta.setCustomModelData(customModelData));
-    }
-
-    public boolean hasName() {
-        ItemMeta itemMeta = this.itemStack.getItemMeta();
-        if (itemMeta == null) {
-            return false;
-        }
-        return itemMeta.hasDisplayName();
-    }
-
-    public @Nullable Text name() {
-        ItemMeta itemMeta = this.meta();
-        if (itemMeta == null) {
-            return null;
-        }
-        if (itemMeta.hasDisplayName()) {
-            Component component = itemMeta.displayName();
-            if (component == null) {
-                return null;
-            }
-            return Text.of(component);
-        }
-        return null;
-    }
-
-    public @NotNull List<@NotNull String> lore() {
-        //noinspection ConstantConditions,deprecation
-        return this.hasLore() ? ColorUtil.translateList(this.meta().getLore()) : new ArrayList<>();
-    }
-
-    public boolean hasLore() {
-        return this.itemStack.hasItemMeta() && this.itemStack.getItemMeta().hasLore();
     }
 
     public @NotNull Item skull(@Nullable PlayerProfile playerProfile) {
