@@ -210,6 +210,26 @@ public class Item extends Taggable<Item, ItemMeta> {
     }
 
     /**
+     * Retrieves the lore text from the item's metadata if it exists.
+     * The lore is a collection of additional text associated with the item.
+     *
+     * @return A list of {@link Text} objects representing the lore if present,
+     *         or null if the item has no metadata, no lore, or the lore is empty.
+     * @since 4.4.0
+     */
+    public @Nullable List<Text> loreTexts() {
+        ItemMeta itemMeta = this.meta();
+        if (itemMeta == null || !itemMeta.hasLore()) {
+            return null;
+        }
+        List<Component> loreComponents = itemMeta.lore();
+        if (loreComponents == null) {
+            return null;
+        }
+        return loreComponents.stream().map(Text::of).toList();
+    }
+
+    /**
      * Retrieves the lore components of the item.
      * If the item meta is null or does not contain lore, an empty list is returned.
      *
