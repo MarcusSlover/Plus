@@ -1,11 +1,11 @@
 plugins {
     id 'java'
     id 'maven-publish'
-    id 'com.gradleup.shadow' version '8.3.0'
+    id 'com.gradleup.shadow' version '9.2.2'
 }
 
 group = 'com.marcusslover'
-version = '4.4.0-SNAPSHOT'
+version = '4.4.1-SNAPSHOT'
 
 ext {
     isRelease = !version.toString().endsWith("SNAPSHOT")
@@ -18,16 +18,16 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'org.jetbrains:annotations:26.0.1'
-    compileOnly 'io.papermc.paper:paper-api:1.21.6-R0.1-SNAPSHOT'
+    compileOnly 'org.jetbrains:annotations:26.0.2-1'
+    compileOnly 'io.papermc.paper:paper-api:1.21.8-R0.1-SNAPSHOT'
     compileOnly 'com.comphenix.protocol:ProtocolLib:5.3.0'
 
-    compileOnly 'org.projectlombok:lombok:1.18.36'
-    annotationProcessor 'org.projectlombok:lombok:1.18.36'
+    compileOnly 'org.projectlombok:lombok:1.18.42'
+    annotationProcessor 'org.projectlombok:lombok:1.18.42'
 
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.11.4'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.11.4'
-    testImplementation 'io.papermc.paper:paper-api:1.21.6-R0.1-SNAPSHOT'
+    testImplementation 'org.junit.jupiter:junit-jupiter:6.0.0'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation 'io.papermc.paper:paper-api:1.21.8-R0.1-SNAPSHOT'
 }
 
 java {
