@@ -73,6 +73,7 @@ public final class MenuManager implements Listener {
         }
 
         Menu menu = canvas.assosiatedMenu();
+        menu.preClose(canvas, player); // call the preClose method so developers can handle it
         Canvas remove = menu.canvasMap().remove(player.getUniqueId());
         if (remove != null) {
             remove.clear(); // help the gc

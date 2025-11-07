@@ -17,7 +17,17 @@ public interface IMenu extends ISendable<IMenu> {
     void open(@NotNull Canvas ctx, @NotNull Player player);
 
     /**
-     * Called when the menu is closed.
+     * Called right before the canvas data is erased. You may use the menuUpdateContext here.
+     *
+     * @param ctx    the canvas
+     * @param player the player
+     */
+    default void preClose(@NotNull Canvas ctx, @NotNull Player player) {
+        // nothing here
+    }
+
+    /**
+     * Called when the menu is closed. At this point using menuUpdateContext is not possible.
      *
      * @param ctx    the canvas
      * @param player the player
