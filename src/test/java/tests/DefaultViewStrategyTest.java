@@ -8,17 +8,17 @@ import java.util.List;
 public class DefaultViewStrategyTest {
     @Test
     public void test() {
-        List<Integer> integers = Canvas.PopulatorContext.DefaultViewStrategy.middleSlots(1);
+        List<Integer> integers = Canvas.BasicPopulator.DefaultViewStrategy.middleSlots(1);
         System.out.println(integers);
-        integers = Canvas.PopulatorContext.DefaultViewStrategy.middleSlots(2);
+        integers = Canvas.BasicPopulator.DefaultViewStrategy.middleSlots(2);
         System.out.println(integers);
-        integers = Canvas.PopulatorContext.DefaultViewStrategy.middleSlots(3);
+        integers = Canvas.BasicPopulator.DefaultViewStrategy.middleSlots(3);
         System.out.println(integers);
-        integers = Canvas.PopulatorContext.DefaultViewStrategy.middleSlots(4);
+        integers = Canvas.BasicPopulator.DefaultViewStrategy.middleSlots(4);
         System.out.println(integers);
-        integers = Canvas.PopulatorContext.DefaultViewStrategy.middleSlots(5);
+        integers = Canvas.BasicPopulator.DefaultViewStrategy.middleSlots(5);
         System.out.println(integers);
-        integers = Canvas.PopulatorContext.DefaultViewStrategy.middleSlots(6);
+        integers = Canvas.BasicPopulator.DefaultViewStrategy.middleSlots(6);
         System.out.println(integers);
     }
 }

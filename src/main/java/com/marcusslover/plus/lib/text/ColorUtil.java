@@ -160,14 +160,14 @@ public class ColorUtil {
             Color color;
             if (value.startsWith("#")) {
                 color = Color.fromRGB(
-                        Integer.valueOf(value.substring(1, 3), 16),
-                        Integer.valueOf(value.substring(3, 5), 16),
-                        Integer.valueOf(value.substring(5, 7), 16));
+                    Integer.valueOf(value.substring(1, 3), 16),
+                    Integer.valueOf(value.substring(3, 5), 16),
+                    Integer.valueOf(value.substring(5, 7), 16));
             } else {
                 color = Color.fromRGB(
-                        Integer.valueOf(value.substring(0, 2), 16),
-                        Integer.valueOf(value.substring(2, 4), 16),
-                        Integer.valueOf(value.substring(4, 6), 16));
+                    Integer.valueOf(value.substring(0, 2), 16),
+                    Integer.valueOf(value.substring(2, 4), 16),
+                    Integer.valueOf(value.substring(4, 6), 16));
             }
             return color;
         } catch (IllegalArgumentException ignored) {

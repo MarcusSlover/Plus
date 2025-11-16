@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.marcusslover.plus.lib.container.type.MapContainer;
 import com.marcusslover.plus.lib.container.type.SingleContainer;
 import lombok.Data;
+import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -19,6 +20,7 @@ import java.io.File;
 public abstract class AbstractContainer<K> {
     protected static final Gson DEFAULT_GSON = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
     protected File parentFolder;
+    protected Plugin plugin;
 
     /**
      * Gets the Gson instance.

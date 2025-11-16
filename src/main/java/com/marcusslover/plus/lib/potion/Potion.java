@@ -54,9 +54,9 @@ public class Potion implements IApplicable<LivingEntity, Potion> {
      */
     public @NotNull PotionEffect potionEffect() {
         return new PotionEffect(this.type, this.duration, this.amplifier)
-                .withParticles(this.particles)
-                .withAmbient(this.transparent)
-                .withIcon(this.icon);
+            .withParticles(this.particles)
+            .withAmbient(this.transparent)
+            .withIcon(this.icon);
     }
 
     @Override

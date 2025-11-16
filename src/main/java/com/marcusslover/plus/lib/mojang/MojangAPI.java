@@ -20,8 +20,8 @@ import java.util.concurrent.TimeUnit;
 
 public class MojangAPI {
     static Cache<UUID, PlayerProfile> cache = CacheBuilder.newBuilder()
-            .expireAfterWrite(15, TimeUnit.MINUTES)
-            .build();
+        .expireAfterWrite(15, TimeUnit.MINUTES)
+        .build();
     static HashMap<String, UUID> nameMap = new HashMap<>();
 
     public static PlayerProfile getPlayerProfile(UUID uuid) {
@@ -49,9 +49,9 @@ public class MojangAPI {
                 if (!name.isBlank()) {
                     profile = new PlayerProfile(name, uuid);
 
-                    cache.put(profile.getUniqueId(), profile);
+                    cache.put(profile.uniqueId(), profile);
 
-                    nameMap.put(profile.getName(), profile.getUniqueId());
+                    nameMap.put(profile.name(), profile.uniqueId());
                 }
             } catch (Throwable ignored) {
                 return PlayerProfile.EMPTY;
@@ -100,9 +100,9 @@ public class MojangAPI {
                 if (!name.isBlank() && playerUUID != null) {
                     profile = new PlayerProfile(name, playerUUID);
 
-                    cache.put(profile.getUniqueId(), profile);
+                    cache.put(profile.uniqueId(), profile);
 
-                    nameMap.put(profile.getName(), profile.getUniqueId());
+                    nameMap.put(profile.name(), profile.uniqueId());
                 }
             } catch (Throwable ignored) {
                 return PlayerProfile.EMPTY;

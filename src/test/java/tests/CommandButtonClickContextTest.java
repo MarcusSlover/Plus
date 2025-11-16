@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class CommandContextTest {
+public class CommandButtonClickContextTest {
     @SuppressWarnings("DataFlowIssue") // i know that sender can't be null but it doesn't matter here
     @Test
     public void childContextTest() {

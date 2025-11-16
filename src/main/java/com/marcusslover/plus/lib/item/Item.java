@@ -27,7 +27,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.function.Consumer;
 
-@SuppressWarnings({"unused", "UnusedReturnValue"})
+@SuppressWarnings({"UnusedReturnValue"})
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Item extends Taggable<Item, ItemMeta> {
 
@@ -190,7 +190,7 @@ public class Item extends Taggable<Item, ItemMeta> {
      * Retrieves the display name component of the item's metadata if available.
      *
      * @return the display name as a Component if the item metadata exists and has a display name,
-     *         or null otherwise.
+     * or null otherwise.
      * @since 4.4.0
      */
     public @Nullable Component nameComponent() {
@@ -214,7 +214,7 @@ public class Item extends Taggable<Item, ItemMeta> {
      * The lore is a collection of additional text associated with the item.
      *
      * @return A list of {@link Text} objects representing the lore if present,
-     *         or null if the item has no metadata, no lore, or the lore is empty.
+     * or null if the item has no metadata, no lore, or the lore is empty.
      * @since 4.4.0
      */
     public @Nullable List<Text> loreTexts() {

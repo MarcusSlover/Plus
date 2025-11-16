@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.marcusslover.plus.lib.container.AbstractContainer;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,7 +14,7 @@ import java.io.IOException;
 
 /**
  * Container that represents a single object.
- * The object is serialized to a single json file.
+ * The object is serialized to a single JSON file.
  * The file name is final and can be changed in the constructor.
  *
  * @param <V> Value type.
@@ -111,7 +110,7 @@ public abstract class SingleContainer<V> extends AbstractContainer<V> {
     }
 
     /**
-     * Stores locally the data.
+     * Locally stores the data.
      * <p>
      * This function does not write the data to the file.
      * </p>
@@ -126,7 +125,7 @@ public abstract class SingleContainer<V> extends AbstractContainer<V> {
     /**
      * Retrieves the object from the cache.
      * <p>
-     * This function will not attempt to load the object from the file,
+     * This function will not attempt to load the object from the file
      * if it is not loaded -> Use {@link #loadData()} instead.
      * </p>
      *
@@ -153,7 +152,7 @@ public abstract class SingleContainer<V> extends AbstractContainer<V> {
             try (FileReader fileReader = new FileReader(file)) {
                 data = gson.fromJson(fileReader, this.valueType);
             } catch (IOException e) {
-                Bukkit.getLogger().severe("Could not read file: " + file.getAbsolutePath());
+                plugin.getLogger().severe("Could not read file: " + file.getAbsolutePath());
                 throw new RuntimeException(e);
             }
             return data;

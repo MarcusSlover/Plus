@@ -21,7 +21,7 @@ import java.util.Objects;
  * us to store a {@link #yaw} and {@link #pitch} as well as being easily serializable.
  */
 @Data
-@Deprecated
+@Deprecated(forRemoval = true)
 public class WorldPoint {
 
     public static final WorldPointAdapter ADAPTER = new WorldPointAdapter();
@@ -314,8 +314,8 @@ public class WorldPoint {
      */
     public boolean isBetween(WorldPoint min, WorldPoint max) {
         return this.x > min.getX() && this.x < max.getX()
-                && this.y > min.getY() && this.y < max.getY()
-                && this.z > min.getZ() && this.z < max.getZ();
+            && this.y > min.getY() && this.y < max.getY()
+            && this.z > min.getZ() && this.z < max.getZ();
     }
 
     /**
@@ -329,9 +329,9 @@ public class WorldPoint {
      */
     public WorldPoint midpoint(double x, double y, double z) {
         return new WorldPoint(
-                x + (this.getX() - x) / 2.0,
-                y + (this.getY() - y) / 2.0,
-                z + (this.getZ() - z) / 2.0);
+            x + (this.getX() - x) / 2.0,
+            y + (this.getY() - y) / 2.0,
+            z + (this.getZ() - z) / 2.0);
     }
 
     /**
@@ -449,10 +449,10 @@ public class WorldPoint {
         }
         WorldPoint worldPoint = (WorldPoint) o;
         return Double.compare(worldPoint.x, this.x) == 0
-                && Double.compare(worldPoint.y, this.y) == 0
-                && Double.compare(worldPoint.z, this.z) == 0
-                && Float.compare(worldPoint.yaw, this.yaw) == 0
-                && Float.compare(worldPoint.pitch, this.pitch) == 0;
+            && Double.compare(worldPoint.y, this.y) == 0
+            && Double.compare(worldPoint.z, this.z) == 0
+            && Float.compare(worldPoint.yaw, this.yaw) == 0
+            && Float.compare(worldPoint.pitch, this.pitch) == 0;
     }
 
     @Override
@@ -484,12 +484,12 @@ public class WorldPoint {
             }
 
             return new WorldPoint(
-                    numbers.get(0).doubleValue(),
-                    numbers.get(1).doubleValue(),
-                    numbers.get(2).doubleValue(),
+                numbers.get(0).doubleValue(),
+                numbers.get(1).doubleValue(),
+                numbers.get(2).doubleValue(),
 
-                    numbers.size() >= 4 ? numbers.get(3).floatValue() : 0,
-                    numbers.size() >= 5 ? numbers.get(4).floatValue() : 0
+                numbers.size() >= 4 ? numbers.get(3).floatValue() : 0,
+                numbers.size() >= 5 ? numbers.get(4).floatValue() : 0
             );
         }
 

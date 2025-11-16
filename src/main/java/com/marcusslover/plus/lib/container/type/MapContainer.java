@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.marcusslover.plus.lib.container.AbstractContainer;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,7 +17,7 @@ import java.util.function.Function;
 /**
  * Container that represents a map of objects.
  * Key is the name of the file. Files are dynamic.
- * Value is the object. Each value is serialized to its own json file.
+ * Value is the object. Each value is serialized to its own JSON file.
  *
  * @param <K> Key type.
  * @param <V> Value type.
@@ -115,6 +114,7 @@ public abstract class MapContainer<K, V> extends AbstractContainer<K> {
                 }
                 this.storeLocally(apply, read);
             } catch (Exception e) {
+                //noinspection CallToPrintStackTrace
                 e.printStackTrace();
             }
         }
@@ -145,7 +145,7 @@ public abstract class MapContainer<K, V> extends AbstractContainer<K> {
     }
 
     /**
-     * Checks if object with the given key is loaded in the cache.
+     * Checks if an object with the given key is loaded in the cache.
      *
      * @param key Key to the object.
      * @return True if the object is loaded, false otherwise.
@@ -206,7 +206,7 @@ public abstract class MapContainer<K, V> extends AbstractContainer<K> {
     /**
      * Retrieves the object from the cache.
      * <p>
-     * This function will not attempt to load the object from the file,
+     * This function will not attempt to load the object from the file
      * if it is not loaded -> Use {@link #loadData(K)} instead.
      * </p>
      *
@@ -250,7 +250,7 @@ public abstract class MapContainer<K, V> extends AbstractContainer<K> {
             try (FileReader fileReader = new FileReader(file)) {
                 data = gson.fromJson(fileReader, this.valueType);
             } catch (IOException e) {
-                Bukkit.getLogger().severe("Could not read file: " + file.getAbsolutePath());
+                plugin.getLogger().severe("Could not read file: " + file.getAbsolutePath());
                 throw new RuntimeException(e);
             }
             return data;

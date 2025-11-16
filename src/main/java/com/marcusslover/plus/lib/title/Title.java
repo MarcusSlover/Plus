@@ -13,9 +13,9 @@ import static net.kyori.adventure.title.Title.title;
 
 public class Title implements ISendable<Title> {
     private static final Times DEFAULT_TIMES = Times.times(
-            Ticks.duration(10),
-            Ticks.duration(40),
-            Ticks.duration(10)
+        Ticks.duration(10),
+        Ticks.duration(40),
+        Ticks.duration(10)
     );
 
     protected final @NotNull Text title;
@@ -58,9 +58,9 @@ public class Title implements ISendable<Title> {
     public @NotNull Title send(@NotNull CommandSender player, long fadeIn, long fadeStay, long fadeOut) {
         Times of = Times.times(Ticks.duration(fadeIn), Ticks.duration(fadeStay), Ticks.duration(fadeOut));
         player.showTitle(title(
-                this.title.comp(),
-                this.subtitle.comp(),
-                of
+            this.title.comp(),
+            this.subtitle.comp(),
+            of
         ));
 
         return this;
@@ -68,9 +68,9 @@ public class Title implements ISendable<Title> {
 
     public @NotNull Title send(@NotNull CommandSender player, @Nullable Times times) {
         player.showTitle(title(
-                this.title.comp(),
-                this.subtitle.comp(),
-                times
+            this.title.comp(),
+            this.subtitle.comp(),
+            times
         ));
 
         return this;
@@ -92,9 +92,9 @@ public class Title implements ISendable<Title> {
 
     public @NotNull net.kyori.adventure.title.Title adventure() {
         return title(
-                this.title.comp(),
-                this.subtitle.comp(),
-                this.times
+            this.title.comp(),
+            this.subtitle.comp(),
+            this.times
         );
     }
 
@@ -105,9 +105,9 @@ public class Title implements ISendable<Title> {
 
     public @NotNull Title times(int fadeIn, int stay, int fadeOut) {
         this.times = Times.times(
-                Ticks.duration(fadeIn),
-                Ticks.duration(stay),
-                Ticks.duration(fadeOut)
+            Ticks.duration(fadeIn),
+            Ticks.duration(stay),
+            Ticks.duration(fadeOut)
         );
 
         return this;
@@ -115,9 +115,9 @@ public class Title implements ISendable<Title> {
 
     public @NotNull Title times(long fadeIn, long stay, long fadeOut) {
         this.times = Times.times(
-                Ticks.duration(fadeIn),
-                Ticks.duration(stay),
-                Ticks.duration(fadeOut)
+            Ticks.duration(fadeIn),
+            Ticks.duration(stay),
+            Ticks.duration(fadeOut)
         );
 
         return this;

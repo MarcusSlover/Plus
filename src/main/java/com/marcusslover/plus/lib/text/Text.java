@@ -24,9 +24,9 @@ import java.util.stream.Collectors;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Text implements ISendable<Text> {
     private static final @NotNull LegacyComponentSerializer LEGACY = LegacyComponentSerializer.builder()
-            .hexColors()
-            .character('&')
-            .build();
+        .hexColors()
+        .character('&')
+        .build();
 
     protected @NotNull String text;
     protected @NotNull Component component;
@@ -34,7 +34,7 @@ public class Text implements ISendable<Text> {
     private Text(@NotNull String text) {
         // Colorize the raw text before deserialization
         this(ColorUtil.hex(text), text.isEmpty() ? Component.empty() :
-                italicReset(LEGACY.deserialize(ColorUtil.hex(text)))
+            italicReset(LEGACY.deserialize(ColorUtil.hex(text)))
         );
     }
 

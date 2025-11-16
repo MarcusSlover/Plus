@@ -137,9 +137,9 @@ public class Color {
      */
     public @NotNull String legacy() {
         return ColorUtil
-                .legacySection()
-                .serialize(Component.text(" ").color(this.adventure()))
-                .trim();
+            .legacySection()
+            .serialize(Component.text(" ").color(this.adventure()))
+            .trim();
     }
 
     /**
@@ -152,9 +152,9 @@ public class Color {
      */
     public @NotNull Color darker(double value) {
         return new Color(
-                Math.max((int) (this.red() * value), 0),
-                Math.max((int) (this.green() * value), 0),
-                Math.max((int) (this.blue() * value), 0)
+            Math.max((int) (this.red() * value), 0),
+            Math.max((int) (this.green() * value), 0),
+            Math.max((int) (this.blue() * value), 0)
         );
     }
 
@@ -186,16 +186,16 @@ public class Color {
         }
 
         return new Color(
-                Math.min((int) (r / value), 255),
-                Math.min((int) (g / value), 255),
-                Math.min((int) (b / value), 255)
+            Math.min((int) (r / value), 255),
+            Math.min((int) (g / value), 255),
+            Math.min((int) (b / value), 255)
         );
     }
 
     @Override
     public String toString() {
         return "Color{" +
-                "rgb=" + this.rgb +
-                '}';
+            "rgb=" + this.rgb +
+            '}';
     }
 }

@@ -8,11 +8,11 @@ import org.jetbrains.annotations.NotNull;
 import java.util.function.Consumer;
 
 public record TabCompleteContext(
-        @NotNull Command commandData,
-        @NotNull CommandSender sender,
-        @NotNull String label,
-        @NotNull String alias,
-        @NotNull String[] args) implements ICommandContextHelper<TabCompleteContext> {
+    @NotNull Command commandData,
+    @NotNull CommandSender sender,
+    @NotNull String label,
+    @NotNull String alias,
+    @NotNull String[] args) implements ICommandContextHelper<TabCompleteContext> {
     @Override
     public @NotNull TabCompleteContext asPlayer(@NotNull Consumer<@NotNull Player> player) {
         if (this.sender instanceof Player p) {

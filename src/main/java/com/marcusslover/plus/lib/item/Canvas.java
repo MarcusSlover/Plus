@@ -1,5 +1,7 @@
 package com.marcusslover.plus.lib.item;
 
+import com.marcusslover.plus.lib.item.Canvas.BasicPopulator.Populator.PopulatorContext;
+import com.marcusslover.plus.lib.item.Canvas.BasicPopulator.ViewStrategy.ViewStrategyContext;
 import com.marcusslover.plus.lib.text.Text;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -54,7 +56,7 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
 
     @Getter(AccessLevel.PACKAGE)
     @Setter(AccessLevel.PRIVATE)
-    private LinkedList<@NotNull PopulatorContext<?>> populatorContext = new LinkedList<>();
+    private LinkedList<@NotNull BasicPopulator<?>> basicPopulator = new LinkedList<>();
 
     @Getter(AccessLevel.PACKAGE)
     @Setter(AccessLevel.PRIVATE)
@@ -207,9 +209,9 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
      * @return the canvas
      */
     @SuppressWarnings("unchecked")
-    public <T> @NotNull PopulatorContext<T> populate(@NotNull List<T> elements) {
-        PopulatorContext<T> newContext = new PopulatorContext<>(this, elements);
-        this.populatorContext.add(newContext);
+    public <T> @NotNull BasicPopulator<T> populate(@NotNull List<T> elements) {
+        BasicPopulator<T> newContext = new BasicPopulator<>(this, elements);
+        this.basicPopulator.add(newContext);
         return newContext;
     }
 
@@ -219,8 +221,8 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
      * @return the canvas
      * @throws NoSuchElementException if there is no populator context
      */
-    public @NotNull Canvas removeLastPopulatorContext() throws NoSuchElementException {
-        this.populatorContext.removeLast();
+    public @NotNull Canvas removeLastPopulator() throws NoSuchElementException {
+        this.basicPopulator.removeLast();
         return this;
     }
 
@@ -230,8 +232,8 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
      * @return the canvas
      * @throws NoSuchElementException if there is no populator context
      */
-    public @NotNull Canvas removeFirstPopulatorContext() throws NoSuchElementException {
-        this.populatorContext.removeFirst();
+    public @NotNull Canvas removeFirstPopulator() throws NoSuchElementException {
+        this.basicPopulator.removeFirst();
         return this;
     }
 
@@ -240,8 +242,8 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
      *
      * @return the list of all populator contexts
      */
-    public @NotNull List<@NotNull PopulatorContext<?>> populatorContexts() {
-        return this.populatorContext;
+    public @NotNull List<@NotNull BasicPopulator<?>> populatorList() {
+        return this.basicPopulator;
     }
 
     @Override
@@ -264,7 +266,7 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
         this.genericClick = null;
         this.selfInventory = null;
         this.closeInventory = null;
-        this.populatorContext.clear(); // clear the populator context
+        this.basicPopulator.clear(); // clear the populator context
         this.dynamicSuppliers.clear(); // clear the dynamic suppliers
     }
 
@@ -306,10 +308,18 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
         /**
          * Called when a target clicks on the button.
          *
-         * @param target the target
-         * @param event  the event
+         * @param ctx the context of the click
          */
-        void onClick(@NotNull Player target, @NotNull Item clicked, @NotNull InventoryClickEvent event, @NotNull Canvas it);
+        void onClick(@NotNull ButtonClickContext ctx);
+
+        @Data(staticConstructor = "of")
+        @Accessors(fluent = true, chain = true)
+        class ButtonClickContext {
+            private final @NotNull Player player;
+            private final @NotNull Item clickedItem;
+            private final @NotNull InventoryClickEvent event;
+            private final @NotNull Canvas canvas;
+        }
     }
 
     /**
@@ -333,7 +343,15 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
      */
     @FunctionalInterface
     public interface CloseInventory {
-        void onClose(@NotNull Player target, @NotNull InventoryCloseEvent event, @NotNull Canvas it);
+        void onClose(@NotNull CloseInventoryContext ctx);
+
+        @Data(staticConstructor = "of")
+        @Accessors(fluent = true, chain = true)
+        class CloseInventoryContext {
+            private final @NotNull Player player;
+            private final @NotNull InventoryCloseEvent event;
+            private final @NotNull Canvas canvas;
+        }
     }
 
     /**
@@ -349,10 +367,16 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
         /**
          * Decorates the inventory.
          *
-         * @param canvas    The canvas associated with the inventory.
-         * @param inventory The inventory to decorate.
+         * @param ctx the context of the decoration
          */
-        void handle(@NotNull Canvas canvas, @NotNull Inventory inventory);
+        void handle(@NotNull ItemDecoratorContext ctx);
+
+        @Data(staticConstructor = "of")
+        @Accessors(fluent = true, chain = true)
+        class ItemDecoratorContext {
+            private final @NotNull Canvas canvas;
+            private final @NotNull Inventory inventory;
+        }
     }
 
     /**
@@ -369,14 +393,14 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
     }
 
     /**
-     * Represents the context of the population.
+     * A basic populator implementation.
      * It holds the elements and the canvas.
      * It also holds the view strategy.
      *
      * @param <T> the type of the elements
      */
     @Data
-    public static class PopulatorContext<T> {
+    public static class BasicPopulator<T> {
         private final @NotNull Canvas canvas;
         private final @NotNull List<T> elements;
         private @Nullable ViewStrategy viewStrategy = null;
@@ -393,7 +417,7 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
          * @param defaultViewStrategy the view strategy
          * @return the populator context
          */
-        public @NotNull PopulatorContext<T> viewStrategy(@Nullable DefaultViewStrategy defaultViewStrategy) {
+        public @NotNull Canvas.BasicPopulator<T> viewStrategy(@Nullable DefaultViewStrategy defaultViewStrategy) {
             if (defaultViewStrategy == null) {
                 this.viewStrategy = null;
                 return this;
@@ -408,7 +432,7 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
          * @param viewStrategy A custom view strategy.
          * @return The populator context.
          */
-        public @NotNull PopulatorContext<T> viewStrategy(@Nullable ViewStrategy viewStrategy) {
+        public @NotNull Canvas.BasicPopulator<T> viewStrategy(@Nullable ViewStrategy viewStrategy) {
             this.viewStrategy = viewStrategy;
             return this;
         }
@@ -427,7 +451,7 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
          * @param populator the populator
          * @return the populator context
          */
-        public @NotNull PopulatorContext<T> content(@NotNull Player player, @NotNull Populator<T> populator) {
+        public @NotNull Canvas.BasicPopulator<T> content(@NotNull Player player, @NotNull Populator<T> populator) {
             this.populator = populator;
 
             int counter = 0;
@@ -436,28 +460,29 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
             // ig one way of getting the elements per page
             if (this.viewStrategy != null) {
                 // it's kinda hacky, but it works
-                elementsPerPage = this.viewStrategy.handle(0, this.canvas, this.canvas.hackyButton());
+                ViewStrategyContext ctx = ViewStrategyContext.of(0, this.canvas, this.canvas.hackyButton());
+                elementsPerPage = this.viewStrategy.handle(ctx);
             }
             // max possible page
             int maxPage = (int) Math.ceil((double) this.elements.size() / elementsPerPage) - 1;
 
             // page manipulation
             if (this.pageForwards != null && this.elements.size() > elementsPerPage && page < maxPage) {
-                this.canvas.button(this.pageForwards, (target, clicked, event, canvas) -> {
-                    UUID uniqueId = target.getUniqueId();
+                this.canvas.button(this.pageForwards, (ctx) -> {
+                    UUID uniqueId = ctx.player.getUniqueId();
                     int _page = this.canvas.pages.getOrDefault(uniqueId, 0);
                     this.canvas.pages.put(uniqueId, _page + 1);
                     Menu menu = this.canvas.assosiatedMenu();
                     menu.debug("Page: " + _page);
                     MenuManager manager = menu.manager();
                     if (manager != null) { // should never be null
-                        manager.internallyOpen(target, menu, false, canvas.menuUpdateContext);
+                        manager.internallyOpen(ctx.player, menu, false, canvas.menuUpdateContext);
                     }
                 }).handleException(Throwable::printStackTrace);
             }
             if (this.pageBackwards != null && page > 0) {
-                this.canvas.button(this.pageBackwards, (target, clicked, event, canvas) -> {
-                    UUID uniqueId = target.getUniqueId();
+                this.canvas.button(this.pageBackwards, (ctx) -> {
+                    UUID uniqueId = ctx.player.getUniqueId();
                     int _page = this.canvas.pages.getOrDefault(uniqueId, 0);
                     if (_page > 0) {
                         this.canvas.pages.put(uniqueId, _page - 1);
@@ -466,7 +491,7 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
                     menu.debug("Page: " + _page);
                     MenuManager manager = menu.manager();
                     if (manager != null) { // should never be null
-                        manager.internallyOpen(target, menu, false, canvas.menuUpdateContext);
+                        manager.internallyOpen(ctx.player, menu, false, canvas.menuUpdateContext);
                     }
                 }).handleException(Throwable::printStackTrace);
             }
@@ -485,11 +510,13 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
 
                 if (this.viewStrategy != null) {
                     // modifying the button based on the view strategy
-                    this.viewStrategy.handle(counter, this.canvas, button);
+                    ViewStrategyContext ctx = ViewStrategyContext.of(counter, this.canvas, button);
+                    this.viewStrategy.handle(ctx);
                 }
 
                 // populating the element
-                populator.populate(element, this.canvas, button);
+                PopulatorContext<T> ctx = PopulatorContext.of(element, this.canvas, button);
+                populator.populate(ctx);
                 counter++;
             }
             return this;
@@ -513,18 +540,18 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
             /**
              * Fills all first possible slots on the canvas.
              */
-            FULL((counter, canvas, button) -> {
-                button.slot(counter);
-                return canvas.rows * 9;
+            FULL((ctx) -> {
+                ctx.button.slot(ctx.counter);
+                return ctx.canvas.rows * 9;
             }),
 
             /**
              * Fills all first possible middle slots on the canvas.
              */
-            MIDDLE((counter, canvas, button) -> {
-                List<Integer> middleSlots = DefaultViewStrategy.middleSlots(canvas.rows());
-                if (middleSlots.size() > counter) {
-                    button.slot(middleSlots.get(counter));
+            MIDDLE((ctx) -> {
+                List<Integer> middleSlots = DefaultViewStrategy.middleSlots(ctx.canvas.rows());
+                if (middleSlots.size() > ctx.counter) {
+                    ctx.button.slot(middleSlots.get(ctx.counter));
                 }
                 return middleSlots.size();
             }),
@@ -533,10 +560,10 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
              * Fills all slots on the canvas, except the edges on the sides.
              * Note that this strategy DOES fill the upper and lower edges.
              */
-            AVOID_SIDE_EDGES((counter, canvas, button) -> {
-                List<Integer> middleSlots = DefaultViewStrategy.avoidEdges(canvas.rows());
-                if (middleSlots.size() > counter) {
-                    button.slot(middleSlots.get(counter));
+            AVOID_SIDE_EDGES((ctx) -> {
+                List<Integer> middleSlots = DefaultViewStrategy.avoidEdges(ctx.canvas.rows());
+                if (middleSlots.size() > ctx.counter) {
+                    ctx.button.slot(middleSlots.get(ctx.counter));
                 }
                 return middleSlots.size();
             });
@@ -598,11 +625,17 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
             /**
              * Populates the element.
              *
-             * @param element the element to populate
-             * @param canvas  the canvas
-             * @param button  the button associated with the element on the canvas
+             * @param ctx the context of the population
              */
-            void populate(@NotNull T element, @NotNull Canvas canvas, @NotNull Button button);
+            void populate(@NotNull PopulatorContext<T> ctx);
+
+            @Data(staticConstructor = "of")
+            @Accessors(fluent = true, chain = true)
+            class PopulatorContext<T> {
+                private final @NotNull T element;
+                private final @NotNull Canvas canvas;
+                private final @NotNull Button button;
+            }
         }
 
         /**
@@ -641,7 +674,7 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
              */
             static ViewStrategy parse(String[] rows) {
                 // Define a ViewStrategy using a lambda expression
-                return (counter, canvas, button) -> {
+                return (ctx) -> {
                     int elementsPerPage = 0;
                     int[] slots = new int[0];
 
@@ -670,8 +703,8 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
                     }
 
                     // Set the button slot based on the counter
-                    if (slots.length > counter) {
-                        button.slot(slots[counter]);
+                    if (slots.length > ctx.counter) {
+                        ctx.button.slot(slots[ctx.counter]);
                     }
 
                     // Return the total number of elements per page
@@ -682,12 +715,18 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
             /**
              * Allows you to modify the button depending on the given context.
              *
-             * @param counter the counter
-             * @param canvas  the canvas
-             * @param button  the button to modify if needed
+             * @param ctx the context of the view strategy
              * @return elements per page
              */
-            int handle(int counter, @NotNull Canvas canvas, @NotNull Button button);
+            int handle(@NotNull ViewStrategyContext ctx);
+
+            @Data(staticConstructor = "of")
+            @Accessors(fluent = true, chain = true)
+            class ViewStrategyContext {
+                private final int counter;
+                private final @NotNull Canvas canvas;
+                private final @NotNull Button button;
+            }
         }
     }
 
@@ -721,11 +760,11 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
         private final @NotNull Item filler; // the filler item
 
         @Override
-        public void handle(@NotNull Canvas canvas, @NotNull Inventory inventory) {
+        public void handle(@NotNull ItemDecoratorContext ctx) {
             ItemStack itemStack = this.filler.get();
 
-            for (int i = 0; i < inventory.getSize(); i++) {
-                inventory.setItem(i, itemStack);
+            for (int i = 0; i < ctx.inventory().getSize(); i++) {
+                ctx.inventory().setItem(i, itemStack);
             }
         }
     }
@@ -740,17 +779,17 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
         private final @NotNull Item filler; // the filler item
 
         @Override
-        public void handle(@NotNull Canvas canvas, @NotNull Inventory inventory) {
+        public void handle(@NotNull ItemDecoratorContext ctx) {
             ItemStack itemStack = this.filler.get();
 
-            for (int i = 0; i < inventory.getSize(); i++) {
-                if (i < 9 || i > inventory.getSize() - 9) {
+            for (int i = 0; i < ctx.inventory().getSize(); i++) {
+                if (i < 9 || i > ctx.inventory().getSize() - 9) {
                     continue;
                 }
                 if (i % 9 == 0 || i % 9 == 8) {
                     continue;
                 }
-                inventory.setItem(i, itemStack);
+                ctx.inventory().setItem(i, itemStack);
             }
         }
     }
@@ -765,16 +804,16 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
         private final @NotNull Item filler; // the filler item
 
         @Override
-        public void handle(@NotNull Canvas canvas, @NotNull Inventory inventory) {
+        public void handle(@NotNull ItemDecoratorContext ctx) {
             ItemStack itemStack = this.filler.get();
 
-            for (int i = 0; i < inventory.getSize(); i++) {
-                if (i < 9 || i > inventory.getSize() - 9) {
-                    inventory.setItem(i, itemStack);
+            for (int i = 0; i < ctx.inventory().getSize(); i++) {
+                if (i < 9 || i > ctx.inventory().getSize() - 9) {
+                    ctx.inventory().setItem(i, itemStack);
                     continue;
                 }
                 if (i % 9 == 0 || i % 9 == 8) {
-                    inventory.setItem(i, itemStack);
+                    ctx.inventory().setItem(i, itemStack);
                 }
             }
         }

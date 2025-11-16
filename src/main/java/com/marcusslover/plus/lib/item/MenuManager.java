@@ -1,7 +1,11 @@
 package com.marcusslover.plus.lib.item;
 
 import com.marcusslover.plus.lib.item.Button.DetectableArea;
+import com.marcusslover.plus.lib.item.Canvas.ButtonClick.ButtonClickContext;
+import com.marcusslover.plus.lib.item.Canvas.ClickContext;
+import com.marcusslover.plus.lib.item.Canvas.CloseInventory.CloseInventoryContext;
 import com.marcusslover.plus.lib.item.Canvas.ItemDecorator;
+import com.marcusslover.plus.lib.item.Canvas.ItemDecorator.ItemDecoratorContext;
 import com.marcusslover.plus.lib.item.event.PlayerMenuOpenEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -20,6 +24,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+@SuppressWarnings({"UnusedReturnValue"})
 public final class MenuManager implements Listener {
     private final @NotNull Plugin plugin;
     private final @NotNull List<@NotNull Menu> menus = new LinkedList<>();
@@ -56,17 +61,18 @@ public final class MenuManager implements Listener {
         if (canvas.assosiatedInventory() == null) return;
 
         // handle the close event action
-        Canvas.ClickContext closeInventory = canvas.closeInventory();
+        ClickContext closeInventory = canvas.closeInventory();
         if (closeInventory != null) {
             Canvas.CloseInventory function = closeInventory.closeInventory();
             if (function != null) {
                 try {
-                    function.onClose(player, event, canvas);
+                    CloseInventoryContext ctx = CloseInventoryContext.of(player, event, canvas);
+                    function.onClose(ctx);
                 } catch (Throwable e) {
                     if (closeInventory.throwableConsumer() != null) {
                         closeInventory.throwableConsumer().accept(e);
                     } else {
-                        Bukkit.getLogger().warning(e.getMessage());
+                        plugin.getLogger().warning(e.getMessage());
                     }
                 }
             }
@@ -99,70 +105,64 @@ public final class MenuManager implements Listener {
         // handle the generic click context (global)
         if (this.genericClick != null) {
             try {
-                this.genericClick.onClick((Player) event.getWhoClicked(), item, event, canvas);
+                ButtonClickContext ctx = ButtonClickContext.of((Player) event.getWhoClicked(), item, event, canvas);
+                this.genericClick.onClick(ctx);
             } catch (Throwable e) {
-                Bukkit.getLogger().warning(e.getMessage());
+                plugin.getLogger().warning(e.getMessage());
             }
         }
 
-        Canvas.ClickContext genericClick = canvas.genericClick();
-        if (genericClick != null) {
-            Canvas.ButtonClick buttonClick = genericClick.click();
-            if (buttonClick != null) {
-                try {
-                    buttonClick.onClick((Player) event.getWhoClicked(), item, event, canvas);
-                } catch (Throwable e) {
-                    if (genericClick.throwableConsumer() != null) {
-                        genericClick.throwableConsumer().accept(e);
-                    } else {
-                        Bukkit.getLogger().warning(e.getMessage());
-                    }
-                }
-            }
-        }
+        ClickContext genericClick = canvas.genericClick();
+        handleOnClick(event, canvas, item, genericClick);
 
         if (slot > size) {
-            Canvas.ClickContext selfInventory = canvas.selfInventory();
-            if (selfInventory != null) {
-                Canvas.ButtonClick buttonClick = selfInventory.click();
-                if (buttonClick != null) {
-                    try {
-                        buttonClick.onClick((Player) event.getWhoClicked(), item, event, canvas);
-                    } catch (Throwable e) {
-                        if (selfInventory.throwableConsumer() != null) {
-                            selfInventory.throwableConsumer().accept(e);
-                        } else {
-                            Bukkit.getLogger().warning(e.getMessage());
-                        }
-                    }
-                }
-            }
+            ClickContext selfInventory = canvas.selfInventory();
+            handleOnClick(event, canvas, item, selfInventory);
             return;
         }
 
         canvas.buttons().stream()
-                .filter(button -> button.within(slot))
-                .findFirst()
-                .ifPresent(button -> {
-                    Player player = (Player) event.getWhoClicked();
-                    Canvas.ClickContext context = button.clickContext();
-                    if (context == null) {
-                        return;
+            .filter(button -> button.within(slot))
+            .findFirst()
+            .ifPresent(button -> {
+                Player player = (Player) event.getWhoClicked();
+                ClickContext context = button.clickContext();
+                if (context == null) {
+                    return;
+                }
+                Canvas.ButtonClick click = context.click();
+                if (click == null) {
+                    return;
+                }
+                try {
+                    ButtonClickContext ctx = ButtonClickContext.of(player, item, event, canvas);
+                    click.onClick(ctx);
+                } catch (Throwable e) {
+                    if (context.throwableConsumer() != null) {
+                        context.throwableConsumer().accept(e);
+                    } else {
+                        plugin.getLogger().warning(e.getMessage());
                     }
-                    Canvas.ButtonClick click = context.click();
-                    if (click == null) {
-                        return;
+                }
+            });
+    }
+
+    private void handleOnClick(InventoryClickEvent event, Canvas canvas, Item item, ClickContext genericClick) {
+        if (genericClick != null) {
+            Canvas.ButtonClick buttonClick = genericClick.click();
+            if (buttonClick != null) {
+                try {
+                    ButtonClickContext ctx = ButtonClickContext.of((Player) event.getWhoClicked(), item, event, canvas);
+                    buttonClick.onClick(ctx);
+                } catch (Throwable e) {
+                    if (genericClick.throwableConsumer() != null) {
+                        genericClick.throwableConsumer().accept(e);
+                    } else {
+                        plugin.getLogger().warning(e.getMessage());
                     }
-                    try {
-                        click.onClick(player, item, event, canvas);
-                    } catch (Throwable e) {
-                        if (context.throwableConsumer() != null) {
-                            context.throwableConsumer().accept(e);
-                        } else {
-                            Bukkit.getLogger().warning(e.getMessage());
-                        }
-                    }
-                });
+                }
+            }
+        }
     }
 
     /**
@@ -228,9 +228,9 @@ public final class MenuManager implements Listener {
      */
     public <T extends Menu> void open(@NotNull Player player, @NotNull Class<T> clazz) {
         this.menus.stream()
-                .filter(menu -> menu.getClass().equals(clazz))
-                .findFirst()
-                .ifPresent(menu -> this.internallyOpen(player, menu));
+            .filter(menu -> menu.getClass().equals(clazz))
+            .findFirst()
+            .ifPresent(menu -> this.internallyOpen(player, menu));
     }
 
     /**
@@ -272,7 +272,9 @@ public final class MenuManager implements Listener {
             try {
                 menu.open(newCanvas, player); // fill the canvas
             } catch (Exception e) {
+                //noinspection CallToPrintStackTrace
                 e.printStackTrace();
+                plugin.getLogger().warning(e.getMessage());
             }
             // craft inventory
             Inventory inventory = newCanvas.craftInventory();
@@ -289,21 +291,24 @@ public final class MenuManager implements Listener {
             // remove all populated buttons
             canvas.buttons().removeIf(Button::populated);
 
-            canvas.populatorContext().forEach(populatorContext -> {
-                if (populatorContext != null) {
-                    Canvas.PopulatorContext.Populator<?> populator = populatorContext.populator();
+            canvas.basicPopulator().forEach(basicPopulator -> {
+                //noinspection ConstantValue
+                if (basicPopulator != null) {
+                    Canvas.BasicPopulator.Populator<?> populator = basicPopulator.populator();
                     if (populator != null) {
                         try {
-                            if (populatorContext.pageBackwards() != null) {
-                                canvas.buttons().remove(populatorContext.pageBackwards());
+                            if (basicPopulator.pageBackwards() != null) {
+                                canvas.buttons().remove(basicPopulator.pageBackwards());
                             }
-                            if (populatorContext.pageForwards() != null) {
-                                canvas.buttons().remove(populatorContext.pageForwards());
+                            if (basicPopulator.pageForwards() != null) {
+                                canvas.buttons().remove(basicPopulator.pageForwards());
                             }
                             // repopulate
-                            populatorContext.updateContent(player, populator);
+                            basicPopulator.updateContent(player, populator);
                         } catch (Throwable e) {
+                            //noinspection CallToPrintStackTrace
                             e.printStackTrace();
+                            plugin.getLogger().warning(e.getMessage());
                         }
                     }
                 }
@@ -311,7 +316,9 @@ public final class MenuManager implements Listener {
             try {
                 menu.update(canvas, player); // update event
             } catch (Exception e) {
+                //noinspection CallToPrintStackTrace
                 e.printStackTrace();
+                plugin.getLogger().warning(e.getMessage());
             }
             // update inventory
             this.updateInventory(player, topInventory, canvas);
@@ -330,7 +337,8 @@ public final class MenuManager implements Listener {
 
         // free items first aka (decorations)
         for (ItemDecorator decorator : canvas.decorators()) {
-            decorator.handle(canvas, inventory); // handle the decoration
+            ItemDecoratorContext ctx = ItemDecoratorContext.of(canvas, inventory);
+            decorator.handle(ctx); // handle the decoration
         }
 
         // then buttons

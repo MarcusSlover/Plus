@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.key.Key;
+import net.kyori.adventure.key.KeyPattern;
 import net.kyori.adventure.sound.Sound;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
@@ -24,11 +25,11 @@ public class Note implements ISendable<Note> {
 
     public static @NotNull Note of(@NotNull org.bukkit.Sound sound, long seed) {
         var builder = Sound.sound()
-                .type(sound)
-                .source(Sound.Source.MASTER)
-                .volume(1F)
-                .pitch(1F)
-                .seed(seed);
+            .type(sound)
+            .source(Sound.Source.MASTER)
+            .volume(1F)
+            .pitch(1F)
+            .seed(seed);
         return new Note(builder.build());
     }
 
@@ -38,11 +39,11 @@ public class Note implements ISendable<Note> {
 
     public static @NotNull Note of(@NotNull org.bukkit.Sound sound, float volume, float pitch, long seed) {
         var builder = Sound.sound()
-                .type(sound)
-                .source(Sound.Source.MASTER)
-                .volume(volume)
-                .pitch(pitch)
-                .seed(seed);
+            .type(sound)
+            .source(Sound.Source.MASTER)
+            .volume(volume)
+            .pitch(pitch)
+            .seed(seed);
         return new Note(builder.build());
     }
 
@@ -52,11 +53,11 @@ public class Note implements ISendable<Note> {
 
     public static @NotNull Note of(@NotNull org.bukkit.Sound sound, float volume, float pitch, @NotNull Sound.Source source, long seed) {
         var builder = Sound.sound()
-                .type(sound)
-                .source(source)
-                .volume(volume)
-                .pitch(pitch)
-                .seed(seed);
+            .type(sound)
+            .source(source)
+            .volume(volume)
+            .pitch(pitch)
+            .seed(seed);
         return new Note(builder.build());
     }
 
@@ -64,45 +65,45 @@ public class Note implements ISendable<Note> {
         return new Note(sound);
     }
 
-    public static @NotNull Note of(@NotNull String sound) {
+    public static @NotNull Note of(@NotNull @KeyPattern String sound) {
         return new Note(Sound.sound(Key.key(sound), Sound.Source.MASTER, 1F, 1F));
     }
 
-    public static @NotNull Note of(@NotNull String sound, long seed) {
+    public static @NotNull Note of(@NotNull @KeyPattern String sound, long seed) {
         var builder = Sound.sound()
-                .type(Key.key(sound))
-                .source(Sound.Source.MASTER)
-                .volume(1F)
-                .pitch(1F)
-                .seed(seed);
+            .type(Key.key(sound))
+            .source(Sound.Source.MASTER)
+            .volume(1F)
+            .pitch(1F)
+            .seed(seed);
         return new Note(builder.build());
     }
 
-    public static @NotNull Note of(@NotNull String sound, float volume, float pitch) {
+    public static @NotNull Note of(@NotNull @KeyPattern String sound, float volume, float pitch) {
         return new Note(Sound.sound(Key.key(sound), Sound.Source.MASTER, volume, pitch));
     }
 
-    public static @NotNull Note of(@NotNull String sound, float volume, float pitch, long seed) {
+    public static @NotNull Note of(@NotNull @KeyPattern String sound, float volume, float pitch, long seed) {
         var builder = Sound.sound()
-                .type(Key.key(sound))
-                .source(Sound.Source.MASTER)
-                .volume(volume)
-                .pitch(pitch)
-                .seed(seed);
+            .type(Key.key(sound))
+            .source(Sound.Source.MASTER)
+            .volume(volume)
+            .pitch(pitch)
+            .seed(seed);
         return new Note(builder.build());
     }
 
-    public static @NotNull Note of(@NotNull String sound, float volume, float pitch, @NotNull Sound.Source source) {
+    public static @NotNull Note of(@NotNull @KeyPattern String sound, float volume, float pitch, @NotNull Sound.Source source) {
         return new Note(Sound.sound(Key.key(sound), source, volume, pitch));
     }
 
-    public static @NotNull Note of(@NotNull String sound, float volume, float pitch, @NotNull Sound.Source source, long seed) {
+    public static @NotNull Note of(@NotNull @KeyPattern String sound, float volume, float pitch, @NotNull Sound.Source source, long seed) {
         var builder = Sound.sound()
-                .type(Key.key(sound))
-                .source(source)
-                .volume(volume)
-                .pitch(pitch)
-                .seed(seed);
+            .type(Key.key(sound))
+            .source(source)
+            .volume(volume)
+            .pitch(pitch)
+            .seed(seed);
         return new Note(builder.build());
     }
 
@@ -112,11 +113,11 @@ public class Note implements ISendable<Note> {
 
     public static @NotNull Note of(@NotNull Key key, long seed) {
         var builder = Sound.sound()
-                .type(key)
-                .source(Sound.Source.MASTER)
-                .volume(1F)
-                .pitch(1F)
-                .seed(seed);
+            .type(key)
+            .source(Sound.Source.MASTER)
+            .volume(1F)
+            .pitch(1F)
+            .seed(seed);
         return new Note(builder.build());
     }
 
@@ -126,11 +127,11 @@ public class Note implements ISendable<Note> {
 
     public static @NotNull Note of(@NotNull Key key, float volume, float pitch, long seed) {
         var builder = Sound.sound()
-                .type(key)
-                .source(Sound.Source.MASTER)
-                .volume(volume)
-                .pitch(pitch)
-                .seed(seed);
+            .type(key)
+            .source(Sound.Source.MASTER)
+            .volume(volume)
+            .pitch(pitch)
+            .seed(seed);
         return new Note(builder.build());
     }
 
@@ -140,11 +141,11 @@ public class Note implements ISendable<Note> {
 
     public static @NotNull Note of(@NotNull Key key, float volume, float pitch, @NotNull Sound.Source source, long seed) {
         var builder = Sound.sound()
-                .type(key)
-                .source(source)
-                .volume(volume)
-                .pitch(pitch)
-                .seed(seed);
+            .type(key)
+            .source(source)
+            .volume(volume)
+            .pitch(pitch)
+            .seed(seed);
         return new Note(builder.build());
     }
 

@@ -62,6 +62,7 @@ public class ContainerManager {
 
             AbstractContainer<?> container = this.containerMap.get(parent);
             container.setParentFolder(containerFolder);
+            container.setPlugin(plugin);
 
             /*Extra data settings*/
             InitialLoading initialLoading = this.getInitialLoadingAnnotation(container);
@@ -79,6 +80,7 @@ public class ContainerManager {
                     singleContainer.loadAllData();
                 }
             } catch (Exception e) {
+                //noinspection CallToPrintStackTrace
                 e.printStackTrace();
             }
         }
@@ -104,12 +106,14 @@ public class ContainerManager {
                 try { // Safe saving.
                     singleContainer.saveData();
                 } catch (Exception e) {
+                    //noinspection CallToPrintStackTrace
                     e.printStackTrace();
                 }
             } else if (container instanceof MapContainer<?, ?> mapContainer) {
                 try { // Safe saving.
                     mapContainer.saveData(); // Saves all the data.
                 } catch (Exception e) {
+                    //noinspection CallToPrintStackTrace
                     e.printStackTrace();
                 }
             }
