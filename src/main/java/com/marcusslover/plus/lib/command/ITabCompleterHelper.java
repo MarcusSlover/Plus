@@ -17,14 +17,14 @@ public interface ITabCompleterHelper {
      *
      * @param arg         The argument.
      * @param subCommands The sub commands.
-     * @return The tab complete.
+     * @return The tab completes.
      */
     default List<String> tabComplete(String arg, List<String> subCommands) {
         return subCommands.stream().filter(x -> x.toLowerCase().startsWith(arg.toLowerCase())).toList();
     }
 
     /**
-     * Gets list of all player names.
+     * Gets a list of all player names.
      *
      * @return The list of all player names.
      */

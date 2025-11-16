@@ -36,14 +36,14 @@ public record CommandContext(@NotNull Command commandData,
     /**
      * Creates a child context.
      *
-     * @param consumedArguments The amount of consumed arguments
+     * @param consumedArguments The number of consumed arguments
      * @return A child context with this context as the parent, the last consumed argument as the label,
      * and all unconsumed arguments as args.
      * Created by tecc
      */
     public @NotNull CommandContext child(int consumedArguments) {
         List<String> originalArgs = List.of(this.args());
-        if (originalArgs.size() < 1) {
+        if (originalArgs.isEmpty()) {
             throw new IndexOutOfBoundsException("At least one argument must be available to make a child context");
         }
 

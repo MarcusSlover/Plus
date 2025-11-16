@@ -307,6 +307,7 @@ public class Item extends Taggable<Item, ItemMeta> {
      * @param material the material type of this item
      * @return this item
      */
+    @Deprecated
     public @NotNull Item type(@NotNull Material material) {
         this.itemStack.setType(material);
         return this;
@@ -517,22 +518,6 @@ public class Item extends Taggable<Item, ItemMeta> {
     public @NotNull Item glow(boolean glow) {
         this.meta(meta -> meta.setEnchantmentGlintOverride(glow));
         return this;
-        //region Old implementation
-        /*if (glow) {
-            if (this.itemStack.getType().equals(Material.BOW)) {
-                meta(it -> {
-                    it.setEnchantmentGlintOverride(glow);
-                });
-                //enchant(Enchantment.DIG_SPEED, 1);
-            } else {
-                //enchant(Enchantment.ARROW_INFINITE, 1);
-            }
-            return addItemFlag(ItemFlag.HIDE_ENCHANTS);
-        } else {
-            clearEnchants();
-            return removeItemFlag(ItemFlag.HIDE_ENCHANTS);
-        }*/
-        //endregion
     }
 
     /**
@@ -617,7 +602,7 @@ public class Item extends Taggable<Item, ItemMeta> {
     /**
      * Change the color of this item.
      *
-     * @param hex The hex color code e.g. #FF0000.
+     * @param hex The hex color code e.g., #FF0000.
      * @return This item.
      * @see #color(Color)
      */
@@ -649,16 +634,16 @@ public class Item extends Taggable<Item, ItemMeta> {
      */
     public @NotNull Item color(@Nullable Color color) {
         return this.meta(itemMeta -> {
-            if (itemMeta instanceof PotionMeta meta) {
-                meta.setColor(color);
-                return;
-            }
-            if (itemMeta instanceof MapMeta meta) {
-                meta.setColor(color);
-                return;
-            }
-            if (itemMeta instanceof LeatherArmorMeta meta) {
-                meta.setColor(color);
+            switch (itemMeta) {
+                case PotionMeta meta -> {
+                    meta.setColor(color);
+                }
+                case MapMeta meta -> {
+                    meta.setColor(color);
+                }
+                case LeatherArmorMeta meta -> meta.setColor(color);
+                default -> {
+                }
             }
         });
     }
@@ -692,7 +677,7 @@ public class Item extends Taggable<Item, ItemMeta> {
     }
 
     /**
-     * Hacky fix for https://github.com/PaperMC/Paper/issues/10693
+     * Hacky fix for <a href="https://github.com/PaperMC/Paper/issues/10693">...</a>
      * Sets the item attributes to an empty multimap.
      *
      * @return this item
@@ -744,9 +729,10 @@ public class Item extends Taggable<Item, ItemMeta> {
         if (itemMeta == null) {
             return false;
         }
-        return itemMeta.hasCustomModelData();
+        return itemMeta.hasCustomModelDataComponent();
     }
 
+    @Deprecated
     public @Nullable Integer customModelData() {
         ItemMeta itemMeta = this.itemStack.getItemMeta();
         if (itemMeta == null) {
@@ -755,6 +741,7 @@ public class Item extends Taggable<Item, ItemMeta> {
         return itemMeta.getCustomModelData();
     }
 
+    @Deprecated
     public @NotNull Item customModelData(@Nullable Integer customModelData) {
         return this.meta(itemMeta -> itemMeta.setCustomModelData(customModelData));
     }

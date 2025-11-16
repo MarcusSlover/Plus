@@ -35,7 +35,7 @@ public class ColorGradient {
     /**
      * Iterates over the gradient.
      *
-     * @param amount   the amount of times to iterate
+     * @param amount   the number of times to iterate
      * @param consumer the consumer
      * @return the gradient
      */

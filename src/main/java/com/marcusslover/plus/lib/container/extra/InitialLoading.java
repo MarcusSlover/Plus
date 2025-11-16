@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 /**
  * Annotate your custom container class with this annotation to toggle
- * whether you want your container to load all the data upon the plugin enabling process.
+ * whether you want your container to load all the data upon the plugin-enabling process.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
