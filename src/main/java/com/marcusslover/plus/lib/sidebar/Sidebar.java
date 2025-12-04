@@ -208,6 +208,11 @@ public class Sidebar implements ISendable<Sidebar> {
         if (team == null) {
             return this;
         }
+        // Check if isn't anything to update
+        if (team.prefix().equals(prefix.comp()) && team.suffix().equals(suffix.comp())) {
+            return this;
+        }
+
         team.prefix(prefix.comp());
         team.suffix(suffix.comp());
 
