@@ -115,7 +115,7 @@ public final class MenuManager implements Listener {
         ClickContext genericClick = canvas.genericClick();
         handleOnClick(event, canvas, item, genericClick);
 
-        if (slot > size) {
+        if (slot >= size) {
             ClickContext selfInventory = canvas.selfInventory();
             handleOnClick(event, canvas, item, selfInventory);
             return;
