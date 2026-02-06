@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'com.marcusslover'
-version = '4.5-SNAPSHOT'
+version = '4.5.1-SNAPSHOT'
 
 ext {
     isRelease = !version.toString().endsWith("SNAPSHOT")
@@ -14,20 +14,19 @@ ext {
 repositories {
     mavenCentral()
     maven { url = 'https://repo.papermc.io/repository/maven-public/' }
-    maven { url = 'https://repo.dmulloy2.net/repository/public/' }
 }
 
 dependencies {
     compileOnly 'org.jetbrains:annotations:26.0.2-1'
-    compileOnly 'io.papermc.paper:paper-api:1.21.8-R0.1-SNAPSHOT'
-    compileOnly 'com.comphenix.protocol:ProtocolLib:5.3.0'
+    compileOnly 'io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT'
+    compileOnly 'net.dmulloy2:ProtocolLib:5.4.0'
 
     compileOnly 'org.projectlombok:lombok:1.18.42'
     annotationProcessor 'org.projectlombok:lombok:1.18.42'
 
     testImplementation 'org.junit.jupiter:junit-jupiter:6.0.0'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    testImplementation 'io.papermc.paper:paper-api:1.21.8-R0.1-SNAPSHOT'
+    testImplementation 'io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT'
 }
 
 java {

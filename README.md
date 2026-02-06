@@ -8,12 +8,12 @@
 
 # 💻 For Developers
 
-This library is designed to work specifically with PaperMC version 1.21.8.<br/>
+This library is designed to work specifically with PaperMC version 1.21.11.<br/>
 Running on Java 21. Use with other Minecraft versions at your own risk.
 
 Based on our testing, version 4.2.0 of Plus is the most compatible with older versions of Minecraft.
-If you are using a Minecraft version other than 1.21.3, we recommend using Plus version 4.5-SNAPSHOT.
-For Minecraft 1.21.8 or newer, use the latest version of Plus for optimal compatibility.
+If you are using a Minecraft version other than 1.21.11, we recommend using Plus version 4.5.1-SNAPSHOT.
+For Minecraft 1.21.11 or newer, use the latest version of Plus for optimal compatibility.
 
 ## 🐘 Gradle
 ### Groovy
@@ -23,7 +23,7 @@ repositories {
     maven { url = 'https://central.sonatype.com/repository/maven-snapshots/' }
 }
 dependencies {
-    implementation 'com.marcusslover:plus:4.5-SNAPSHOT'
+    implementation 'com.marcusslover:plus:4.5.1-SNAPSHOT'
 }
 ```
 ### Kotlin
@@ -33,7 +33,7 @@ repositories {
     maven("https://central.sonatype.com/repository/maven-snapshots/")
 }
 dependencies {
-    implementation("com.marcusslover:plus:4.5-SNAPSHOT")
+    implementation("com.marcusslover:plus:4.5.1-SNAPSHOT")
 }
 ```
 ## 🦢 Maven
@@ -45,6 +45,6 @@ dependencies {
 <dependency>
     <groupId>com.marcusslover</groupId>
     <artifactId>plus</artifactId>
-    <version>4.5-SNAPSHOT</version>
+    <version>4.5.1-SNAPSHOT</version>
 </dependency>
 ```

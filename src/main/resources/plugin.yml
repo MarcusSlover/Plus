@@ -1,7 +1,7 @@
 name: Plus
 main: com.marcusslover.plus.PlusPlugin
-version: 4.5-SNAPSHOT
+version: 4.5.1-SNAPSHOT
 description: "A set of tools used for programming Minecraft plugins."
 website: "https://github.com/MarcusSlover/Plus"
-api-version: 1.21.1
+api-version: 1.21.11
 author: MarcusSlover

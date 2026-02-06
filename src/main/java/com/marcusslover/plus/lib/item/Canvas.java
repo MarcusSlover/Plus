@@ -647,6 +647,131 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
         public interface ViewStrategy {
             /**
              * Parses an array of strings to create a {@link ViewStrategy} for rendering elements on a canvas.
+             *
+             * <p>The provided array of strings represents a grid layout, where each character indicates the
+             * presence or absence of an element at a specific position.</p>
+             *
+             * <ul>
+             *   <li>Use any letter (e.g. {@code 'x'}) to indicate the presence of an element.</li>
+             *   <li>Use {@code '-'} to indicate the absence of an element.</li>
+             *   <li>Grouping is supported: multiple identical letters may represent a single element. This is
+             *       useful for creating components larger than one slot (e.g., a button occupying 4 cells).</li>
+             * </ul>
+             *
+             * <p><b>Examples:</b></p>
+             *
+             * <p>Example 1: A simple layout with 10 individual slots (no grouping).</p>
+             * <pre>{@code
+             * String[] rows = {
+             *     "---------",
+             *     "--xxxxx--",
+             *     "--xxxxx--",
+             *     "---------",
+             *     "---------",
+             *     "---------"
+             * };
+             *
+             * ViewStrategy viewStrategy = ViewStrategy.parseLayout(false, rows);
+             * canvas.viewStrategy(viewStrategy);
+             * }</pre>
+             *
+             * <p>Example 2: A grouped layout with two buttons, each occupying four slots.</p>
+             * <pre>{@code
+             * String[] rows = {
+             *     "---------",
+             *     "--aa-bb--",
+             *     "--aa-bb--",
+             *     "---------",
+             *     "---------",
+             *     "---------"
+             * };
+             *
+             * ViewStrategy viewStrategy = ViewStrategy.parseLayout(true, rows);
+             * canvas.viewStrategy(viewStrategy);
+             * }</pre>
+             *
+             * @param groupLetters whether identical letters should be treated as grouped elements
+             *                     or as individual slots
+             * @param rows         an array of strings representing the grid layout
+             * @return a {@link ViewStrategy} defining the rendering behavior based on the parsed layout
+             * @throws IllegalArgumentException if any row does not have a length of exactly 9
+             */
+            static ViewStrategy parseLayout(boolean groupLetters, String... rows) {
+                // Precompute the button areas once
+                final List<Button.DetectableArea> areas = new ArrayList<>();
+
+                if (groupLetters) {
+                    // letter → bounding box
+                    Map<Character, Bounds> groups = new LinkedHashMap<>();
+
+                    // Iterate through each row in the grid
+                    for (int y = 0; y < rows.length; y++) {
+                        String row = rows[y];
+
+                        // Check if the length of the row is 9, throw an exception if not
+                        if (row.length() != 9) {
+                            throw new IllegalArgumentException("Row length must be 9");
+                        }
+
+                        // Iterate through each character in the row
+                        for (int x = 0; x < 9; x++) {
+                            char c = row.charAt(x);
+
+                            // Skip empty slots
+                            if (c == '-') {
+                                continue;
+                            }
+
+                            // Expand bounding box
+                            int finalX = x;
+                            int finalY = y;
+                            groups.computeIfAbsent(c, k -> new Bounds(finalX, finalY))
+                                .expand(x, y);
+                        }
+                    }
+
+                    // Convert bounding boxes into detectable areas
+                    for (Bounds b : groups.values()) {
+                        areas.add(
+                            Button.DetectableArea.of(
+                                new org.bukkit.util.Vector(b.minX, 0, b.minY),
+                                new org.bukkit.util.Vector(b.maxX, 0, b.maxY)
+                            )
+                        );
+                    }
+
+                } else {
+                    // Treat each non '-' character as an individual button slot
+                    for (int y = 0; y < rows.length; y++) {
+                        String row = rows[y];
+
+                        if (row.length() != 9) {
+                            throw new IllegalArgumentException("Row length must be 9");
+                        }
+
+                        for (int x = 0; x < 9; x++) {
+                            if (row.charAt(x) != '-') {
+                                areas.add(Button.DetectableArea.of(x, y));
+                            }
+                        }
+                    }
+                }
+
+                // Define a ViewStrategy using a lambda expression
+                return (ctx) -> {
+                    // Set the button area based on the counter
+                    if (ctx.counter < areas.size()) {
+                        ctx.button.detectableArea(areas.get(ctx.counter));
+                    }
+
+                    // Return the total number of elements per page
+                    return areas.size();
+                };
+            }
+
+            /**
+             * This method is deprecated and will be removed in future versions. Use {@link #parseLayout(boolean, String...)} instead.
+             * Parses an array of strings to create a {@link ViewStrategy} for rendering elements on a canvas.
              * <p>
              * The provided array of strings represents a grid, where each character in the strings
              * indicates the presence or absence of an element at a specific grid position.
@@ -672,6 +797,7 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
              * @return A {@link ViewStrategy} that defines the rendering behavior based on the parsed grid.
              * @throws IllegalArgumentException If the length of any row is not equal to 9.
              */
+            @Deprecated // Use parseLayout instead
             static ViewStrategy parse(String[] rows) {
                 // Define a ViewStrategy using a lambda expression
                 return (ctx) -> {
@@ -724,8 +850,27 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
             @Accessors(fluent = true, chain = true)
             class ViewStrategyContext {
                 private final int counter;
-                private final @NotNull Canvas canvas;
+                private final /*@NotNull*/ Canvas canvas;
                 private final @NotNull Button button;
+            }
+
+            /**
+             * A helper class to calculate bounds.
+             */
+            final class Bounds {
+                int minX, minY, maxX, maxY;
+
+                Bounds(int x, int y) {
+                    this.minX = this.maxX = x;
+                    this.minY = this.maxY = y;
+                }
+
+                void expand(int x, int y) {
+                    minX = Math.min(minX, x);
+                    minY = Math.min(minY, y);
+                    maxX = Math.max(maxX, x);
+                    maxY = Math.max(maxY, y);
+                }
             }
         }
     }
