@@ -13,6 +13,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
@@ -53,6 +54,7 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
     @Setter(AccessLevel.PACKAGE)
     private @Nullable Inventory assosiatedInventory = null;
     private @Nullable ClickContext genericClick = null, selfInventory = null, closeInventory = null;
+    private @Nullable DragContext genericDrag = null;
 
     @Getter(AccessLevel.PACKAGE)
     @Setter(AccessLevel.PRIVATE)
@@ -138,6 +140,18 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
     public @NotNull ClickContext genericClick(@Nullable GenericClick genericClick) {
         this.genericClick = new ClickContext(this, genericClick, null);
         return this.genericClick;
+    }
+
+    /**
+     * Set the generic drag action.
+     * This action is called when the player drags on the inventory.
+     *
+     * @param genericDrag the generic drag action
+     * @return the drag context associated with the generic drag action
+     */
+    public @NotNull DragContext genericDrag(@Nullable GenericDrag genericDrag) {
+        this.genericDrag = new DragContext(this, genericDrag);
+        return this.genericDrag;
     }
 
     /**
@@ -298,6 +312,35 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
             }
         }
         return () -> null;
+    }
+
+    /**
+     * A button drag. This is called when a player drags on the button.
+     */
+    @FunctionalInterface
+    public interface ButtonDrag {
+        /**
+         * Called when a player drags on the button.
+         *
+         * @param ctx the context of the drag
+         */
+        void onDrag(@NotNull ButtonDragContext ctx);
+
+        @Data(staticConstructor = "of")
+        @Accessors(fluent = true, chain = true)
+        class ButtonDragContext {
+            private final @NotNull Player player;
+            private final @NotNull InventoryDragEvent event;
+            private final @NotNull Canvas canvas;
+        }
+    }
+
+    /**
+     * A generic button drag. This is called when a player drags on the button.
+     */
+    @FunctionalInterface
+    public interface GenericDrag extends ButtonDrag {
+
     }
 
     /**
@@ -886,6 +929,25 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
         private @Nullable Consumer<Throwable> throwableConsumer;
 
         public @NotNull ClickContext handleException(@NotNull Consumer<Throwable> exception) {
+            this.throwableConsumer = exception;
+            return this;
+        }
+
+        public @NotNull Canvas end() {
+            return this.canvas;
+        }
+    }
+
+    /**
+     * A button drag context or some inventory related action.
+     */
+    @Data
+    public static class DragContext {
+        private final @NotNull Canvas canvas;
+        private final @Nullable ButtonDrag drag;
+        private @Nullable Consumer<Throwable> throwableConsumer;
+
+        public @NotNull DragContext handleException(@NotNull Consumer<Throwable> exception) {
             this.throwableConsumer = exception;
             return this;
         }

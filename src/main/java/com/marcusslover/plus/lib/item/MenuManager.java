@@ -2,8 +2,11 @@ package com.marcusslover.plus.lib.item;
 
 import com.marcusslover.plus.lib.item.Button.DetectableArea;
 import com.marcusslover.plus.lib.item.Canvas.ButtonClick.ButtonClickContext;
+import com.marcusslover.plus.lib.item.Canvas.ButtonDrag;
+import com.marcusslover.plus.lib.item.Canvas.ButtonDrag.ButtonDragContext;
 import com.marcusslover.plus.lib.item.Canvas.ClickContext;
 import com.marcusslover.plus.lib.item.Canvas.CloseInventory.CloseInventoryContext;
+import com.marcusslover.plus.lib.item.Canvas.DragContext;
 import com.marcusslover.plus.lib.item.Canvas.ItemDecorator;
 import com.marcusslover.plus.lib.item.Canvas.ItemDecorator.ItemDecoratorContext;
 import com.marcusslover.plus.lib.item.event.PlayerMenuOpenEvent;
@@ -14,6 +17,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.plugin.Plugin;
@@ -85,6 +89,39 @@ public final class MenuManager implements Listener {
             remove.clear(); // help the gc
         }
         menu.close(canvas, player); // call the close method so developers can handle it
+    }
+
+    @EventHandler
+    public void onDrag(InventoryDragEvent event) {
+        InventoryView view = event.getView();
+        Inventory inventory = view.getTopInventory();
+
+        if (!(inventory.getHolder() instanceof Canvas canvas)) {
+            return;
+        }
+
+        event.setCancelled(true);
+
+        DragContext genericDrag = canvas.genericDrag();
+        handleOnDrag(event, canvas, genericDrag);
+    }
+
+    private void handleOnDrag(InventoryDragEvent event, Canvas canvas, DragContext genericDrag) {
+        if (genericDrag != null) {
+            ButtonDrag buttonDrag = genericDrag.drag();
+            if (buttonDrag != null) {
+                try {
+                    ButtonDragContext ctx = ButtonDragContext.of((Player) event.getWhoClicked(), event, canvas);
+                    buttonDrag.onDrag(ctx);
+                } catch (Throwable e) {
+                    if (genericDrag.throwableConsumer() != null) {
+                        genericDrag.throwableConsumer().accept(e);
+                    } else {
+                        plugin.getLogger().warning(e.getMessage());
+                    }
+                }
+            }
+        }
     }
 
     @EventHandler
