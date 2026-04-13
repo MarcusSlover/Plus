@@ -40,8 +40,6 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
     @Getter(AccessLevel.PRIVATE)
     private final @NotNull Button hackyButton = Button.create(-1);
 
-    // pages of the canvas
-    private final @NotNull Map<UUID, Integer> pages = new HashMap<>();
     private @NotNull Integer rows; // 1-6 (using non-primitive to allow @NotNull for the constructor)
 
     @Getter(AccessLevel.PACKAGE)
@@ -273,7 +271,6 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
         for (Button button : this.buttons) button.clickContext(null);
         this.buttons.clear();
         this.decorators.clear();
-        this.pages.clear();
         this.title = null;
         this.menuUpdateContext = null;
         this.assosiatedInventory = null;
@@ -449,6 +446,7 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
         private @Nullable ViewStrategy viewStrategy = null;
 
         /*Page manipulation*/
+        private final @NotNull Map<UUID, Integer> pages = new HashMap<>();
         private @Nullable Button pageForwards = null;
         private @Nullable Button pageBackwards = null;
         private @Nullable Populator<T> populator = null; // internal
@@ -498,7 +496,7 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
             this.populator = populator;
 
             int counter = 0;
-            int page = this.canvas.pages.getOrDefault(player.getUniqueId(), 0);
+            int page = this.pages.getOrDefault(player.getUniqueId(), 0);
             int elementsPerPage = this.canvas.rows * 9;
             // ig one way of getting the elements per page
             if (this.viewStrategy != null) {
@@ -513,8 +511,8 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
             if (this.pageForwards != null && this.elements.size() > elementsPerPage && page < maxPage) {
                 this.canvas.button(this.pageForwards, (ctx) -> {
                     UUID uniqueId = ctx.player.getUniqueId();
-                    int _page = this.canvas.pages.getOrDefault(uniqueId, 0);
-                    this.canvas.pages.put(uniqueId, _page + 1);
+                    int _page = this.pages.getOrDefault(uniqueId, 0);
+                    this.pages.put(uniqueId, _page + 1);
                     Menu menu = this.canvas.assosiatedMenu();
                     menu.debug("Page: " + _page);
                     MenuManager manager = menu.manager();
@@ -526,9 +524,9 @@ public class Canvas implements InventoryHolder { // Inventory holder to keep tra
             if (this.pageBackwards != null && page > 0) {
                 this.canvas.button(this.pageBackwards, (ctx) -> {
                     UUID uniqueId = ctx.player.getUniqueId();
-                    int _page = this.canvas.pages.getOrDefault(uniqueId, 0);
+                    int _page = this.pages.getOrDefault(uniqueId, 0);
                     if (_page > 0) {
-                        this.canvas.pages.put(uniqueId, _page - 1);
+                        this.pages.put(uniqueId, _page - 1);
                     }
                     Menu menu = this.canvas.assosiatedMenu();
                     menu.debug("Page: " + _page);

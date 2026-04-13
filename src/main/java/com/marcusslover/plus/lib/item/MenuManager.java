@@ -13,11 +13,13 @@ import com.marcusslover.plus.lib.item.event.PlayerMenuOpenEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.plugin.Plugin;
@@ -49,6 +51,17 @@ public final class MenuManager implements Listener {
     @Deprecated
     public static @NotNull MenuManager createManager(@NotNull Plugin plugin) {
         return new MenuManager(plugin);
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onQuit(PlayerQuitEvent event) {
+        Player player = event.getPlayer();
+        this.menus.forEach(menu -> {
+            Canvas remove = menu.canvasMap().remove(player.getUniqueId());
+            if (remove != null) {
+                remove.clear();
+            }
+        });
     }
 
     @EventHandler
