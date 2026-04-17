@@ -9,6 +9,7 @@ import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.ShadowColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -142,6 +143,20 @@ public class Text implements ISendable<Text> {
 
     public @NotNull String legacy() {
         return Text.legacy(this.text);
+    }
+
+    /**
+     * Attempt to parse a shadow color from a #-prefixed hex string.
+     * This string must be in the format #RRGGBBAA
+     */
+    public @NotNull Text shadowColor(@NotNull String hexColor) {
+        //noinspection DataFlowIssue
+        return shadowColor(ShadowColor.fromHexString(hexColor));
+    }
+
+    public @NotNull Text shadowColor(@NotNull ShadowColor color) {
+        this.component = this.component.shadowColor(color);
+        return this;
     }
 
     /**
