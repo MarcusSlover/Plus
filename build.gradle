@@ -2,10 +2,12 @@ plugins {
     id 'java'
     id 'maven-publish'
     id 'com.gradleup.shadow' version '9.2.2'
+    id 'com.gradleup.nmcp'
+    id 'signing'
 }
 
 group = 'com.marcusslover'
-version = '4.5.1-SNAPSHOT'
+version = '4.5.1'
 
 ext {
     isRelease = !version.toString().endsWith("SNAPSHOT")
@@ -78,13 +80,18 @@ publishing {
                         url = "https://tecc.me"
                     }
                 }
+                scm {
+                    connection = 'scm:git:git://github.com/MarcusSlover/Plus.git'
+                    developerConnection = 'scm:git:ssh://github.com/MarcusSlover/Plus.git'
+                    url = 'https://github.com/MarcusSlover/Plus'
+                }
             }
         }
     }
 
     repositories {
         maven {
-            name = "centralPortal"
+            name = "centralPortalSnapshots"
             url = uri("https://central.sonatype.com/repository/maven-snapshots/")
 
             credentials {
@@ -92,5 +99,24 @@ publishing {
                 password = findProperty("portalPassword") ?: System.getenv("PORTAL_PASSWORD")
             }
         }
+    }
+}
+
+signing {
+    def signingKey = System.getenv("GPG_SIGNING_KEY")
+    def signingPassword = System.getenv("GPG_SIGNING_PASSWORD")
+
+    if (signingKey && signingPassword) {
+        useInMemoryPgpKeys(signingKey, signingPassword)
+        sign publishing.publications.mavenJava
+    } else if (project.ext.isRelease) {
+        logger.warn("GPG signing key not set - release artifacts will be unsigned.")
+    }
+}
+
+nmcp {
+    publishAllPublicationsToCentralPortal {
+        username.set(providers.gradleProperty("centralUsername").orElse(providers.environmentVariable("CENTRAL_USERNAME")))
+        password.set(providers.gradleProperty("centralPassword").orElse(providers.environmentVariable("CENTRAL_PASSWORD")))
     }
 }
